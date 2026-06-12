@@ -4881,6 +4881,17 @@ function readSavedUser(){
   }
 }
 
+function applyBlogAvatarPreview(avatar){
+  [blogMiniAvatar, blogProfileAvatar].forEach(el=>{
+    if(!el) return;
+    if(avatar){
+      el.style.setProperty('--blog-avatar-image', `url("${avatar}")`);
+    }else{
+      el.style.removeProperty('--blog-avatar-image');
+    }
+  });
+}
+
 function renderBlogHomeUser(userLike){
   const user = typeof userLike === 'object' && userLike ? userLike : readSavedUser();
   const profile = user && user.profile ? user.profile : {};
@@ -4904,14 +4915,7 @@ function renderBlogHomeUser(userLike){
   if(profileIntroInput) profileIntroInput.value = intro;
   if(profileTagsInput) profileTagsInput.value = tags.join(', ');
 
-  [blogMiniAvatar, blogProfileAvatar].forEach(el=>{
-    if(!el) return;
-    if(avatar){
-      el.style.setProperty('--blog-avatar-image', `url("${avatar}")`);
-    }else{
-      el.style.removeProperty('--blog-avatar-image');
-    }
-  });
+  applyBlogAvatarPreview(avatar);
 
   if(blogProfileTags){
     blogProfileTags.innerHTML = tags.map(tag=>`<span>${escapeHtml(tag)}</span>`).join('');
@@ -5134,7 +5138,7 @@ if(profileAvatarInput){
       const user = readSavedUser() || {};
       user.profile = { ...(user.profile || {}), avatar };
       sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
-      renderBlogHomeUser(user);
+      applyBlogAvatarPreview(avatar);
       showLoginToast('头像已预览，点击保存并同步后生效。', 'success', '头像已更新');
     }catch(_){
       showLoginToast('头像读取失败，请换一张图片试试。', 'error', '读取失败');
