@@ -3603,7 +3603,10 @@
     transform:translateY(16px) scale(.96);
     pointer-events:none;
     transition:opacity .28s, transform .28s;
+    overflow-y:auto;
+    scrollbar-width:none;
   }
+  .profile-editor::-webkit-scrollbar{display:none;}
   .profile-editor.open{
     opacity:1;
     transform:translateY(0) scale(1);
@@ -3701,9 +3704,141 @@
     resize:none;
   }
   .profile-editor textarea{min-height:82px;}
-  .profile-avatar-upload,
+  .account-security-box{
+    display:grid;
+    gap:11px;
+    padding:13px;
+    border-radius:18px;
+    background:linear-gradient(135deg, rgba(127,247,255,.1), rgba(255,143,199,.1));
+    border:1px solid rgba(255,255,255,.15);
+  }
+  .account-security-box > div:first-child{
+    display:grid;
+    gap:5px;
+  }
+  .account-security-box strong{
+    color:#fff;
+    font-size:13px;
+  }
+  .account-security-box span{
+    color:rgba(255,255,255,.58);
+    font-size:10px;
+    font-weight:800;
+    line-height:1.55;
+  }
+  .account-security-box button,
   .profile-save-btn{
     min-height:40px;
+  }
+  .account-security-box button{
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:999px;
+    color:#fff;
+    font-weight:900;
+    cursor:pointer;
+    background:linear-gradient(135deg, rgba(255,255,255,.16), rgba(124,92,255,.18));
+    transition:transform .2s, background .2s;
+  }
+  .account-security-box button:hover{
+    transform:translateY(-1px);
+    background:linear-gradient(135deg, rgba(255,255,255,.25), rgba(255,143,199,.2));
+  }
+  .account-edit-fields{
+    display:none;
+    gap:10px;
+  }
+  .account-edit-fields.unlocked{
+    display:grid;
+  }
+  .account-action-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+  }
+  #accountDeleteBtn{
+    background:linear-gradient(135deg, rgba(255,91,122,.34), rgba(255,143,199,.16));
+    border-color:rgba(255,129,151,.34);
+  }
+  .account-verify-modal{
+    position:fixed;
+    inset:0;
+    z-index:150;
+    display:grid;
+    place-items:center;
+    padding:22px;
+    background:rgba(8,10,26,.48);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .24s, visibility .24s;
+  }
+  .account-verify-modal.open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+  .account-verify-card{
+    position:relative;
+    width:min(360px, 92vw);
+    display:grid;
+    gap:13px;
+    padding:24px;
+    border-radius:28px;
+    color:#fff;
+    background:rgba(16,20,48,.88);
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 30px 90px rgba(0,0,0,.38);
+    transform:translateY(18px) scale(.96);
+    transition:transform .24s;
+  }
+  .account-verify-modal.open .account-verify-card{
+    transform:translateY(0) scale(1);
+  }
+  .account-verify-card h2{
+    margin:0;
+    font-size:22px;
+  }
+  .account-verify-card p{
+    margin:0;
+    color:rgba(255,255,255,.62);
+    font-size:12px;
+    line-height:1.7;
+    font-weight:750;
+  }
+  .account-verify-card label{
+    display:grid;
+    gap:7px;
+    color:rgba(255,255,255,.72);
+    font-size:11px;
+    font-weight:900;
+  }
+  .account-verify-card input{
+    border:none;
+    outline:none;
+    border-radius:15px;
+    padding:12px;
+    color:#fff;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.14);
+  }
+  .account-verify-card button{
+    min-height:42px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+    font-weight:950;
+    cursor:pointer;
+    background:linear-gradient(135deg, #7c5cff, #ff8fc7);
+  }
+  .account-verify-close{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:30px;
+    min-height:30px !important;
+    background:rgba(255,255,255,.1) !important;
   }
   .notice-carousel-card{
     min-height:315px;
@@ -4101,6 +4236,16 @@
     </form>
   </div>
 </div>
+<div class="account-verify-modal" id="accountVerifyModal" aria-hidden="true">
+  <div class="account-verify-card" role="dialog" aria-modal="true" aria-labelledby="accountVerifyTitle">
+    <button class="account-verify-close" id="accountVerifyCloseBtn" type="button" aria-label="关闭验证窗口">×</button>
+    <h2 id="accountVerifyTitle">验证当前账号</h2>
+    <p>请输入当前账号的用户名和密码，验证成功后才可以修改账号信息或注销账号。</p>
+    <label>当前用户名<input id="accountVerifyUsername" type="text" autocomplete="username" /></label>
+    <label>当前密码<input id="accountVerifyPassword" type="password" autocomplete="current-password" /></label>
+    <button id="accountVerifySubmitBtn" type="button">登录验证</button>
+  </div>
+</div>
 
 <!-- 主舞台 -->
 <div class="stage">
@@ -4283,6 +4428,22 @@
         <label>个人简介<textarea id="profileIntroInput" maxlength="500"></textarea></label>
         <label>身份标签<input id="profileTagsInput" type="text" placeholder="用逗号分隔，例如 AI, Python, 生活" /></label>
         <input id="profileAvatarInput" type="file" accept="image/*" hidden />
+        <section class="account-security-box">
+          <div>
+            <strong>账号安全</strong>
+            <span id="accountVerifyState">修改用户名、密码或注销前需要先验证当前密码。</span>
+          </div>
+          <button id="accountVerifyOpenBtn" type="button">验证身份</button>
+          <div class="account-edit-fields" id="accountEditFields" aria-hidden="true">
+            <label>新用户名<input id="accountUsernameInput" type="text" maxlength="20" autocomplete="username" /></label>
+            <label>新密码<input id="accountPasswordInput" type="password" autocomplete="new-password" placeholder="不修改可留空" /></label>
+            <label>确认新密码<input id="accountPasswordConfirmInput" type="password" autocomplete="new-password" placeholder="再次输入新密码" /></label>
+            <div class="account-action-row">
+              <button id="accountSaveBtn" type="button">保存账号修改</button>
+              <button id="accountDeleteBtn" type="button">注销账号</button>
+            </div>
+          </div>
+        </section>
         <button class="profile-save-btn" id="profileSaveBtn" type="button">保存并同步</button>
       </div>
     </aside>
@@ -4773,6 +4934,19 @@ const profileAvatarUpload = document.getElementById('profileAvatarUpload');
 const profileAvatarInput = document.getElementById('profileAvatarInput');
 const profileEditorAvatarPreview = document.getElementById('profileEditorAvatarPreview');
 const profileSaveBtn = document.getElementById('profileSaveBtn');
+const accountVerifyState = document.getElementById('accountVerifyState');
+const accountVerifyOpenBtn = document.getElementById('accountVerifyOpenBtn');
+const accountEditFields = document.getElementById('accountEditFields');
+const accountUsernameInput = document.getElementById('accountUsernameInput');
+const accountPasswordInput = document.getElementById('accountPasswordInput');
+const accountPasswordConfirmInput = document.getElementById('accountPasswordConfirmInput');
+const accountSaveBtn = document.getElementById('accountSaveBtn');
+const accountDeleteBtn = document.getElementById('accountDeleteBtn');
+const accountVerifyModal = document.getElementById('accountVerifyModal');
+const accountVerifyCloseBtn = document.getElementById('accountVerifyCloseBtn');
+const accountVerifyUsername = document.getElementById('accountVerifyUsername');
+const accountVerifyPassword = document.getElementById('accountVerifyPassword');
+const accountVerifySubmitBtn = document.getElementById('accountVerifySubmitBtn');
 const articleGrid = document.getElementById('articleGrid');
 const articlePageInfo = document.getElementById('articlePageInfo');
 const articlePrevBtn = document.getElementById('articlePrevBtn');
@@ -5139,6 +5313,157 @@ function createGuestUser(){
 }
 
 let pendingProfileAvatar = '';
+let accountVerifiedPassword = '';
+
+function resetAccountEditor(){
+  accountVerifiedPassword = '';
+  if(accountEditFields){
+    accountEditFields.classList.remove('unlocked');
+    accountEditFields.setAttribute('aria-hidden', 'true');
+  }
+  if(accountVerifyState) accountVerifyState.textContent = '修改用户名、密码或注销前需要先验证当前密码。';
+  if(accountPasswordInput) accountPasswordInput.value = '';
+  if(accountPasswordConfirmInput) accountPasswordConfirmInput.value = '';
+}
+
+function openAccountVerifyModal(){
+  const user = readSavedUser();
+  if(!getAuthToken() || !user || user.username === 'guest'){
+    showLoginToast('游客模式不能修改账号，请先注册或登录账号。', 'warn', '需要账号');
+    return;
+  }
+  if(accountVerifyUsername) accountVerifyUsername.value = user.username || '';
+  if(accountVerifyPassword) accountVerifyPassword.value = '';
+  accountVerifyModal?.classList.add('open');
+  accountVerifyModal?.setAttribute('aria-hidden', 'false');
+  setTimeout(()=>accountVerifyPassword?.focus(), 80);
+}
+
+function closeAccountVerifyModal(){
+  accountVerifyModal?.classList.remove('open');
+  accountVerifyModal?.setAttribute('aria-hidden', 'true');
+}
+
+async function verifyAccountForEdit(){
+  const user = readSavedUser();
+  const username = String(accountVerifyUsername?.value || '').trim();
+  const currentPassword = String(accountVerifyPassword?.value || '');
+  if(!user || username !== user.username){
+    showLoginToast('请输入当前登录账号的用户名。', 'warn', '验证失败');
+    return;
+  }
+  if(!currentPassword){
+    showLoginToast('请输入当前密码。', 'warn', '验证失败');
+    return;
+  }
+  try{
+    accountVerifySubmitBtn.disabled = true;
+    accountVerifySubmitBtn.textContent = '验证中...';
+    await authRequest('/api/account', {
+      method:'POST',
+      headers:authorizedHeaders(),
+      body:JSON.stringify({ currentPassword })
+    });
+    accountVerifiedPassword = currentPassword;
+    if(accountUsernameInput) accountUsernameInput.value = user.username || '';
+    if(accountEditFields){
+      accountEditFields.classList.add('unlocked');
+      accountEditFields.setAttribute('aria-hidden', 'false');
+    }
+    if(accountVerifyState) accountVerifyState.textContent = '身份已验证，可以修改用户名、密码或注销账号。';
+    closeAccountVerifyModal();
+    showLoginToast('身份验证成功，现在可以修改账号信息。', 'success', '验证成功');
+  }catch(error){
+    showLoginToast(error.message || '身份验证失败，请检查用户名和密码。', 'error', '验证失败');
+  }finally{
+    accountVerifySubmitBtn.disabled = false;
+    accountVerifySubmitBtn.textContent = '登录验证';
+  }
+}
+
+async function saveAccountChanges(){
+  const user = readSavedUser();
+  if(!accountVerifiedPassword || !user){
+    openAccountVerifyModal();
+    return;
+  }
+  const nextUsername = String(accountUsernameInput?.value || '').trim();
+  const nextPassword = String(accountPasswordInput?.value || '');
+  const confirmPassword = String(accountPasswordConfirmInput?.value || '');
+  if(!isFrontendUsernameValid(nextUsername)){
+    showLoginToast('用户名只能由字母和数字组成，长度 2 到 20 位。', 'warn', '格式不对');
+    return;
+  }
+  if(nextPassword || confirmPassword){
+    if(nextPassword !== confirmPassword){
+      showLoginToast('两次输入的新密码不一致。', 'warn', '密码不一致');
+      return;
+    }
+    if(!isFrontendPasswordValid(nextPassword)){
+      showLoginToast('新密码格式不符合要求。', 'warn', '格式不对');
+      return;
+    }
+  }
+  if(nextUsername === user.username && !nextPassword){
+    showLoginToast('没有需要保存的账号修改。', 'warn', '无需修改');
+    return;
+  }
+  try{
+    accountSaveBtn.disabled = true;
+    accountSaveBtn.textContent = '保存中...';
+    const result = await authRequest('/api/account', {
+      method:'PUT',
+      headers:authorizedHeaders(),
+      body:JSON.stringify({
+        currentPassword:accountVerifiedPassword,
+        username:nextUsername,
+        newPassword:nextPassword
+      })
+    });
+    saveLoginSession(result.token, result.user);
+    accountVerifiedPassword = nextPassword || accountVerifiedPassword;
+    if(accountPasswordInput) accountPasswordInput.value = '';
+    if(accountPasswordConfirmInput) accountPasswordConfirmInput.value = '';
+    renderBlogHomeUser(result.user);
+    if(accountUsernameInput) accountUsernameInput.value = result.user.username;
+    showLoginToast('账号信息已保存并同步。', 'success', '修改成功');
+  }catch(error){
+    showLoginToast(error.message || '账号信息修改失败。', 'error', '修改失败');
+  }finally{
+    accountSaveBtn.disabled = false;
+    accountSaveBtn.textContent = '保存账号修改';
+  }
+}
+
+async function deleteCurrentAccount(){
+  const user = readSavedUser();
+  if(!accountVerifiedPassword || !user){
+    openAccountVerifyModal();
+    return;
+  }
+  const confirmed = confirm(`确定要注销账号 ${user.username} 吗？该操作会删除当前账号数据，无法恢复。`);
+  if(!confirmed) return;
+  try{
+    accountDeleteBtn.disabled = true;
+    accountDeleteBtn.textContent = '注销中...';
+    await authRequest('/api/account', {
+      method:'DELETE',
+      headers:authorizedHeaders(),
+      body:JSON.stringify({ currentPassword:accountVerifiedPassword })
+    });
+    sessionStorage.removeItem(AUTH_TOKEN_KEY);
+    sessionStorage.removeItem(AUTH_USER_KEY);
+    closeProfileEditor();
+    closeAccountVerifyModal();
+    returnToLogin();
+    showLoginToast('账号已注销。', 'success', '注销成功');
+  }catch(error){
+    showLoginToast(error.message || '注销账号失败。', 'error', '注销失败');
+  }finally{
+    accountDeleteBtn.disabled = false;
+    accountDeleteBtn.textContent = '注销账号';
+  }
+}
 
 function openProfileEditor(){
   const user = readSavedUser();
@@ -5147,13 +5472,16 @@ function openProfileEditor(){
     return;
   }
   pendingProfileAvatar = '';
+  resetAccountEditor();
   renderBlogHomeUser(user);
+  if(accountUsernameInput) accountUsernameInput.value = user.username || '';
   profileEditor?.classList.add('open');
   profileEditor?.setAttribute('aria-hidden', 'false');
 }
 
 function closeProfileEditor(){
   pendingProfileAvatar = '';
+  resetAccountEditor();
   profileEditor?.classList.remove('open');
   profileEditor?.setAttribute('aria-hidden', 'true');
 }
@@ -5202,6 +5530,21 @@ async function saveProfileEditor(){
 if(profileEditBtn) profileEditBtn.addEventListener('click', openProfileEditor);
 if(profileEditorClose) profileEditorClose.addEventListener('click', closeProfileEditor);
 if(profileSaveBtn) profileSaveBtn.addEventListener('click', saveProfileEditor);
+if(accountVerifyOpenBtn) accountVerifyOpenBtn.addEventListener('click', openAccountVerifyModal);
+if(accountVerifyCloseBtn) accountVerifyCloseBtn.addEventListener('click', closeAccountVerifyModal);
+if(accountVerifySubmitBtn) accountVerifySubmitBtn.addEventListener('click', verifyAccountForEdit);
+if(accountSaveBtn) accountSaveBtn.addEventListener('click', saveAccountChanges);
+if(accountDeleteBtn) accountDeleteBtn.addEventListener('click', deleteCurrentAccount);
+if(accountVerifyPassword){
+  accountVerifyPassword.addEventListener('keydown', event=>{
+    if(event.key === 'Enter') verifyAccountForEdit();
+  });
+}
+if(accountVerifyModal){
+  accountVerifyModal.addEventListener('click', event=>{
+    if(event.target === accountVerifyModal) closeAccountVerifyModal();
+  });
+}
 if(profileMoodBtn){
   profileMoodBtn.addEventListener('click', ()=>{
     const ideas = ['今天适合写一篇短随笔。', '把一个重复动作变成自动化。', '整理三个灵感关键词。', '给未来的自己留一段注释。'];

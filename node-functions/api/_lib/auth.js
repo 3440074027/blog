@@ -58,6 +58,10 @@ async function getUsers(){
   return users && typeof users === 'object' && !Array.isArray(users) ? users : {};
 }
 
+async function setLegacyUsers(users){
+  await redis.set(LEGACY_USER_STORE_KEY, users);
+}
+
 export async function getUser(username){
   const user = await redis.get(`${USER_KEY_PREFIX}${username}`);
   if(user) return user;
@@ -73,6 +77,34 @@ export async function getUser(username){
 
 export async function setUser(user){
   await redis.set(`${USER_KEY_PREFIX}${user.username}`, user);
+}
+
+export async function deleteUser(username){
+  await redis.del(`${USER_KEY_PREFIX}${username}`);
+  const legacyUsers = await getUsers();
+  if(legacyUsers[username]){
+    delete legacyUsers[username];
+    await setLegacyUsers(legacyUsers);
+  }
+}
+
+export async function renameUser(user, nextUsername){
+  const previousUsername = user.username;
+  user.username = nextUsername;
+  if(user.profile && (!user.profile.nickname || user.profile.nickname === previousUsername)){
+    user.profile.nickname = nextUsername;
+  }
+  user.updatedAt = nowIso();
+  await redis.set(`${USER_KEY_PREFIX}${nextUsername}`, user);
+  if(previousUsername !== nextUsername){
+    await redis.del(`${USER_KEY_PREFIX}${previousUsername}`);
+    const legacyUsers = await getUsers();
+    if(legacyUsers[previousUsername]){
+      delete legacyUsers[previousUsername];
+      await setLegacyUsers(legacyUsers);
+    }
+  }
+  return user;
 }
 
 export function isValidUsername(username){
