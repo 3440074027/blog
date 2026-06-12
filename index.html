@@ -4417,7 +4417,7 @@
       <div class="blog-profile-avatar" id="blogProfileAvatar" aria-label="用户头像"></div>
       <p class="blog-profile-kicker" id="blogProfileMeta" data-i18n="profileMeta">系统架构师 版本 2026</p>
       <h2 class="blog-profile-name" id="blogProfileName">An Blog</h2>
-      <p class="blog-profile-role" data-i18n="profileRole">江大计算机学子 ｜ AI Agent 开发者</p>
+      <p class="blog-profile-role" id="blogProfileRole" data-i18n="profileRole">江大计算机学子 ｜ AI Agent 开发者</p>
       <p class="blog-profile-slogan" id="blogProfileSlogan" data-i18n="profileSlogan">开创未来现实</p>
       <section class="profile-info-block">
         <span>个性签名</span>
@@ -4437,14 +4437,6 @@
         <span data-i18n="tagVisual">视觉逻辑控</span>
         <span data-i18n="tagCode">代码试验家</span>
       </div>
-      <div class="profile-mini-tools">
-        <span>文章草稿 <strong id="profileDraftCount">3</strong></span>
-        <span>灵感星标 <strong id="profileStarCount">12</strong></span>
-      </div>
-      <div class="profile-visit-counter">
-        <span>网页访问量</span>
-        <strong id="visitorCount">统计中</strong>
-      </div>
       <div class="profile-editor" id="profileEditor" aria-hidden="true">
         <div class="profile-editor-head">
           <strong>编辑个人资料</strong>
@@ -4463,6 +4455,8 @@
           <small>点击头像选择图片，保存后同步</small>
         </div>
         <label>昵称<input id="profileNameInput" type="text" maxlength="40" /></label>
+        <label>资料副标题<input id="profileMetaInput" type="text" maxlength="80" placeholder="例如：系统架构师 版本 2026" /></label>
+        <label>身份说明<input id="profileRoleInput" type="text" maxlength="120" placeholder="例如：江大计算机学子 ｜ AI Agent 开发者" /></label>
         <label>个性签名<input id="profileSignatureInput" type="text" maxlength="120" /></label>
         <label>个人简介<textarea id="profileIntroInput" maxlength="500"></textarea></label>
         <label>身份标签<input id="profileTagsInput" type="text" placeholder="用逗号分隔，例如 AI, Python, 生活" /></label>
@@ -4959,6 +4953,8 @@ const blogProfileName = document.getElementById('blogProfileName');
 const blogProfileSlogan = document.getElementById('blogProfileSlogan');
 const blogHeroName = document.getElementById('blogHeroName');
 const blogProfileTags = document.getElementById('blogProfileTags');
+const blogProfileMeta = document.getElementById('blogProfileMeta');
+const blogProfileRole = document.getElementById('blogProfileRole');
 const profileSignatureText = document.getElementById('profileSignatureText');
 const profileIntroText = document.getElementById('profileIntroText');
 const profileEditBtn = document.getElementById('profileEditBtn');
@@ -4966,6 +4962,8 @@ const profileMoodBtn = document.getElementById('profileMoodBtn');
 const profileEditor = document.getElementById('profileEditor');
 const profileEditorClose = document.getElementById('profileEditorClose');
 const profileNameInput = document.getElementById('profileNameInput');
+const profileMetaInput = document.getElementById('profileMetaInput');
+const profileRoleInput = document.getElementById('profileRoleInput');
 const profileSignatureInput = document.getElementById('profileSignatureInput');
 const profileIntroInput = document.getElementById('profileIntroInput');
 const profileTagsInput = document.getElementById('profileTagsInput');
@@ -5112,44 +5110,6 @@ function showLoginToast(message, type = 'success', title = ''){
   loginToast.classList.add('show');
 }
 
-async function updateVisitorCount(){
-  const visitorCount = document.getElementById('visitorCount');
-  if(!visitorCount) return;
-  visitorCount.textContent = '统计中';
-  try{
-    const visitedKey = 'ans_blog_cloud_counted';
-    const method = sessionStorage.getItem(visitedKey) ? 'GET' : 'POST';
-    const response = await fetch(authApiUrl('/api/visitor-count'), { method, cache:'no-store' });
-    const data = await response.json().catch(()=>({}));
-    if(response.ok && typeof data.value === 'number'){
-      visitorCount.textContent = data.value.toLocaleString('zh-CN');
-      visitorCount.setAttribute('title', 'Upstash 实时访问统计');
-      sessionStorage.setItem(visitedKey, '1');
-      return;
-    }
-    throw new Error(data.error || 'remote counter unavailable');
-  }catch(remoteError){
-    visitorCount.setAttribute('title', '云端统计不可用，当前显示本机兜底计数');
-  }
-  const key = 'ans_blog_visitor_count';
-  const visitedKey = 'ans_blog_session_counted';
-  let count = 1280;
-  try{
-    count = Number(localStorage.getItem(key) || count);
-    if(!sessionStorage.getItem(visitedKey)){
-      count += 1;
-      localStorage.setItem(key, String(count));
-      sessionStorage.setItem(visitedKey, '1');
-    }
-  }catch(err){
-    count = 1280 + Math.floor(Math.random() * 120);
-  }
-  visitorCount.textContent = count.toLocaleString('zh-CN');
-}
-
-updateVisitorCount();
-
-
 function pulseTransitionFlare(){
   transitionFlare.classList.remove('active');
   void transitionFlare.offsetWidth;
@@ -5189,9 +5149,12 @@ function applyProfileEditorAvatarPreview(avatar){
 function renderBlogHomeUser(userLike){
   const user = typeof userLike === 'object' && userLike ? userLike : readSavedUser();
   const profile = user && user.profile ? user.profile : {};
+  const profileTexts = profile.texts && typeof profile.texts === 'object' ? profile.texts : {};
   const username = (user && user.username) || (typeof userLike === 'string' ? userLike : '') || 'Visitor';
   const displayName = profile.nickname || username;
   const avatar = profile.avatar || '';
+  const profileMeta = profileTexts.profileMeta || tr('profileMeta');
+  const profileRole = profileTexts.profileRole || tr('profileRole');
   const signature = profile.signature || tr('profileSlogan');
   const intro = profile.intro || '这里会记录你的创作、灵感、文章和成长轨迹。';
   const tags = Array.isArray(profile.tags) && profile.tags.length
@@ -5201,10 +5164,14 @@ function renderBlogHomeUser(userLike){
   if(blogWelcomeName) blogWelcomeName.textContent = displayName;
   if(blogProfileName) blogProfileName.textContent = displayName;
   if(blogHeroName) blogHeroName.textContent = displayName;
+  if(blogProfileMeta) blogProfileMeta.textContent = profileMeta;
+  if(blogProfileRole) blogProfileRole.textContent = profileRole;
   if(blogProfileSlogan) blogProfileSlogan.textContent = signature;
   if(profileSignatureText) profileSignatureText.textContent = signature;
   if(profileIntroText) profileIntroText.textContent = intro;
   if(profileNameInput) profileNameInput.value = displayName;
+  if(profileMetaInput) profileMetaInput.value = profileMeta;
+  if(profileRoleInput) profileRoleInput.value = profileRole;
   if(profileSignatureInput) profileSignatureInput.value = signature;
   if(profileIntroInput) profileIntroInput.value = intro;
   if(profileTagsInput) profileTagsInput.value = tags.join(', ');
@@ -5561,7 +5528,12 @@ async function saveProfileEditor(){
     nickname:String(profileNameInput?.value || user.username).trim().slice(0, 40) || user.username,
     signature:String(profileSignatureInput?.value || '').trim().slice(0, 120),
     intro:String(profileIntroInput?.value || '').trim().slice(0, 500),
-    tags
+    tags,
+    texts:{
+      ...(currentProfile.texts && typeof currentProfile.texts === 'object' ? currentProfile.texts : {}),
+      profileMeta:String(profileMetaInput?.value || '').trim().slice(0, 80),
+      profileRole:String(profileRoleInput?.value || '').trim().slice(0, 120)
+    }
   };
   try{
     profileSaveBtn.disabled = true;
