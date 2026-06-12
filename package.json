@@ -1,0 +1,13 @@
+{
+  "name": "an-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An Blog —— 个人博客（EdgeOne Pages Node Functions + Upstash Redis）",
+  "dependencies": {
+    "@upstash/redis": "^1.34.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
