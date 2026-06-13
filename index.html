@@ -5045,12 +5045,45 @@
     border-color:rgba(255,255,255,.28);
   }
   .article-thumb{
+    position:relative;
+    overflow:hidden;
     border-radius:18px;
     min-height:98px;
     background:var(--article-thumb);
     background-size:cover;
     background-position:center;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 16px 30px rgba(0,0,0,.14);
+  }
+  .article-thumb-slide{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    background:var(--slide-image);
+    background-size:cover;
+    background-position:center;
+    animation:articleThumbCarousel var(--slide-duration, 8s) infinite;
+    animation-delay:var(--slide-delay, 0s);
+  }
+  .article-thumb-slide:first-child{opacity:1;}
+  .article-thumb-dots{
+    position:absolute;
+    left:10px;
+    bottom:9px;
+    z-index:2;
+    display:flex;
+    gap:5px;
+  }
+  .article-thumb-dots span{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:rgba(255,255,255,.72);
+    box-shadow:0 0 10px rgba(0,0,0,.2);
+  }
+  @keyframes articleThumbCarousel{
+    0%,28%{opacity:1;transform:scale(1);}
+    36%,92%{opacity:0;transform:scale(1.04);}
+    100%{opacity:1;transform:scale(1);}
   }
   .article-card h3{
     margin:4px 0 8px;
@@ -6393,6 +6426,7 @@ const guestLoginBtn = document.getElementById('guestLoginBtn');
 const SITE_OWNER_USERNAME = 'An';
 const AUTH_TOKEN_KEY = 'ans_blog_auth_token';
 const AUTH_USER_KEY = 'ans_blog_auth_user';
+const AUTH_RETURN_LOGIN_KEY = 'ans_blog_return_login';
 const AUTH_API_BASE = (window.AUTH_API_BASE || window.PROFILE_API_BASE || '').replace(/\/$/, '');
 
 function authApiUrl(path){
@@ -6431,6 +6465,7 @@ function saveLoginSession(token, user){
   try{
     sessionStorage.setItem(AUTH_TOKEN_KEY, token);
     sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+    sessionStorage.removeItem(AUTH_RETURN_LOGIN_KEY);
   }catch(_){}
 }
 
@@ -6676,7 +6711,7 @@ function goUserArticles(username){
     showLoginToast('没有找到要浏览的用户。', 'warn', '无法跳转');
     return;
   }
-  window.location.href = `user_articles.html?user=${encodeURIComponent(target)}`;
+  window.location.href = `html/user_articles.html?user=${encodeURIComponent(target)}`;
 }
 
 function getAllArticles(){
@@ -6689,6 +6724,28 @@ function articleThumbStyle(article){
   const thumb = String(article?.thumb || '');
   if(thumb.startsWith('data:image/')) return `url("${thumb}")`;
   return thumb || 'linear-gradient(135deg,#7c5cff,#ff8fc7)';
+}
+
+function articleGalleryImages(article){
+  const gallery = Array.isArray(article?.gallery) ? article.gallery : [];
+  const images = gallery.filter(src=>typeof src === 'string' && src.startsWith('data:image/')).slice(0, 5);
+  const thumb = String(article?.thumb || '');
+  if(!images.length && thumb.startsWith('data:image/')) images.push(thumb);
+  return images;
+}
+
+function renderArticleThumb(article){
+  const images = articleGalleryImages(article);
+  if(!images.length){
+    return `<div class="article-thumb" style="--article-thumb:${articleThumbStyle(article)}"></div>`;
+  }
+  const duration = Math.max(6, images.length * 2.4);
+  return `
+    <div class="article-thumb" style="--article-thumb:url('${images[0]}')">
+      ${images.map((src, index)=>`<span class="article-thumb-slide" style="--slide-image:url('${src}');--slide-duration:${duration}s;--slide-delay:${-(duration / images.length) * index}s"></span>`).join('')}
+      ${images.length > 1 ? `<div class="article-thumb-dots">${images.map(()=>'<span></span>').join('')}</div>` : ''}
+    </div>
+  `;
 }
 
 function computeArticlesPerPage(){
@@ -6737,7 +6794,7 @@ function renderArticles(){
   articleGrid.innerHTML = items.map(article=>`
     <article class="article-card ${deleteArticleMode && isCurrentUserAuthor(article) ? 'selectable' : ''} ${selectedArticleIds.has(article.id) ? 'selected' : ''}" data-article-id="${escapeHtml(article.id || '')}" data-demo="${article.demo ? '1' : '0'}">
       ${deleteArticleMode && isCurrentUserAuthor(article) ? `<input class="article-select-check" type="checkbox" ${selectedArticleIds.has(article.id) ? 'checked' : ''} aria-label="选择文章" />` : ''}
-      <div class="article-thumb" style="--article-thumb:${articleThumbStyle(article)}"></div>
+      ${renderArticleThumb(article)}
       <div>
         <small>${escapeHtml(article.category)} · ${escapeHtml(article.createdAt || '')} · @${escapeHtml(article.author || '')}</small>
         <h3>${escapeHtml(article.title)}</h3>
@@ -6915,7 +6972,7 @@ function getFirstArticleImage(html){
   return match ? match[1] : 'linear-gradient(135deg,#7c5cff,#ff8fc7)';
 }
 
-function compressArticleImageFile(file, maxSize = 720, quality = .58){
+function compressArticleImageFile(file, maxSize = 520, quality = .52){
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
     reader.onerror = reject;
@@ -8130,6 +8187,7 @@ if(guestLoginBtn){
   guestLoginBtn.addEventListener('click', ()=>{
     try{
       sessionStorage.removeItem(AUTH_TOKEN_KEY);
+      sessionStorage.removeItem(AUTH_RETURN_LOGIN_KEY);
       sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(createGuestUser()));
     }catch(_){}
     showLoginToast(tr('visitorSuccess'), 'success', tr('visitorLogin'));
@@ -8138,6 +8196,7 @@ if(guestLoginBtn){
 }
 
 function returnToLogin(){
+  try{ sessionStorage.setItem(AUTH_RETURN_LOGIN_KEY, '1'); }catch(_){}
   switchBackgroundMode(false);
   if(blogHome){
     blogHome.classList.remove('active');
@@ -8592,6 +8651,23 @@ document.querySelector('.btn-guest').addEventListener('click', ()=>{
   openRegisterModal();
 });
 if(returnLoginBtn) returnLoginBtn.addEventListener('click', returnToLogin);
+
+(async function restoreLoggedInHome(){
+  try{
+    if(sessionStorage.getItem(AUTH_RETURN_LOGIN_KEY) === '1') return;
+    const token = getAuthToken();
+    const savedUser = readSavedUser();
+    if(!token || !savedUser || savedUser.username === 'guest') return;
+    enterDashboard(savedUser);
+    const data = await authRequest('/api/me', { method:'GET', headers:authorizedHeaders() });
+    if(data.user){
+      saveLoginSession(token, data.user);
+      renderBlogHomeUser(data.user);
+    }
+  }catch(error){
+    console.warn('restore login state failed:', error);
+  }
+})();
 </script>
 </body>
 </html>

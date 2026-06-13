@@ -9,6 +9,7 @@ import {
 
 const ARTICLE_INDEX_KEY = 'site:article-index:v2';
 const ARTICLE_KEY_PREFIX = 'site:article:';
+const LEGACY_ARTICLES_KEY = 'site:articles';
 
 function cleanHtml(html){
   return String(html || '')
@@ -16,6 +17,17 @@ function cleanHtml(html){
     .replace(/\son\w+="[^"]*"/gi, '')
     .replace(/\son\w+='[^']*'/gi, '')
     .slice(0, 1_800_000);
+}
+
+function extractImagesFromHtml(html){
+  const matches = String(html || '').match(/<img[^>]+src=["']([^"']+)["']/gi) || [];
+  return matches
+    .map(tag=>{
+      const match = tag.match(/src=["']([^"']+)["']/i);
+      return match ? match[1] : '';
+    })
+    .filter(src=>src.startsWith('data:image/') && src.length <= 420_000)
+    .slice(0, 5);
 }
 
 function sanitizeArticle(input = {}, fallbackAuthor = ''){
@@ -26,6 +38,11 @@ function sanitizeArticle(input = {}, fallbackAuthor = ''){
     ? input.tags.map(tag=>String(tag).trim()).filter(Boolean).slice(0, 8).map(tag=>tag.slice(0, 24))
     : String(input.tags || category).split(/[,，/、\s]+/).map(tag=>tag.trim()).filter(Boolean).slice(0, 8).map(tag=>tag.slice(0, 24));
   const content = cleanHtml(input.content);
+  const inputGallery = Array.isArray(input.gallery)
+    ? input.gallery.filter(src=>typeof src === 'string' && src.startsWith('data:image/') && src.length <= 420_000).slice(0, 5)
+    : [];
+  const gallery = extractImagesFromHtml(content);
+  const finalGallery = gallery.length ? gallery : inputGallery;
   const now = nowIso();
   return {
     id: typeof input.id === 'string' && input.id ? input.id.slice(0, 80) : crypto.randomUUID(),
@@ -34,7 +51,8 @@ function sanitizeArticle(input = {}, fallbackAuthor = ''){
     tags,
     summary: String(input.summary || '').trim().slice(0, 260),
     content,
-    thumb: typeof input.thumb === 'string' && input.thumb.length <= 900_000 && (input.thumb.startsWith('data:image/') || input.thumb.startsWith('linear-gradient(')) ? input.thumb : 'linear-gradient(135deg,#7c5cff,#ff8fc7)',
+    thumb: finalGallery[0] || (typeof input.thumb === 'string' && input.thumb.length <= 420_000 && (input.thumb.startsWith('data:image/') || input.thumb.startsWith('linear-gradient(')) ? input.thumb : 'linear-gradient(135deg,#7c5cff,#ff8fc7)'),
+    gallery: finalGallery,
     fontFamily: typeof input.fontFamily === 'string' ? input.fontFamily.slice(0, 120) : '',
     author,
     createdAt: typeof input.createdAt === 'string' ? input.createdAt.slice(0, 40) : now,
@@ -50,6 +68,7 @@ function toArticleMeta(article){
     tags: article.tags,
     summary: article.summary,
     thumb: article.thumb,
+    gallery: Array.isArray(article.gallery) ? article.gallery.slice(0, 5) : [],
     fontFamily: article.fontFamily,
     author: article.author,
     createdAt: article.createdAt,
@@ -59,7 +78,24 @@ function toArticleMeta(article){
 
 async function readArticleIndex(){
   const index = await redis.get(ARTICLE_INDEX_KEY);
-  return Array.isArray(index) ? index.map(item=>toArticleMeta(sanitizeArticle(item, item.author))).filter(item=>item.author && item.id) : [];
+  if(Array.isArray(index) && index.length){
+    return index.map(item=>toArticleMeta(sanitizeArticle(item, item.author))).filter(item=>item.author && item.id);
+  }
+  try{
+    const legacyArticles = await redis.get(LEGACY_ARTICLES_KEY);
+    if(Array.isArray(legacyArticles) && legacyArticles.length){
+      const migrated = legacyArticles.map(article=>sanitizeArticle(article, article.author)).filter(article=>article.author && article.id);
+      for(const article of migrated.slice(0, 200)){
+        await redis.set(`${ARTICLE_KEY_PREFIX}${article.id}`, article);
+      }
+      const meta = migrated.map(toArticleMeta);
+      await writeArticleIndex(meta);
+      return meta;
+    }
+  }catch(error){
+    console.error('legacy articles migration skipped:', error);
+  }
+  return [];
 }
 
 async function writeArticleIndex(index){
