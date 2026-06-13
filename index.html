@@ -4753,6 +4753,16 @@
     border:1px solid rgba(255,255,255,.14);
     font:inherit;
   }
+  .article-style-panel select,
+  .article-style-panel input[type="number"]{
+    color:#fff;
+    background:rgba(18,24,58,.92);
+    appearance:auto;
+  }
+  .article-style-panel select option{
+    color:#161a2e;
+    background:#f7f3ff;
+  }
   .article-editor-meta label:nth-child(3){grid-column:1 / -1;}
   .article-editor-meta textarea{resize:none;min-height:58px;}
   .article-style-panel{
@@ -4820,6 +4830,57 @@
     justify-content:flex-end;
     gap:10px;
     flex-wrap:wrap;
+    align-items:center;
+  }
+  .article-progress{
+    display:none;
+    position:relative;
+    flex:1 1 220px;
+    min-width:180px;
+    height:12px;
+    overflow:hidden;
+    border-radius:999px;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.16);
+  }
+  .article-progress.active{display:block;}
+  .article-progress span{
+    position:absolute;
+    inset:0 auto 0 0;
+    width:0%;
+    border-radius:inherit;
+    background:linear-gradient(90deg,#7ff7ff,#ff8fc7,#ffd166);
+    box-shadow:0 0 18px rgba(127,247,255,.34);
+    transition:width .25s ease;
+  }
+  .profile-clock-card{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    border-radius:22px;
+    text-align:center;
+    color:#fff;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,143,199,.2), transparent 38%),
+      radial-gradient(circle at 88% 18%, rgba(127,247,255,.16), transparent 36%),
+      rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.15);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
+  }
+  .profile-clock-card strong{
+    display:block;
+    font-size:20px;
+    line-height:1;
+    letter-spacing:.06em;
+    text-shadow:0 10px 26px rgba(0,0,0,.22);
+  }
+  .profile-clock-card span{
+    display:block;
+    margin-top:7px;
+    color:rgba(255,255,255,.62);
+    font-size:11px;
+    font-weight:900;
+  }
   }
   .article-card:hover{
     transform:translateY(-3px);
@@ -5330,6 +5391,10 @@
         <button class="profile-quick-btn" id="profileEditBtn" type="button">编辑资料</button>
         <button class="profile-quick-btn" id="profileMoodBtn" type="button">今日灵感</button>
       </div>
+      <div class="profile-clock-card" aria-label="实时时间">
+        <strong id="profileClockTime">00:00:00</strong>
+        <span id="profileClockDate">0000年00月00日 星期一</span>
+      </div>
       <div class="blog-profile-tags" id="blogProfileTags" aria-label="用户标签">
         <span data-i18n="tagLong">长期主义者</span>
         <span data-i18n="tagAuto">自动化优先</span>
@@ -5471,14 +5536,28 @@
           <option value="'Microsoft YaHei','Segoe UI',sans-serif">微软雅黑</option>
           <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方</option>
           <option value="'Noto Sans SC','Microsoft YaHei',sans-serif">思源黑体</option>
+          <option value="'HarmonyOS Sans SC','Microsoft YaHei',sans-serif">鸿蒙 Sans</option>
+          <option value="'Source Han Sans SC','Noto Sans SC',sans-serif">Source Han Sans</option>
+          <option value="'LXGW WenKai','KaiTi',serif">霞鹜文楷</option>
+          <option value="'YouYuan','Microsoft YaHei',sans-serif">幼圆</option>
+          <option value="'STXingkai','KaiTi',cursive">华文行楷</option>
+          <option value="'STKaiti','KaiTi',serif">华文楷体</option>
+          <option value="'STHeiti','Microsoft YaHei',sans-serif">华文黑体</option>
+          <option value="'ZCOOL QingKe HuangYou','Microsoft YaHei',sans-serif">站酷庆科黄油体</option>
           <option value="'SimSun','Songti SC',serif">宋体</option>
           <option value="'KaiTi','Kaiti SC',serif">楷体</option>
           <option value="'FangSong','STFangsong',serif">仿宋</option>
           <option value="'Arial','Helvetica',sans-serif">Arial</option>
+          <option value="'Verdana','Arial',sans-serif">Verdana</option>
+          <option value="'Tahoma','Arial',sans-serif">Tahoma</option>
           <option value="'Georgia',serif">Georgia</option>
+          <option value="'Palatino Linotype','Book Antiqua',serif">Palatino</option>
           <option value="'Times New Roman',serif">Times New Roman</option>
           <option value="'Trebuchet MS','Comic Sans MS',cursive">可爱手写风</option>
+          <option value="'Comic Sans MS','Trebuchet MS',cursive">Comic Sans</option>
           <option value="'Courier New',monospace">Courier New</option>
+          <option value="'Consolas','Courier New',monospace">Consolas</option>
+          <option value="'Monaco','Consolas',monospace">Monaco</option>
         </select>
       </label>
       <label>字号<input id="articleFontSizeInput" type="number" min="12" max="48" value="16" /></label>
@@ -5497,7 +5576,11 @@
           <option value="H1">一级标题</option>
           <option value="H2">二级标题</option>
           <option value="H3">三级标题</option>
+          <option value="H4">四级标题</option>
+          <option value="H5">五级标题</option>
+          <option value="H6">六级标题</option>
           <option value="BLOCKQUOTE">引用块</option>
+          <option value="PRE">代码块</option>
         </select>
       </label>
       <div class="article-editor-switches">
@@ -5511,8 +5594,8 @@
     <div class="article-rich-editor" id="articleContentEditor" contenteditable="true" spellcheck="false">在这里写文章内容。图片会插入到光标所在位置，并自动缩小显示。</div>
     <input id="articleImageInput" type="file" accept="image/*" hidden />
     <div class="article-editor-actions">
-      <button id="articlePreviewBtn" type="button">功能开关已显示</button>
-      <button id="articleSaveBtn" type="button">发布并同步</button>
+      <div class="article-progress" id="articlePublishProgress" aria-hidden="true"><span id="articlePublishProgressBar"></span></div>
+      <button id="articleSaveBtn" type="button">发布</button>
     </div>
   </div>
 </div>
@@ -6063,6 +6146,10 @@ const articleClearFormatBtn = document.getElementById('articleClearFormatBtn');
 const articleContentEditor = document.getElementById('articleContentEditor');
 const articleImageInput = document.getElementById('articleImageInput');
 const articleSaveBtn = document.getElementById('articleSaveBtn');
+const articlePublishProgress = document.getElementById('articlePublishProgress');
+const articlePublishProgressBar = document.getElementById('articlePublishProgressBar');
+const profileClockTime = document.getElementById('profileClockTime');
+const profileClockDate = document.getElementById('profileClockDate');
 const homeSearchInput = document.getElementById('homeSearchInput');
 const homeSearchBtn = document.getElementById('homeSearchBtn');
 const searchResultsPanel = document.getElementById('searchResultsPanel');
@@ -6217,12 +6304,23 @@ function showLoginToast(message, type = 'success', title = ''){
   loginToast.innerHTML = `
     <div class="toast-icon" aria-hidden="true">${toast.icon}</div>
     <div class="toast-title">${escapeHtml(title || toast.title)}</div>
-    <div class="toast-message">${escapeHtml(message)}</div>
+    <div class="toast-message">${escapeHtml(message).replace(/\n/g, '<br>')}</div>
   `;
   loginToast.classList.remove('show');
   void loginToast.offsetWidth;
   loginToast.classList.add('show');
 }
+
+function updateProfileClock(){
+  if(!profileClockTime || !profileClockDate) return;
+  const now = new Date();
+  const weekNames = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+  const pad = value => String(value).padStart(2, '0');
+  profileClockTime.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  profileClockDate.textContent = `${now.getFullYear()}年${pad(now.getMonth() + 1)}月${pad(now.getDate())}日 ${weekNames[now.getDay()]}`;
+}
+updateProfileClock();
+setInterval(updateProfileClock, 1000);
 
 function pulseTransitionFlare(){
   transitionFlare.classList.remove('active');
@@ -6353,6 +6451,7 @@ let articlePage = 1;
 let articlesPerPage = 4;
 let deleteArticleMode = false;
 let selectedArticleIds = new Set();
+let savedArticleRange = null;
 let mailState = { inbox:[], sent:[] };
 let currentMailMode = 'inbox';
 let pendingMailAttachment = null;
@@ -6516,9 +6615,26 @@ function closeArticleEditor(){
   articleEditorModal?.setAttribute('aria-hidden', 'true');
 }
 
-function applyArticleCommand(command, value = null){
+function saveArticleSelection(){
+  const selection = window.getSelection();
+  if(selection && selection.rangeCount && articleContentEditor?.contains(selection.anchorNode)){
+    savedArticleRange = selection.getRangeAt(0).cloneRange();
+  }
+}
+
+function restoreArticleSelection(){
   articleContentEditor?.focus();
+  if(savedArticleRange){
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(savedArticleRange);
+  }
+}
+
+function applyArticleCommand(command, value = null){
+  restoreArticleSelection();
   document.execCommand(command, false, value);
+  saveArticleSelection();
 }
 
 function markArticleControlApplied(control){
@@ -6559,8 +6675,9 @@ async function insertArticleImage(file){
     return;
   }
   const src = await readFileAsDataUrl(file);
-  articleContentEditor?.focus();
+  restoreArticleSelection();
   document.execCommand('insertHTML', false, `<img src="${src}" alt="文章图片" />`);
+  saveArticleSelection();
 }
 
 async function saveArticleFromEditor(){
@@ -6574,7 +6691,9 @@ async function saveArticleFromEditor(){
   }
   try{
     articleSaveBtn.disabled = true;
-    articleSaveBtn.textContent = '同步中...';
+    articleSaveBtn.textContent = '发布中...';
+    articlePublishProgress?.classList.add('active');
+    if(articlePublishProgressBar) articlePublishProgressBar.style.width = '18%';
     const article = {
       id:`article-${Date.now()}-${Math.random().toString(16).slice(2)}`,
       title:title.slice(0, 120),
@@ -6586,14 +6705,20 @@ async function saveArticleFromEditor(){
       createdAt:new Date().toISOString().slice(0, 16).replace('T', ' '),
       updatedAt:new Date().toISOString()
     };
+    if(articlePublishProgressBar) articlePublishProgressBar.style.width = '62%';
     await syncUserArticles([article, ...getUserArticles(user)]);
+    if(articlePublishProgressBar) articlePublishProgressBar.style.width = '100%';
     closeArticleEditor();
     showLoginToast('文章已发布并同步到当前账号。', 'success', '发布成功');
   }catch(error){
     showLoginToast(error.message || '文章发布失败。', 'error', '发布失败');
   }finally{
-    articleSaveBtn.disabled = false;
-    articleSaveBtn.textContent = '发布并同步';
+    setTimeout(()=>{
+      articlePublishProgress?.classList.remove('active');
+      if(articlePublishProgressBar) articlePublishProgressBar.style.width = '0%';
+      articleSaveBtn.disabled = false;
+      articleSaveBtn.textContent = '发布';
+    }, 360);
   }
 }
 
@@ -6639,6 +6764,11 @@ if(articleDeleteCancelBtn) articleDeleteCancelBtn.addEventListener('click', ()=>
 if(articleDeleteConfirmBtn) articleDeleteConfirmBtn.addEventListener('click', deleteSelectedArticles);
 if(articleEditorCloseBtn) articleEditorCloseBtn.addEventListener('click', closeArticleEditor);
 if(articleEditorModal) articleEditorModal.addEventListener('click', event=>{ if(event.target === articleEditorModal) closeArticleEditor(); });
+if(articleContentEditor){
+  articleContentEditor.addEventListener('keyup', saveArticleSelection);
+  articleContentEditor.addEventListener('mouseup', saveArticleSelection);
+  articleContentEditor.addEventListener('blur', saveArticleSelection);
+}
 if(articleBoldBtn) articleBoldBtn.addEventListener('click', ()=>{ applyArticleCommand('bold'); articleBoldBtn.classList.toggle('active'); });
 if(articleItalicBtn) articleItalicBtn.addEventListener('click', ()=>{ applyArticleCommand('italic'); articleItalicBtn.classList.toggle('active'); });
 if(articleUnderlineBtn) articleUnderlineBtn.addEventListener('click', ()=>{ applyArticleCommand('underline'); articleUnderlineBtn.classList.toggle('active'); });
@@ -6654,6 +6784,7 @@ if(articleImageInput) articleImageInput.addEventListener('change', async ()=>{
   if(file) await insertArticleImage(file);
   articleImageInput.value = '';
 });
+if(articleSaveBtn) articleSaveBtn.addEventListener('click', saveArticleFromEditor);
 renderArticles();
 if(window.ResizeObserver && articleGrid){
   new ResizeObserver(()=>refreshArticlePageSize()).observe(articleGrid);
@@ -7251,15 +7382,13 @@ function getProfileCompleteness(user = readSavedUser()){
 
 function getFeatureText(type){
   const user = readSavedUser();
-  const texts = userTexts(user);
-  const zodiac = texts.zodiac || '未知星座';
-  const birthday = texts.birthday || '未填写生日';
   const days = daysSince(user?.createdAt);
   const completeness = getProfileCompleteness(user);
+  const inspiration = getCalendarInspiration(user).split('\n');
   const map = {
-    writing:`今日适合写一篇与 ${zodiac} 灵感相关的短文；你的账号已记录 ${days} 天，可以回顾最近一次成长。`,
-    archive:`资料完整度约 ${completeness}%。补全生日、星座、QQ、邮箱后，公开资料和今日灵感会更丰富。`,
-    search:`可以搜索用户、文章和标签；生日：${birthday}，星座：${zodiac}，这些信息也会参与个人灵感生成。`
+    writing:`${inspiration[2]} ${inspiration[3]} 账号已记录 ${days} 天，适合把今天的灵感发布成文章。`,
+    archive:`资料完整度约 ${completeness}%。${inspiration[1]} 补全生日和星座后，今日灵感会更贴近你。`,
+    search:`${inspiration[4]} 可搜索用户、文章和标签；也可以用今日宜做作为写作关键词。`
   };
   return map[type] || map.writing;
 }
@@ -7582,20 +7711,31 @@ if(accountDeleteModal){
     if(event.target === accountDeleteModal) closeAccountDeleteModal();
   });
 }
+function getCalendarInspiration(user = readSavedUser()){
+  const texts = userTexts(user);
+  const now = new Date();
+  const weekNames = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+  const zodiac = texts.zodiac || '未知星座';
+  const birthday = texts.birthday || '未填写生日';
+  const tags = Array.isArray(user?.profile?.tags) && user.profile.tags.length ? user.profile.tags.join('、') : '生活、学习、创作';
+  const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+  const yi = ['整理灵感草稿','发布一篇短文','联系重要的人','复盘最近的学习','给作品补一张配图','清理待办列表','做一次轻量运动','学习一个小技巧'];
+  const ji = ['反复拖延','一次开太多任务','熬夜硬撑','忽略身体提醒','把灵感只留在脑中','在情绪里做重大决定','过度比较','忘记保存作品'];
+  const lucky = ['晨间 30 分钟','午后茶歇','傍晚散步后','夜晚安静时段'][seed % 4];
+  const colors = ['星云紫','薄荷蓝','樱花粉','奶油黄','月光白','湖水青'];
+  return [
+    `${now.getFullYear()}年${String(now.getMonth()+1).padStart(2,'0')}月${String(now.getDate()).padStart(2,'0')}日 ${weekNames[now.getDay()]}`,
+    `生日档案：${birthday}；星座能量：${zodiac}；个人关键词：${tags}。`,
+    `今日宜做：${yi[seed % yi.length]}，尤其适合把一个想法写成可发布的小片段。`,
+    `今日不宜：${ji[(seed + 3) % ji.length]}，先完成一件小事再开启下一件。`,
+    `幸运时段：${lucky}；灵感色：${colors[(seed + now.getDay()) % colors.length]}。`,
+    `给你的提示：如果今天只能推进 1%，就把标题、摘要和第一张图先留下来。`
+  ].join('\n');
+}
+
 if(profileMoodBtn){
   profileMoodBtn.addEventListener('click', ()=>{
-    const user = readSavedUser();
-    const texts = userTexts(user);
-    const zodiac = texts.zodiac || '神秘星座';
-    const birthday = texts.birthday || '还未填写生日';
-    const tags = Array.isArray(user?.profile?.tags) && user.profile.tags.length ? user.profile.tags.join('、') : '生活、学习、创作';
-    const ideas = [
-      `${zodiac} 今日关键词：把 ${tags} 中的一个主题写成 300 字灵感卡片。生日信息：${birthday}。`,
-      `围绕 ${zodiac} 的性格印象，给未来的自己写一封短邮件，记录今天最想坚持的一件事。`,
-      `从你的标签「${tags}」里选一个，写一篇“为什么它对我重要”的微型随笔。`,
-      `今天适合整理一篇文章提纲：标题、三个小节、一个真实案例，再给它配一张灵感图。`
-    ];
-    showLoginToast(ideas[Math.floor(Math.random() * ideas.length)], 'success', '今日灵感');
+    showLoginToast(getCalendarInspiration(), 'success', '今日灵感');
   });
 }
 if(profileAvatarUpload) profileAvatarUpload.addEventListener('click', ()=>profileAvatarInput?.click());
