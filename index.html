@@ -4805,6 +4805,125 @@
     background:rgba(255,255,255,.32);
     filter:blur(.3px);
   }
+  .public-profile-card{
+    width:min(900px, 94vw);
+    gap:18px;
+    padding:26px;
+    border-radius:36px;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(255,143,199,.2), transparent 32%),
+      radial-gradient(circle at 90% 12%, rgba(127,247,255,.16), transparent 34%),
+      rgba(16,20,48,.92);
+  }
+  .public-profile-top{
+    position:relative;
+    min-height:150px;
+    padding:24px;
+    border-radius:30px;
+    overflow:hidden;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.15), rgba(255,255,255,.07)),
+      radial-gradient(circle at 18% 22%, rgba(255,143,199,.22), transparent 34%);
+    border:1px solid rgba(255,255,255,.16);
+  }
+  .public-profile-top::before{
+    content:"";
+    position:absolute;
+    inset:-40% -12% auto auto;
+    width:260px;
+    height:260px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(127,247,255,.2), transparent 62%);
+  }
+  .public-profile-avatar{
+    width:112px;
+    height:112px;
+    border-radius:50%;
+    background:var(--public-avatar, linear-gradient(135deg,#7c5cff,#3ad6ff 55%,#ff8fc7));
+    background-size:cover;
+    background-position:center;
+    border:6px solid rgba(255,255,255,.94);
+    box-shadow:0 20px 52px rgba(0,0,0,.28), 0 0 0 8px rgba(255,255,255,.08);
+  }
+  .public-profile-avatar::after{
+    inset:14px auto auto 18px;
+    width:22px;
+    height:22px;
+    background:rgba(255,255,255,.48);
+  }
+  .public-profile-top > div:last-child{
+    position:relative;
+    z-index:1;
+    min-width:0;
+  }
+  .public-profile-top h3{
+    margin:0 0 8px;
+    font-size:clamp(26px, 4vw, 42px);
+    line-height:1.04;
+    letter-spacing:-.04em;
+    text-shadow:0 16px 38px rgba(0,0,0,.26);
+  }
+  .public-profile-top p{
+    margin:0;
+    color:rgba(255,255,255,.7);
+    font-size:13px;
+    font-weight:850;
+  }
+  .public-profile-info-grid{
+    gap:12px;
+  }
+  .public-profile-info-grid div{
+    padding:14px;
+    border-radius:20px;
+    background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.07));
+  }
+  .public-profile-info-grid .public-profile-wide{
+    grid-column:1 / -1;
+  }
+  .public-profile-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .public-profile-tags b{
+    padding:6px 10px;
+    border-radius:999px;
+    color:#fff;
+    font-size:11px;
+    background:rgba(127,247,255,.16);
+    border:1px solid rgba(127,247,255,.2);
+  }
+  .public-profile-article-head{
+    padding:0 2px;
+  }
+  .public-profile-article-head h3{
+    margin:0;
+    font-size:18px;
+  }
+  .public-profile-articles{
+    gap:12px;
+  }
+  .public-profile-articles article{
+    padding:15px;
+    border-radius:22px;
+    transition:transform .2s, background .2s, border-color .2s;
+  }
+  .public-profile-articles article:hover{
+    transform:translateY(-3px);
+    background:rgba(255,255,255,.14);
+    border-color:rgba(255,255,255,.22);
+  }
+  @media (max-width:680px){
+    .public-profile-top,
+    .public-profile-info-grid,
+    .public-profile-articles{
+      grid-template-columns:1fr;
+    }
+    .public-profile-top{
+      text-align:center;
+      justify-items:center;
+    }
+  }
   .article-category-chips{
     grid-column:1 / -1;
     display:flex;
@@ -6722,7 +6841,7 @@ function getAllArticles(){
 
 function articleThumbStyle(article){
   const thumb = String(article?.thumb || '');
-  if(thumb.startsWith('data:image/')) return `url("${thumb}")`;
+  if(thumb.startsWith('data:image/')) return `url('${thumb}')`;
   return thumb || 'linear-gradient(135deg,#7c5cff,#ff8fc7)';
 }
 
@@ -7437,7 +7556,7 @@ function userTexts(user){
 }
 
 function publicAvatarStyle(avatar){
-  return avatar ? `url("${avatar}")` : 'linear-gradient(135deg,#7c5cff,#3ad6ff 55%,#ff8fc7)';
+  return avatar ? `url('${avatar}')` : 'linear-gradient(135deg,#7c5cff,#3ad6ff 55%,#ff8fc7)';
 }
 
 function renderSearchResults(items){
@@ -7488,6 +7607,37 @@ function renderSearchResults(items){
   });
 }
 
+let homeSearchTimer = 0;
+let homeSearchSeq = 0;
+const homeSearchCache = new Map();
+
+function getLocalSearchResults(query){
+  const lower = query.toLowerCase();
+  const articleMatches = publicArticles
+    .filter(article => [article.title, article.category, article.summary, article.createdAt, article.author, ...(article.tags || [])].join(' ').toLowerCase().includes(lower))
+    .slice(0, 8)
+    .map(article=>({ type:'article', article }));
+  const savedUser = readSavedUser();
+  const localUsers = [];
+  if(savedUser && savedUser.username !== 'guest'){
+    const profile = savedUser.profile || {};
+    const texts = userTexts(savedUser);
+    const blob = [savedUser.username, profile.nickname, profile.signature, profile.intro, texts.profileRole, ...(profile.tags || [])].join(' ').toLowerCase();
+    if(blob.includes(lower)) localUsers.push({ type:'user', user:savedUser });
+  }
+  return [...localUsers, ...articleMatches].slice(0, 16);
+}
+
+function setSearchLoading(query, localItems = []){
+  if(!searchResultsPanel || !query) return;
+  if(localItems.length){
+    renderSearchResults(localItems);
+    return;
+  }
+  searchResultsPanel.innerHTML = '<div class="search-result-item"><div class="search-result-avatar"></div><div><strong>正在搜索...</strong><span>正在快速匹配用户和公开文章</span></div><em class="search-result-kind">SEARCH</em></div>';
+  searchResultsPanel.classList.add('open');
+}
+
 async function runHomeSearch(){
   const query = String(homeSearchInput?.value || '').trim();
   if(!query){
@@ -7495,16 +7645,40 @@ async function runHomeSearch(){
     searchResultsPanel.classList.remove('open');
     return;
   }
-  const articleMatches = publicArticles
-    .filter(article => [article.title, article.category, article.summary, article.date].join(' ').toLowerCase().includes(query.toLowerCase()))
-    .slice(0, 8)
-    .map(article=>({ type:'article', article }));
-  let userMatches = [];
+  const seq = ++homeSearchSeq;
+  const localItems = getLocalSearchResults(query);
+  setSearchLoading(query, localItems);
+  if(homeSearchCache.has(query)){
+    renderSearchResults(homeSearchCache.get(query));
+    return;
+  }
   try{
     const data = await authRequest(`/api/users/search?q=${encodeURIComponent(query)}`, { method:'GET' });
-    userMatches = (data.users || []).slice(0, 8).map(user=>({ type:'user', user }));
-  }catch(_){}
-  renderSearchResults([...userMatches, ...articleMatches].slice(0, 16));
+    if(seq !== homeSearchSeq) return;
+    const userMatches = (data.users || []).slice(0, 8).map(user=>({ type:'user', user }));
+    const merged = [...userMatches, ...localItems.filter(item=>item.type !== 'user')].slice(0, 16);
+    homeSearchCache.set(query, merged);
+    renderSearchResults(merged);
+  }catch(_){
+    if(seq === homeSearchSeq) renderSearchResults(localItems);
+  }
+}
+
+function scheduleHomeSearch(){
+  const query = String(homeSearchInput?.value || '').trim();
+  clearTimeout(homeSearchTimer);
+  if(!query){
+    searchResultsPanel.innerHTML = '';
+    searchResultsPanel.classList.remove('open');
+    return;
+  }
+  const localItems = getLocalSearchResults(query);
+  setSearchLoading(query, localItems);
+  homeSearchTimer = setTimeout(runHomeSearch, 120);
+}
+
+async function refreshSearchUserProfile(username){
+  if(username) openPublicUserProfile(username);
 }
 
 function closePublicProfile(){
@@ -7521,7 +7695,7 @@ function renderPublicProfile(user){
   publicProfileBody.innerHTML = `
     <div class="public-profile-top">
       <div class="public-profile-avatar" style="--public-avatar:${publicAvatarStyle(profile.avatar || '')}"></div>
-      <div>
+      <div class="public-profile-main">
         <h3>${escapeHtml(userDisplayName(user))}</h3>
         <p>@${escapeHtml(user.username)} · 公开资料只读，不可编辑</p>
       </div>
@@ -7533,8 +7707,8 @@ function renderPublicProfile(user){
       <div><span>生日 / 星座</span><strong>${escapeHtml(texts.birthday || '未填写')} · ${escapeHtml(texts.zodiac || '未填写')}</strong></div>
       <div class="copy-field" data-copy="${escapeHtml(texts.qq || '')}" data-copy-label="QQ"><span>QQ（点击复制）</span><strong>${escapeHtml(texts.qq || '未填写')}</strong></div>
       <div class="copy-field" data-copy="${escapeHtml(texts.email || '')}" data-copy-label="邮箱"><span>邮箱（点击复制）</span><strong>${escapeHtml(texts.email || '未填写')}</strong></div>
-      <div style="grid-column:1 / -1"><span>个人简介</span><p>${escapeHtml(profile.intro || '这个用户暂时还没有填写简介。')}</p></div>
-      <div style="grid-column:1 / -1"><span>标签</span><strong>${tags.map(escapeHtml).join(' · ') || '未填写'}</strong></div>
+      <div class="public-profile-wide"><span>个人简介</span><p>${escapeHtml(profile.intro || '这个用户暂时还没有填写简介。')}</p></div>
+      <div class="public-profile-wide"><span>标签</span><div class="public-profile-tags">${tags.length ? tags.map(tag=>`<b>${escapeHtml(tag)}</b>`).join('') : '<b>未填写</b>'}</div></div>
     </div>
     <div class="public-profile-article-head">
       <h3>公开文章</h3>
@@ -7563,10 +7737,10 @@ function renderPublicProfile(user){
   });
 }
 
-async function openPublicUserProfile(username){
+async function openPublicUserProfile(username, prefetchedUser = null){
   if(!username) return;
   try{
-    const data = await authRequest(`/api/users/profile?username=${encodeURIComponent(username)}`, { method:'GET' });
+    const data = prefetchedUser ? { user:prefetchedUser } : await authRequest(`/api/users/profile?username=${encodeURIComponent(username)}`, { method:'GET' });
     renderPublicProfile(data.user);
     publicProfileModal?.classList.add('open');
     publicProfileModal?.setAttribute('aria-hidden', 'false');
@@ -7739,12 +7913,7 @@ if(homeSearchBtn) homeSearchBtn.addEventListener('click', ()=>{
   if(String(homeSearchInput?.value || '').trim()) runHomeSearch();
 });
 if(homeSearchInput){
-  homeSearchInput.addEventListener('input', ()=>{
-    if(!String(homeSearchInput.value || '').trim()){
-      searchResultsPanel.innerHTML = '';
-      searchResultsPanel.classList.remove('open');
-    }
-  });
+  homeSearchInput.addEventListener('input', scheduleHomeSearch);
   homeSearchInput.addEventListener('keydown', event=>{
     if(event.key === 'Enter') runHomeSearch();
     if(event.key === 'Escape') searchResultsPanel?.classList.remove('open');
