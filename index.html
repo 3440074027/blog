@@ -227,7 +227,7 @@
     height:250px;
     border-radius:999px;
     background:transparent;
-    pointer-events:auto;
+    pointer-events:none;
   }
   #homeSettingsBtn{
     background:linear-gradient(135deg, rgba(255,255,255,.3), rgba(124,92,255,.2));
@@ -238,8 +238,7 @@
     stroke-width:2.2;
     filter:drop-shadow(0 3px 7px rgba(0,0,0,.28));
   }
-  .home-settings-wrap:hover #homeSettingsBtn,
-  .home-settings-wrap:focus-within #homeSettingsBtn{
+  .home-settings-wrap.settings-open #homeSettingsBtn{
     background:linear-gradient(135deg, rgba(255,255,255,.42), rgba(255,143,199,.24));
     border-color:rgba(255,255,255,.86);
     transform:rotate(18deg) translateY(-1px);
@@ -390,8 +389,7 @@
     pointer-events:none;
     transition:opacity .28s, transform .28s, max-height .28s, padding-top .28s;
   }
-  .home-settings-wrap:hover .home-settings-menu,
-  .home-settings-wrap:focus-within .home-settings-menu{
+  .home-settings-wrap.settings-open .home-settings-menu{
     max-height:64px;
     padding-top:12px;
     opacity:1;
@@ -417,13 +415,11 @@
     transform:translateY(-8px) scale(.82);
     transition:opacity .25s, transform .25s, background .25s, box-shadow .25s;
   }
-  .home-settings-wrap:hover .home-tool-btn,
-  .home-settings-wrap:focus-within .home-tool-btn{
+  .home-settings-wrap.settings-open .home-tool-btn{
     opacity:1;
     transform:translateY(0) scale(1);
   }
-  .home-settings-wrap:hover .home-tool-btn,
-  .home-settings-wrap:focus-within .home-tool-btn{transition-delay:.04s;}
+  .home-settings-wrap.settings-open .home-tool-btn{transition-delay:.04s;}
   .home-tool-btn:hover{
     background:linear-gradient(135deg, rgba(255,255,255,.36), rgba(255,143,199,.26));
     box-shadow:0 16px 34px rgba(0,0,0,.25), 0 0 24px rgba(124,92,255,.28), inset 0 1px 0 rgba(255,255,255,.42);
@@ -3967,6 +3963,100 @@
   .mail-read-close{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.1);cursor:pointer;}
   .mail-read-meta{color:#8fceff;font-size:12px;font-weight:900;}
   .mail-read-body{margin:0;color:rgba(255,255,255,.76);line-height:1.85;white-space:pre-wrap;}
+  .article-editor-modal{
+    position:fixed;
+    inset:0;
+    z-index:430;
+    display:grid;
+    place-items:center;
+    padding:22px;
+    background:rgba(8,10,26,.52);
+    backdrop-filter:blur(18px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .24s, visibility .24s;
+  }
+  .article-editor-modal.open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+  .article-editor-card{
+    width:min(920px, 95vw);
+    max-height:88vh;
+    overflow:auto;
+    display:grid;
+    gap:14px;
+    padding:22px;
+    border-radius:30px;
+    color:#fff;
+    background:rgba(16,20,48,.92);
+    border:1px solid rgba(255,255,255,.2);
+    box-shadow:0 30px 90px rgba(0,0,0,.42);
+  }
+  .article-editor-head{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .article-editor-head h2{margin:0;font-size:22px;}
+  .article-editor-close{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.1);cursor:pointer;}
+  .article-title-input{
+    width:100%;
+    height:46px;
+    border:none;
+    outline:none;
+    border-radius:16px;
+    padding:0 14px;
+    color:#fff;
+    font-size:18px;
+    font-weight:900;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.14);
+  }
+  .article-editor-toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .article-editor-toolbar button,
+  .article-editor-toolbar select,
+  .article-editor-toolbar input[type="color"]{
+    min-height:34px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.18);
+    color:#fff;
+    font-weight:900;
+    background:rgba(255,255,255,.12);
+    cursor:pointer;
+  }
+  .article-editor-toolbar button{padding:0 12px;}
+  .article-editor-toolbar select{padding:0 10px;color:#111827;background:rgba(255,255,255,.86);}
+  .article-content-editor{
+    min-height:330px;
+    padding:18px;
+    border-radius:22px;
+    color:#fff;
+    line-height:1.85;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.14);
+    outline:none;
+    overflow:auto;
+  }
+  .article-content-editor img{
+    max-width:100%;
+    border-radius:18px;
+    margin:10px 0;
+    box-shadow:0 16px 36px rgba(0,0,0,.24);
+  }
+  .article-editor-actions{display:flex;justify-content:flex-end;gap:10px;}
+  .article-editor-actions button{
+    min-height:40px;
+    padding:0 16px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+    font-weight:950;
+    cursor:pointer;
+    background:linear-gradient(135deg, rgba(127,247,255,.22), rgba(255,143,199,.2));
+  }
   .tool-stats-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -4014,9 +4104,25 @@
     min-height:0;
     overflow:hidden;
   }
+  .article-head-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .article-publish-btn{
+    min-height:34px;
+    padding:0 13px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.22);
+    color:#fff;
+    font-size:11px;
+    font-weight:950;
+    cursor:pointer;
+    background:linear-gradient(135deg, rgba(127,247,255,.24), rgba(255,143,199,.18));
+  }
   .blog-post-grid{
     display:grid;
-    grid-template-columns:repeat(3, minmax(0, 1fr));
+    grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
     gap:14px;
     margin-top:18px;
   }
@@ -4070,19 +4176,19 @@
     flex-direction:column;
     justify-content:center;
   }
-  .blog-stat-card span{
+  .blog-stat-card:not(.feature-orbit-card) span{
     display:block;
     font-size:clamp(36px, 5vw, 64px);
     font-weight:950;
     line-height:1;
     letter-spacing:-.08em;
   }
-  .blog-stat-card strong{
+  .blog-stat-card:not(.feature-orbit-card) strong{
     display:block;
     margin-top:10px;
     font-size:15px;
   }
-  .blog-stat-card p{
+  .blog-stat-card:not(.feature-orbit-card) p{
     margin:8px 0 0;
     color:rgba(255,255,255,.55);
     font-size:11px;
@@ -4594,7 +4700,7 @@
     100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}
   }
   .article-card{
-    min-height:126px;
+    min-height:118px;
     display:grid;
     grid-template-columns:92px 1fr;
     gap:14px;
@@ -4603,6 +4709,22 @@
     background:rgba(255,255,255,.12);
     border:1px solid rgba(255,255,255,.14);
     transition:transform .22s, background .22s, border-color .22s;
+  }
+  .article-card-actions{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+  }
+  .article-delete-btn{
+    min-height:28px;
+    padding:0 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,143,199,.32);
+    color:#fff;
+    font-size:10px;
+    font-weight:900;
+    cursor:pointer;
+    background:rgba(255,91,122,.18);
   }
   .article-card:hover{
     transform:translateY(-3px);
@@ -5180,7 +5302,10 @@
       <section class="blog-posts-card blog-glass-card" id="blogPosts">
         <div class="blog-section-head">
           <span>文章收纳区</span>
-          <small id="articlePageInfo">第 1 / 1 页</small>
+          <div class="article-head-actions">
+            <button class="article-publish-btn" id="articlePublishBtn" type="button">发布文章</button>
+            <small id="articlePageInfo">第 1 / 1 页</small>
+          </div>
         </div>
         <div class="blog-post-grid article-grid" id="articleGrid"></div>
         <div class="article-pager">
@@ -5263,6 +5388,49 @@
     <div id="mailReadAttachment"></div>
   </div>
 </div>
+<div class="article-editor-modal" id="articleEditorModal" aria-hidden="true">
+  <div class="article-editor-card" role="dialog" aria-modal="true" aria-labelledby="articleEditorTitle">
+    <div class="article-editor-head">
+      <h2 id="articleEditorTitle">发布新文章</h2>
+      <button class="article-editor-close" id="articleEditorCloseBtn" type="button" aria-label="关闭">×</button>
+    </div>
+    <input class="article-title-input" id="articleTitleInput" type="text" maxlength="100" placeholder="填写文章标题" />
+    <div class="article-editor-toolbar" aria-label="文章编辑工具栏">
+      <select id="articleBlockSelect" title="标题级别">
+        <option value="P">正文</option>
+        <option value="H1">一级标题</option>
+        <option value="H2">二级标题</option>
+        <option value="H3">三级标题</option>
+      </select>
+      <select id="articleFontSelect" title="字体">
+        <option value="Microsoft YaHei">微软雅黑</option>
+        <option value="SimSun">宋体</option>
+        <option value="KaiTi">楷体</option>
+        <option value="Arial">Arial</option>
+        <option value="Georgia">Georgia</option>
+      </select>
+      <select id="articleSizeSelect" title="字号">
+        <option value="2">小</option>
+        <option value="3" selected>正常</option>
+        <option value="4">中大</option>
+        <option value="5">大</option>
+        <option value="6">超大</option>
+      </select>
+      <button type="button" data-command="bold">加粗</button>
+      <button type="button" data-command="italic">斜体</button>
+      <button type="button" data-command="underline">下划线</button>
+      <button type="button" data-command="insertUnorderedList">列表</button>
+      <input id="articleColorInput" type="color" value="#ffffff" title="文字颜色" />
+      <button id="articleImageBtn" type="button">插入图片 ≤3MB</button>
+      <input id="articleImageInput" type="file" accept="image/*" hidden />
+    </div>
+    <div class="article-content-editor" id="articleContentEditor" contenteditable="true" data-placeholder="在这里写文章。点击任意位置后插入图片，图片会出现在光标所在处。"></div>
+    <div class="article-editor-actions">
+      <button id="articleEditorCancelBtn" type="button">取消</button>
+      <button id="articleEditorSaveBtn" type="button">发布并同步</button>
+    </div>
+  </div>
+</div>
 <div class="owner-contact-modal" id="ownerContactModal" aria-hidden="true">
   <div class="owner-contact-card" role="dialog" aria-modal="true" aria-labelledby="ownerContactTitle">
     <div class="owner-contact-head">
@@ -5307,6 +5475,7 @@ const langBtn = document.getElementById('langBtn');
 const langPanel = document.getElementById('langPanel');
 const homeLangBtn = document.getElementById('homeLangBtn');
 const homeSettingsBtn = document.getElementById('homeSettingsBtn');
+const homeSettingsWrap = document.getElementById('homeSettingsWrap');
 langBtn.addEventListener('click', (e)=>{
   e.stopPropagation();
   langPanel.classList.toggle('open');
@@ -5317,9 +5486,27 @@ if(homeLangBtn){
     langPanel.classList.toggle('open');
   });
 }
+if(homeSettingsBtn && homeSettingsWrap){
+  homeSettingsBtn.addEventListener('mouseenter', ()=>homeSettingsWrap.classList.add('settings-open'));
+  homeSettingsBtn.addEventListener('focus', ()=>homeSettingsWrap.classList.add('settings-open'));
+  homeSettingsWrap.addEventListener('mouseleave', ()=>homeSettingsWrap.classList.remove('settings-open'));
+  homeSettingsWrap.querySelectorAll('.home-tool-btn').forEach(btn=>{
+    btn.addEventListener('focus', ()=>homeSettingsWrap.classList.add('settings-open'));
+  });
+  homeSettingsWrap.addEventListener('focusout', ()=>{
+    setTimeout(()=>{
+      if(!homeSettingsWrap.contains(document.activeElement)){
+        homeSettingsWrap.classList.remove('settings-open');
+      }
+    }, 0);
+  });
+}
 document.addEventListener('click', (e)=>{
   if(!langPanel.contains(e.target) && e.target!==langBtn && e.target!==homeLangBtn && !homeLangBtn?.contains(e.target)){
     langPanel.classList.remove('open');
+  }
+  if(homeSettingsWrap && !homeSettingsWrap.contains(e.target)){
+    homeSettingsWrap.classList.remove('settings-open');
   }
 });
 
@@ -5750,6 +5937,19 @@ const articlePrevBtn = document.getElementById('articlePrevBtn');
 const articleNextBtn = document.getElementById('articleNextBtn');
 const articlePageInput = document.getElementById('articlePageInput');
 const articleJumpBtn = document.getElementById('articleJumpBtn');
+const articlePublishBtn = document.getElementById('articlePublishBtn');
+const articleEditorModal = document.getElementById('articleEditorModal');
+const articleEditorCloseBtn = document.getElementById('articleEditorCloseBtn');
+const articleEditorCancelBtn = document.getElementById('articleEditorCancelBtn');
+const articleEditorSaveBtn = document.getElementById('articleEditorSaveBtn');
+const articleTitleInput = document.getElementById('articleTitleInput');
+const articleContentEditor = document.getElementById('articleContentEditor');
+const articleBlockSelect = document.getElementById('articleBlockSelect');
+const articleFontSelect = document.getElementById('articleFontSelect');
+const articleSizeSelect = document.getElementById('articleSizeSelect');
+const articleColorInput = document.getElementById('articleColorInput');
+const articleImageBtn = document.getElementById('articleImageBtn');
+const articleImageInput = document.getElementById('articleImageInput');
 const homeSearchInput = document.getElementById('homeSearchInput');
 const homeSearchBtn = document.getElementById('homeSearchBtn');
 const searchResultsPanel = document.getElementById('searchResultsPanel');
@@ -6024,7 +6224,7 @@ function renderBlogHomeUser(userLike){
   updateToolStats(user);
 }
 
-const BLOG_ARTICLES = [
+const DEFAULT_BLOG_ARTICLES = [
   { title:'AI Agent 从入门到实践', category:'AI AGENT', date:'2026-06-11 20:30', summary:'记录一次从想法、流程拆解到自动化执行的完整路径。', thumb:'linear-gradient(135deg,#7c5cff,#3ad6ff)' },
   { title:'让脚本替你整理生活', category:'PYTHON', date:'2026-06-08 18:10', summary:'把重复的日常动作交给程序，留下更多时间给创造。', thumb:'linear-gradient(135deg,#42f5b6,#7c5cff)' },
   { title:'长期主义者的知识档案', category:'THINKING', date:'2026-06-01 09:20', summary:'把零散笔记连接起来，形成能持续生长的个人系统。', thumb:'linear-gradient(135deg,#ff8fc7,#ffd166)' },
@@ -6034,9 +6234,10 @@ const BLOG_ARTICLES = [
   { title:'Python 文件整理器', category:'CODE', date:'2026-05-05 16:40', summary:'按日期、类型和关键词自动归类桌面文件。', thumb:'linear-gradient(135deg,#84fab0,#8fd3f4)' },
   { title:'写给未来自己的复盘', category:'LIFE', date:'2026-04-28 23:16', summary:'把每一次试错变成下一次行动的地图。', thumb:'linear-gradient(135deg,#d4fc79,#96e6a1)' }
 ];
+let userArticles = [];
 
 let articlePage = 1;
-const ARTICLES_PER_PAGE = 4;
+let articlesPerPage = 4;
 let mailState = { inbox:[], sent:[] };
 let currentMailMode = 'inbox';
 let pendingMailAttachment = null;
@@ -6044,7 +6245,7 @@ let pendingMailAttachment = null;
 function updateToolStats(user = readSavedUser()){
   const profile = user?.profile || {};
   const tags = Array.isArray(profile.tags) ? profile.tags : [];
-  const articleCount = BLOG_ARTICLES.length;
+  const articleCount = userArticles.length;
   if(toolArticleCount) toolArticleCount.textContent = articleCount;
   if(toolRegisterDays) toolRegisterDays.textContent = daysSince(user?.createdAt);
   if(toolTagCount) toolTagCount.textContent = tags.length;
@@ -6055,32 +6256,61 @@ function updateToolStats(user = readSavedUser()){
   }
 }
 
+function getAllArticles(){
+  return [...userArticles, ...DEFAULT_BLOG_ARTICLES];
+}
+
+function calculateArticlesPerPage(){
+  if(!articleGrid) return 4;
+  const rect = articleGrid.getBoundingClientRect();
+  const width = rect.width || 640;
+  const height = rect.height || 280;
+  const cols = width >= 860 ? 3 : width >= 560 ? 2 : 1;
+  const rows = height >= 420 ? 2 : 1;
+  return Math.max(2, Math.min(6, cols * rows));
+}
+
+function articleThumbValue(article){
+  const thumb = article.thumb || '';
+  return thumb.startsWith('data:image/') ? `url("${thumb}")` : (thumb || 'linear-gradient(135deg,#7c5cff,#ff8fc7)');
+}
+
 function renderArticles(){
   if(!articleGrid) return;
-  const totalPages = Math.max(1, Math.ceil(BLOG_ARTICLES.length / ARTICLES_PER_PAGE));
+  const articles = getAllArticles();
+  articlesPerPage = calculateArticlesPerPage();
+  const totalPages = Math.max(1, Math.ceil(articles.length / articlesPerPage));
   articlePage = Math.min(Math.max(1, articlePage), totalPages);
-  const start = (articlePage - 1) * ARTICLES_PER_PAGE;
-  const items = BLOG_ARTICLES.slice(start, start + ARTICLES_PER_PAGE);
+  const start = (articlePage - 1) * articlesPerPage;
+  const items = articles.slice(start, start + articlesPerPage);
   articleGrid.classList.remove('turning');
   void articleGrid.offsetWidth;
   articleGrid.classList.add('turning');
   articleGrid.innerHTML = items.map(article=>`
     <article class="article-card">
-      <div class="article-thumb" style="--article-thumb:${article.thumb}"></div>
+      <div class="article-thumb" style="--article-thumb:${articleThumbValue(article)}"></div>
       <div>
         <small>${escapeHtml(article.category)} · ${escapeHtml(article.date)}</small>
         <h3>${escapeHtml(article.title)}</h3>
         <p>${escapeHtml(article.summary)}</p>
+        ${article.owner ? `<div class="article-card-actions"><button class="article-delete-btn" type="button" data-article-id="${escapeHtml(article.id)}">删除</button></div>` : ''}
       </div>
     </article>
   `).join('');
-  if(articlePageInfo) articlePageInfo.textContent = `第 ${articlePage} / ${totalPages} 页`;
+  articleGrid.querySelectorAll('[data-article-id]').forEach(btn=>{
+    btn.addEventListener('click', event=>{
+      event.stopPropagation();
+      deleteUserArticle(btn.dataset.articleId);
+    });
+  });
+  if(articlePageInfo) articlePageInfo.textContent = `第 ${articlePage} / ${totalPages} 页 · 本页 ${items.length} 篇`;
   if(articlePageInput){
     articlePageInput.max = totalPages;
     articlePageInput.value = articlePage;
   }
   if(articlePrevBtn) articlePrevBtn.disabled = articlePage <= 1;
   if(articleNextBtn) articleNextBtn.disabled = articlePage >= totalPages;
+  updateToolStats();
 }
 
 function goArticlePage(nextPage){
@@ -6095,6 +6325,129 @@ if(articlePageInput){
   articlePageInput.addEventListener('keydown', event=>{
     if(event.key === 'Enter') goArticlePage(articlePageInput.value);
   });
+}
+
+async function loadUserArticles(){
+  if(!getAuthToken() || readSavedUser()?.username === 'guest'){
+    userArticles = [];
+    renderArticles();
+    return;
+  }
+  try{
+    const data = await authRequest('/api/articles', { method:'GET', headers:authorizedHeaders() });
+    userArticles = Array.isArray(data.articles) ? data.articles.map(article=>({
+      ...article,
+      date:(article.createdAt || '').slice(0, 16).replace('T', ' ')
+    })) : [];
+  }catch(error){
+    userArticles = [];
+  }
+  renderArticles();
+}
+
+function openArticleEditor(){
+  if(!getAuthToken() || readSavedUser()?.username === 'guest'){
+    showLoginToast('请先注册或登录账号后发布文章。', 'warn', '需要账号');
+    return;
+  }
+  if(articleTitleInput) articleTitleInput.value = '';
+  if(articleContentEditor) articleContentEditor.innerHTML = '<p>在这里写下你的新文章。</p>';
+  articleEditorModal?.classList.add('open');
+  articleEditorModal?.setAttribute('aria-hidden', 'false');
+}
+
+function closeArticleEditor(){
+  articleEditorModal?.classList.remove('open');
+  articleEditorModal?.setAttribute('aria-hidden', 'true');
+}
+
+function execArticleCommand(command, value = null){
+  articleContentEditor?.focus();
+  document.execCommand(command, false, value);
+}
+
+async function insertArticleImage(file){
+  if(!file) return;
+  if(!file.type.startsWith('image/')){
+    showLoginToast('请选择图片文件。', 'warn', '格式不对');
+    return;
+  }
+  if(file.size > 3 * 1024 * 1024){
+    showLoginToast('文章图片不能超过 3MB。', 'warn', '图片过大');
+    return;
+  }
+  const dataUrl = await readFileAsDataUrl(file);
+  execArticleCommand('insertImage', dataUrl);
+}
+
+async function publishArticle(){
+  const title = String(articleTitleInput?.value || '').trim();
+  const content = String(articleContentEditor?.innerHTML || '').trim();
+  if(!title || !content || content === '<br>'){
+    showLoginToast('请填写文章标题和正文。', 'warn', '内容不完整');
+    return;
+  }
+  try{
+    articleEditorSaveBtn.disabled = true;
+    articleEditorSaveBtn.textContent = '发布中...';
+    const data = await authRequest('/api/articles', {
+      method:'POST',
+      headers:authorizedHeaders(),
+      body:JSON.stringify({ article:{ title, content, category:'USER POST' } })
+    });
+    userArticles = (data.articles || []).map(article=>({
+      ...article,
+      date:(article.createdAt || '').slice(0, 16).replace('T', ' ')
+    }));
+    closeArticleEditor();
+    renderArticles();
+    showLoginToast('文章已发布并同步到当前用户。', 'success', '发布成功');
+  }catch(error){
+    showLoginToast(error.message || '发布文章失败。', 'error', '发布失败');
+  }finally{
+    articleEditorSaveBtn.disabled = false;
+    articleEditorSaveBtn.textContent = '发布并同步';
+  }
+}
+
+async function deleteUserArticle(id){
+  if(!id) return;
+  try{
+    const data = await authRequest('/api/articles', {
+      method:'DELETE',
+      headers:authorizedHeaders(),
+      body:JSON.stringify({ id })
+    });
+    userArticles = (data.articles || []).map(article=>({
+      ...article,
+      date:(article.createdAt || '').slice(0, 16).replace('T', ' ')
+    }));
+    renderArticles();
+    showLoginToast('文章已删除。', 'success', '删除成功');
+  }catch(error){
+    showLoginToast(error.message || '删除文章失败。', 'error', '删除失败');
+  }
+}
+
+if(articlePublishBtn) articlePublishBtn.addEventListener('click', openArticleEditor);
+if(articleEditorCloseBtn) articleEditorCloseBtn.addEventListener('click', closeArticleEditor);
+if(articleEditorCancelBtn) articleEditorCancelBtn.addEventListener('click', closeArticleEditor);
+if(articleEditorModal) articleEditorModal.addEventListener('click', event=>{ if(event.target === articleEditorModal) closeArticleEditor(); });
+document.querySelectorAll('.article-editor-toolbar [data-command]').forEach(btn=>{
+  btn.addEventListener('click', ()=>execArticleCommand(btn.dataset.command));
+});
+if(articleBlockSelect) articleBlockSelect.addEventListener('change', ()=>execArticleCommand('formatBlock', articleBlockSelect.value));
+if(articleFontSelect) articleFontSelect.addEventListener('change', ()=>execArticleCommand('fontName', articleFontSelect.value));
+if(articleSizeSelect) articleSizeSelect.addEventListener('change', ()=>execArticleCommand('fontSize', articleSizeSelect.value));
+if(articleColorInput) articleColorInput.addEventListener('input', ()=>execArticleCommand('foreColor', articleColorInput.value));
+if(articleImageBtn) articleImageBtn.addEventListener('click', ()=>articleImageInput?.click());
+if(articleImageInput) articleImageInput.addEventListener('change', ()=>insertArticleImage(articleImageInput.files && articleImageInput.files[0]));
+if(articleEditorSaveBtn) articleEditorSaveBtn.addEventListener('click', publishArticle);
+if(window.ResizeObserver && articleGrid){
+  const articleGridObserver = new ResizeObserver(()=>renderArticles());
+  articleGridObserver.observe(articleGrid);
+}else{
+  window.addEventListener('resize', renderArticles);
 }
 renderArticles();
 
@@ -6367,10 +6720,10 @@ function renderSearchResults(items){
   searchResultsPanel.querySelectorAll('[data-result-type="article"]').forEach(btn=>{
     const index = Number(btn.dataset.index);
     const articleTitle = items[index]?.article?.title || '';
-    const articleIndex = BLOG_ARTICLES.findIndex(article=>article.title === articleTitle);
+    const articleIndex = getAllArticles().findIndex(article=>article.title === articleTitle);
     if(articleIndex >= 0){
       btn.addEventListener('click', ()=>{
-        goArticlePage(Math.floor(articleIndex / ARTICLES_PER_PAGE) + 1);
+        goArticlePage(Math.floor(articleIndex / articlesPerPage) + 1);
         searchResultsPanel.classList.remove('open');
         document.getElementById('blogPosts')?.scrollIntoView({ behavior:'smooth', block:'center' });
       });
@@ -6384,7 +6737,7 @@ async function runHomeSearch(){
     renderSearchResults([]);
     return;
   }
-  const articleMatches = BLOG_ARTICLES
+  const articleMatches = getAllArticles()
     .filter(article => [article.title, article.category, article.summary, article.date].join(' ').toLowerCase().includes(query.toLowerCase()))
     .slice(0, 8)
     .map(article=>({ type:'article', article }));
@@ -6426,7 +6779,7 @@ function renderPublicProfile(user){
     </div>
     <h3>公开文章</h3>
     <div class="public-profile-articles">
-      ${BLOG_ARTICLES.slice(0, 4).map((article, index)=>`<article data-article-index="${index}"><small>${escapeHtml(article.category)} · ${escapeHtml(article.date)}</small><h3>${escapeHtml(article.title)}</h3><p>${escapeHtml(article.summary)}</p></article>`).join('')}
+      ${getAllArticles().slice(0, 4).map((article, index)=>`<article data-article-index="${index}"><small>${escapeHtml(article.category)} · ${escapeHtml(article.date)}</small><h3>${escapeHtml(article.title)}</h3><p>${escapeHtml(article.summary)}</p></article>`).join('')}
     </div>
   `;
   publicProfileBody.querySelectorAll('[data-copy]').forEach(el=>{
@@ -6435,7 +6788,7 @@ function renderPublicProfile(user){
   publicProfileBody.querySelectorAll('[data-article-index]').forEach(el=>{
     el.addEventListener('click', ()=>{
       const index = Number(el.dataset.articleIndex);
-      goArticlePage(Math.floor(index / ARTICLES_PER_PAGE) + 1);
+      goArticlePage(Math.floor(index / articlesPerPage) + 1);
       closePublicProfile();
       document.getElementById('blogPosts')?.scrollIntoView({ behavior:'smooth', block:'center' });
     });
@@ -6732,6 +7085,7 @@ function enterDashboard(userLike){
   if(getAuthToken() && readSavedUser()?.username !== 'guest'){
     loadMail('inbox');
   }
+  loadUserArticles();
   pulseTransitionFlare();
   triggerLightFeathers();
   setTimeout(()=>{
@@ -7076,7 +7430,10 @@ function returnToLogin(){
   closePublicProfile();
   closeNoticeEditor();
   closeMailCenter();
+  closeArticleEditor();
   closeOwnerContact();
+  userArticles = [];
+  renderArticles();
   if(loginStage){
     loginStage.classList.remove('hidden','login-exit');
     loginStage.classList.add('login-enter');
