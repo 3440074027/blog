@@ -355,6 +355,43 @@
     display:grid;
     gap:10px;
   }
+  .home-mail-entry{
+    position:relative;
+    width:44px;
+    height:44px;
+    margin-bottom:10px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.56);
+    color:#fff;
+    cursor:pointer;
+    background:linear-gradient(135deg, rgba(127,247,255,.22), rgba(255,143,199,.24));
+    box-shadow:0 14px 34px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.42);
+    backdrop-filter:blur(12px);
+    transition:transform .22s, box-shadow .22s, background .22s;
+  }
+  .home-mail-entry:hover{
+    transform:translateY(-2px) scale(1.05);
+    box-shadow:0 18px 42px rgba(0,0,0,.28), 0 0 24px rgba(127,247,255,.18);
+  }
+  .home-mail-entry svg{width:20px;height:20px;stroke:#fff;stroke-width:2.25;}
+  .home-mail-badge{
+    position:absolute;
+    top:-5px;
+    right:-5px;
+    min-width:19px;
+    height:19px;
+    padding:0 5px;
+    display:none;
+    place-items:center;
+    border-radius:999px;
+    color:#fff;
+    font-size:10px;
+    font-weight:950;
+    background:#ff315f;
+    border:2px solid rgba(20,18,45,.96);
+    box-shadow:0 0 18px rgba(255,49,95,.42);
+  }
+  .home-mail-badge.active{display:grid;}
   .top-tools.portal-mode .home-settings-wrap{
     display:flex;
     flex-direction:column;
@@ -3874,7 +3911,7 @@
   .mail-compose{display:grid;gap:10px;}
   .mail-list{
     display:grid;
-    grid-template-columns:repeat(3, minmax(0, 1fr));
+    grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:12px;
   }
   .mail-compose label{
@@ -3888,6 +3925,7 @@
     border:1px solid rgba(255,255,255,.14);font:inherit;resize:none;
   }
   .mail-item{
+    position:relative;
     min-height:136px;
     padding:14px;
     border-radius:22px;
@@ -3915,6 +3953,41 @@
     -webkit-line-clamp:3;
     -webkit-box-orient:vertical;
     overflow:hidden;
+  }
+  .mail-item.unread{
+    border-color:rgba(255,49,95,.44);
+    box-shadow:0 0 0 1px rgba(255,49,95,.1), 0 18px 44px rgba(255,49,95,.08);
+  }
+  .mail-read-state{
+    position:absolute;
+    top:10px;
+    right:10px;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:4px 8px;
+    border-radius:999px;
+    color:rgba(255,255,255,.72);
+    font-size:10px;
+    font-weight:950;
+    background:rgba(255,255,255,.1);
+  }
+  .mail-read-state.unread::before{
+    content:"";
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#ff315f;
+    box-shadow:0 0 12px rgba(255,49,95,.6);
+  }
+  .mail-thumb{
+    width:100%;
+    height:70px;
+    margin:9px 0;
+    border-radius:15px;
+    object-fit:cover;
+    border:1px solid rgba(255,255,255,.16);
+    box-shadow:0 12px 24px rgba(0,0,0,.18);
   }
   .mail-user-link{color:#fff;text-decoration:underline;cursor:pointer;}
   .mail-attach-row{
@@ -5490,7 +5563,7 @@
   <div class="home-settings-wrap" id="homeSettingsWrap">
     <div class="home-search-popover" id="homeSearchPopover" aria-label="首页搜索">
       <div class="search-star" aria-hidden="true">✦</div>
-      <input id="homeSearchInput" type="text" name="site_public_search_box" placeholder="搜索用户、文章、标签和灵感..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search" data-lpignore="true" data-form-type="other" />
+      <input id="homeSearchInput" type="text" name="not_login_search_field_2026" placeholder="搜索用户、文章、标签和灵感..." autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search" data-lpignore="true" data-1p-ignore="true" data-form-type="other" />
       <button id="homeSearchBtn" type="button" title="搜索" aria-label="搜索">
         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="11" cy="11" r="6.5"/>
@@ -5499,6 +5572,13 @@
       </button>
       <div class="search-results-panel" id="searchResultsPanel" aria-live="polite"></div>
     </div>
+    <button class="home-mail-entry" id="homeMailBtn" type="button" title="站内邮件" aria-label="站内邮件">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 6.8h16v10.4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6.8Z"/>
+        <path d="m4.8 7.6 6.1 5.2a1.8 1.8 0 0 0 2.2 0l6.1-5.2"/>
+      </svg>
+      <span class="home-mail-badge" id="homeMailBadge">0</span>
+    </button>
     <button class="icon-btn" id="homeSettingsBtn" type="button" title="设置" aria-label="设置">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/>
@@ -5880,11 +5960,6 @@
           <div class="tool-stat"><strong id="toolTagCount">0</strong><span>资料标签</span></div>
           <div class="tool-stat"><strong id="toolMailCount">0</strong><span>收件箱邮件</span></div>
         </div>
-        <div class="tool-mini-actions">
-          <button class="feature-pill active" type="button" data-feature="writing">今日写作建议</button>
-          <button class="feature-pill" type="button" data-feature="archive">资料完整度</button>
-          <button class="feature-pill" type="button" data-feature="search">快速搜索</button>
-        </div>
         <p id="featureDescription">结合生日、星座、标签和文章记录，为你生成今日灵感。</p>
       </section>
       <section class="blog-tech-card blog-glass-card" id="blogTech">
@@ -6014,7 +6089,6 @@
     </div>
     <div class="mail-tabs">
       <button id="mailInboxTab" class="active" type="button">收件箱</button>
-      <button id="mailSentTab" type="button">发件箱</button>
       <button id="mailComposeTab" type="button">写邮件</button>
     </div>
     <div class="mail-compose" id="mailComposePanel" hidden>
@@ -6567,6 +6641,8 @@ const profileClockTime = document.getElementById('profileClockTime');
 const profileClockDate = document.getElementById('profileClockDate');
 const homeSearchInput = document.getElementById('homeSearchInput');
 const homeSearchBtn = document.getElementById('homeSearchBtn');
+const homeMailBtn = document.getElementById('homeMailBtn');
+const homeMailBadge = document.getElementById('homeMailBadge');
 const searchResultsPanel = document.getElementById('searchResultsPanel');
 const noticeCarousel = document.getElementById('noticeCarousel');
 const noticeDots = document.getElementById('noticeDots');
@@ -6842,6 +6918,7 @@ function renderBlogHomeUser(userLike){
   if(profileEmailInput) profileEmailInput.value = profileTexts.email || '';
   if(profileTagsInput) profileTagsInput.value = tags.join(', ');
   document.body.classList.toggle('site-owner', isSiteOwnerUser(user));
+  if(contactOwnerBtn) contactOwnerBtn.style.display = isSiteOwnerUser(user) ? 'none' : '';
   applyProfileEditorAvatarPreview(avatar);
 
   applyBlogAvatarPreview(avatar);
@@ -6885,9 +6962,18 @@ function updateToolStats(user = readSavedUser()){
   if(toolRegisterDays) toolRegisterDays.textContent = daysSince(user?.createdAt);
   if(toolTagCount) toolTagCount.textContent = tags.length;
   if(toolMailCount) toolMailCount.textContent = mailState.inbox.length;
+  updateMailBadge();
   const activeTool = document.querySelector('.feature-pill.active');
   if(featureDescription && activeTool && typeof getFeatureText === 'function'){
     featureDescription.textContent = getFeatureText(activeTool.dataset.feature);
+  }
+}
+
+function updateMailBadge(){
+  const unreadCount = (mailState.inbox || []).filter(mail=>!mail.read).length;
+  if(homeMailBadge){
+    homeMailBadge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+    homeMailBadge.classList.toggle('active', unreadCount > 0);
   }
 }
 
@@ -7895,6 +7981,7 @@ async function loadMail(mode = 'inbox'){
     const data = await authRequest('/api/mail', { method:'GET', headers:authorizedHeaders() });
     mailState = { inbox:data.inbox || [], sent:data.sent || [] };
     updateToolStats();
+    updateMailBadge();
     renderMailList(mode);
   }catch(error){
     showLoginToast(error.message || '读取邮件失败。', 'error', '邮件错误');
@@ -7905,13 +7992,15 @@ function renderMailList(mode){
   const items = mailState[mode] || [];
   if(!mailListPanel) return;
   if(!items.length){
-    mailListPanel.innerHTML = `<div class="mail-item"><strong>${mode === 'inbox' ? '收件箱为空' : '发件箱为空'}</strong><p>邮件 24 小时后会自动清理，这里会同时展示最近 3 条。</p></div>`;
+    mailListPanel.innerHTML = `<div class="mail-item"><strong>收件箱为空</strong><p>这里会显示最近收到的站内邮件，邮件 24 小时后会自动清理。</p></div>`;
     return;
   }
-  mailListPanel.innerHTML = items.slice(0, 3).map((mail, index)=>`
-    <article class="mail-item" data-mail-index="${index}">
+  mailListPanel.innerHTML = items.slice(0, 8).map((mail, index)=>`
+    <article class="mail-item ${!mail.read ? 'unread' : ''}" data-mail-index="${index}">
+      <span class="mail-read-state ${!mail.read ? 'unread' : ''}">${mail.read ? '已读' : '未读'}</span>
       <strong>${escapeHtml(mail.subject || '无主题')}</strong>
-      <small>${mode === 'inbox' ? '来自' : '发送给'} <span class="mail-user-link" data-mail-user="${escapeHtml(mode === 'inbox' ? mail.from : mail.to)}">${escapeHtml(mode === 'inbox' ? mail.from : mail.to)}</span> · ${escapeHtml(mail.createdAt || '')}</small>
+      <small>发件人 <span class="mail-user-link" data-mail-user="${escapeHtml(mail.from)}">${escapeHtml(mail.from)}</span> · 收件时间 ${escapeHtml(mail.createdAt || '')}</small>
+      ${mail.attachment && String(mail.attachment.type || '').startsWith('image/') ? `<img class="mail-thumb" src="${mail.attachment.data}" alt="邮件图片缩略图" />` : ''}
       <p>${escapeHtml(mail.body || '')}</p>
       ${mail.attachment ? `<small>📎 ${escapeHtml(mail.attachment.name || '附件')}</small>` : ''}
     </article>
@@ -7938,6 +8027,16 @@ function openMailReader(mail, mode){
   }
   mailReadModal?.classList.add('open');
   mailReadModal?.setAttribute('aria-hidden', 'false');
+  if(mode === 'inbox' && !mail.read){
+    mail.read = true;
+    updateMailBadge();
+    renderMailList('inbox');
+    authRequest('/api/mail', {
+      method:'PUT',
+      headers:authorizedHeaders(),
+      body:JSON.stringify({ id:mail.id })
+    }).then(()=>loadMail('inbox')).catch(()=>{});
+  }
 }
 
 function closeMailReader(){
@@ -7978,7 +8077,7 @@ async function sendMail(){
     mailBodyInput.value = '';
     clearMailAttachment();
     showLoginToast('站内邮件已发送。', 'success', '发送成功');
-    await loadMail('sent');
+    await loadMail('inbox');
   }catch(error){
     showLoginToast(error.message || '发送邮件失败。', 'error', '发送失败');
   }finally{
@@ -7993,11 +8092,14 @@ if(homeSearchBtn) homeSearchBtn.addEventListener('click', ()=>{
 });
 if(homeSearchInput){
   homeSearchInput.value = '';
-  homeSearchInput.setAttribute('autocomplete', 'off');
+  homeSearchInput.setAttribute('autocomplete', 'new-password');
   homeSearchInput.setAttribute('readonly', 'readonly');
   setTimeout(()=>homeSearchInput.removeAttribute('readonly'), 350);
   window.addEventListener('pageshow', ()=>{ homeSearchInput.value = ''; searchResultsPanel?.classList.remove('open'); });
-  homeSearchInput.addEventListener('input', scheduleHomeSearch);
+  homeSearchInput.addEventListener('input', ()=>{
+    searchResultsPanel.innerHTML = '';
+    searchResultsPanel.classList.remove('open');
+  });
   homeSearchInput.addEventListener('focus', ()=>homeSearchInput.removeAttribute('readonly'));
   homeSearchInput.addEventListener('keydown', event=>{
     if(event.key === 'Enter') runHomeSearch();
@@ -8011,9 +8113,9 @@ if(publicProfileModal){
   });
 }
 if(contactOwnerBtn) contactOwnerBtn.addEventListener('click', contactSiteOwner);
+if(homeMailBtn) homeMailBtn.addEventListener('click', ()=>openMailCenter('inbox'));
 if(mailCloseBtn) mailCloseBtn.addEventListener('click', closeMailCenter);
 if(mailInboxTab) mailInboxTab.addEventListener('click', ()=>loadMail('inbox'));
-if(mailSentTab) mailSentTab.addEventListener('click', ()=>loadMail('sent'));
 if(mailComposeTab) mailComposeTab.addEventListener('click', ()=>setMailTab('compose'));
 if(mailSendBtn) mailSendBtn.addEventListener('click', sendMail);
 if(mailModal) mailModal.addEventListener('click', event=>{ if(event.target === mailModal) closeMailCenter(); });

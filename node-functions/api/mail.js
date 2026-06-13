@@ -130,6 +130,26 @@ export async function onRequestPost(context){
   }
 }
 
+export async function onRequestPut(context){
+  const auth = await requireUser(context.request);
+  if(auth.error){
+    return json({ error:auth.error }, auth.status);
+  }
+  try{
+    const body = await readJsonBody(context.request);
+    const id = String(body.id || '').trim();
+    if(!id) return json({ error:'缺少邮件 ID。' }, 400);
+    const inbox = await readMailbox(inboxKey(auth.user.username));
+    const nextInbox = inbox.map(mail => mail.id === id ? { ...mail, read:true } : mail);
+    await redis.set(inboxKey(auth.user.username), nextInbox);
+    const mail = nextInbox.find(item=>item.id === id) || null;
+    return json({ ok:true, mail });
+  }catch(error){
+    console.error('mail update error:', error);
+    return json({ error:error.message || '更新邮件状态失败。' }, error.status || 500);
+  }
+}
+
 export function onRequest(){
-  return json({ error:'只支持 GET 或 POST 请求。' }, 405);
+  return json({ error:'只支持 GET、POST 或 PUT 请求。' }, 405);
 }
