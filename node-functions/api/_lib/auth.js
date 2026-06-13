@@ -218,7 +218,7 @@ export function sanitizeUserProfile(input = {}, username = ''){
           category: typeof article.category === 'string' ? article.category.trim().slice(0, 40) : 'USER',
           summary: typeof article.summary === 'string' ? article.summary.trim().slice(0, 260) : '',
           content: typeof article.content === 'string' ? article.content.slice(0, 8_000_000) : '',
-          thumb: typeof article.thumb === 'string' && article.thumb.startsWith('data:image/') && Buffer.byteLength(article.thumb, 'utf8') <= 3_800_000
+          thumb: typeof article.thumb === 'string' && article.thumb.startsWith('data:image/') && Buffer.byteLength(article.thumb, 'utf8') <= 4_800_000
             ? article.thumb
             : 'linear-gradient(135deg,#7c5cff,#ff8fc7)',
           fontFamily: typeof article.fontFamily === 'string' ? article.fontFamily.slice(0, 80) : '',

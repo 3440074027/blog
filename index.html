@@ -4636,6 +4636,16 @@
     background:rgba(12,16,38,.72);
     border:1px solid rgba(255,255,255,.28);
   }
+  .article-select-check{
+    position:absolute;
+    top:10px;
+    right:10px;
+    z-index:3;
+    width:24px;
+    height:24px;
+    accent-color:#ff8fc7;
+    cursor:pointer;
+  }
   .article-toolbar{
     display:flex;
     flex-wrap:wrap;
@@ -4653,6 +4663,10 @@
     font-weight:950;
     cursor:pointer;
     background:linear-gradient(135deg, rgba(127,247,255,.18), rgba(255,143,199,.16));
+  }
+  .article-toolbar button.active{
+    background:linear-gradient(135deg, rgba(127,247,255,.34), rgba(255,143,199,.28));
+    box-shadow:0 0 0 3px rgba(127,247,255,.1), 0 12px 28px rgba(0,0,0,.2);
   }
   .article-toolbar button.danger{
     background:linear-gradient(135deg, rgba(255,91,122,.28), rgba(255,143,199,.18));
@@ -4769,6 +4783,16 @@
   }
   .article-editor-switches button.active{
     background:linear-gradient(135deg, rgba(127,247,255,.24), rgba(255,143,199,.2));
+    box-shadow:0 0 0 3px rgba(127,247,255,.1);
+    transform:translateY(-1px);
+  }
+  .article-style-panel label.applied{
+    color:#fff;
+  }
+  .article-style-panel label.applied input,
+  .article-style-panel label.applied select{
+    border-color:rgba(127,247,255,.55);
+    box-shadow:0 0 0 3px rgba(127,247,255,.1);
   }
   .article-rich-editor{
     min-height:300px;
@@ -6353,7 +6377,7 @@ function getUserArticles(user = readSavedUser()){
 }
 
 function getAllArticles(){
-  return [...getUserArticles(), ...BLOG_ARTICLES.map((article, index)=>({ ...article, id:`demo-${index}`, demo:true }))];
+  return [...getUserArticles()];
 }
 
 function articleThumbStyle(article){
@@ -6393,9 +6417,21 @@ function renderArticles(){
   articleGrid.classList.remove('turning');
   void articleGrid.offsetWidth;
   articleGrid.classList.add('turning');
+  if(!items.length){
+    articleGrid.innerHTML = `
+      <article class="article-card">
+        <div class="article-thumb" style="--article-thumb:linear-gradient(135deg,#7c5cff,#ff8fc7)"></div>
+        <div>
+          <small>EMPTY · 当前账号</small>
+          <h3>还没有发布文章</h3>
+          <p>点击右上角“发布文章”，创建第一篇和账号绑定的文章。</p>
+        </div>
+      </article>
+    `;
+  }else{
   articleGrid.innerHTML = items.map(article=>`
     <article class="article-card ${deleteArticleMode && !article.demo ? 'selectable' : ''} ${selectedArticleIds.has(article.id) ? 'selected' : ''}" data-article-id="${escapeHtml(article.id || '')}" data-demo="${article.demo ? '1' : '0'}">
-      ${deleteArticleMode && !article.demo ? `<div class="article-select-mark">${selectedArticleIds.has(article.id) ? '✓' : ''}</div>` : ''}
+      ${deleteArticleMode && !article.demo ? `<input class="article-select-check" type="checkbox" ${selectedArticleIds.has(article.id) ? 'checked' : ''} aria-label="选择文章" />` : ''}
       <div class="article-thumb" style="--article-thumb:${articleThumbStyle(article)}"></div>
       <div>
         <small>${escapeHtml(article.category)} · ${escapeHtml(article.date || article.createdAt || '')}</small>
@@ -6404,6 +6440,7 @@ function renderArticles(){
       </div>
     </article>
   `).join('');
+  }
   if(articlePageInfo) articlePageInfo.textContent = `第 ${articlePage} / ${totalPages} 页`;
   if(articlePageInput){
     articlePageInput.max = totalPages;
@@ -6412,13 +6449,18 @@ function renderArticles(){
   if(articlePrevBtn) articlePrevBtn.disabled = articlePage <= 1;
   if(articleNextBtn) articleNextBtn.disabled = articlePage >= totalPages;
   articleGrid.querySelectorAll('.article-card.selectable').forEach(card=>{
-    card.addEventListener('click', ()=>{
+    const toggle = ()=>{
       const id = card.dataset.articleId;
       if(!id) return;
       if(selectedArticleIds.has(id)) selectedArticleIds.delete(id);
       else selectedArticleIds.add(id);
       renderArticles();
+    };
+    card.addEventListener('click', event=>{
+      if(event.target.closest('.article-select-check')) return;
+      toggle();
     });
+    card.querySelector('.article-select-check')?.addEventListener('change', toggle);
   });
   updateToolStats();
 }
@@ -6477,6 +6519,20 @@ function closeArticleEditor(){
 function applyArticleCommand(command, value = null){
   articleContentEditor?.focus();
   document.execCommand(command, false, value);
+}
+
+function markArticleControlApplied(control){
+  if(!control) return;
+  control.classList.add('active');
+  const label = control.closest?.('label');
+  label?.classList.add('applied');
+  clearTimeout(control._appliedTimer);
+  control._appliedTimer = setTimeout(()=>{
+    if(!['articleBoldBtn','articleItalicBtn','articleUnderlineBtn'].includes(control.id)){
+      control.classList.remove('active');
+    }
+    label?.classList.remove('applied');
+  }, 900);
 }
 
 function applyArticleFontSize(){
@@ -6546,6 +6602,7 @@ function toggleArticleDeleteMode(on = !deleteArticleMode){
   deleteArticleMode = on;
   if(!deleteArticleMode) selectedArticleIds.clear();
   articleDeleteTools?.classList.toggle('active', deleteArticleMode);
+  articleDeleteModeBtn?.classList.toggle('active', deleteArticleMode);
   articleDeleteModeBtn.textContent = deleteArticleMode ? '选择要删除的文章' : '删除文章';
   renderArticles();
 }
@@ -6582,15 +6639,15 @@ if(articleDeleteCancelBtn) articleDeleteCancelBtn.addEventListener('click', ()=>
 if(articleDeleteConfirmBtn) articleDeleteConfirmBtn.addEventListener('click', deleteSelectedArticles);
 if(articleEditorCloseBtn) articleEditorCloseBtn.addEventListener('click', closeArticleEditor);
 if(articleEditorModal) articleEditorModal.addEventListener('click', event=>{ if(event.target === articleEditorModal) closeArticleEditor(); });
-if(articleBoldBtn) articleBoldBtn.addEventListener('click', ()=>applyArticleCommand('bold'));
-if(articleItalicBtn) articleItalicBtn.addEventListener('click', ()=>applyArticleCommand('italic'));
-if(articleUnderlineBtn) articleUnderlineBtn.addEventListener('click', ()=>applyArticleCommand('underline'));
-if(articleClearFormatBtn) articleClearFormatBtn.addEventListener('click', ()=>applyArticleCommand('removeFormat'));
-if(articleFontSelect) articleFontSelect.addEventListener('change', ()=>applyArticleCommand('fontName', articleFontSelect.value));
-if(articleFontWeightSelect) articleFontWeightSelect.addEventListener('change', ()=>{ articleContentEditor.style.fontWeight = articleFontWeightSelect.value; });
-if(articleFontSizeInput) articleFontSizeInput.addEventListener('change', applyArticleFontSize);
-if(articleColorInput) articleColorInput.addEventListener('input', ()=>applyArticleCommand('foreColor', articleColorInput.value));
-if(articleHeadingSelect) articleHeadingSelect.addEventListener('change', ()=>applyArticleCommand('formatBlock', articleHeadingSelect.value));
+if(articleBoldBtn) articleBoldBtn.addEventListener('click', ()=>{ applyArticleCommand('bold'); articleBoldBtn.classList.toggle('active'); });
+if(articleItalicBtn) articleItalicBtn.addEventListener('click', ()=>{ applyArticleCommand('italic'); articleItalicBtn.classList.toggle('active'); });
+if(articleUnderlineBtn) articleUnderlineBtn.addEventListener('click', ()=>{ applyArticleCommand('underline'); articleUnderlineBtn.classList.toggle('active'); });
+if(articleClearFormatBtn) articleClearFormatBtn.addEventListener('click', ()=>{ applyArticleCommand('removeFormat'); [articleBoldBtn, articleItalicBtn, articleUnderlineBtn].forEach(btn=>btn?.classList.remove('active')); markArticleControlApplied(articleClearFormatBtn); });
+if(articleFontSelect) articleFontSelect.addEventListener('change', ()=>{ applyArticleCommand('fontName', articleFontSelect.value); markArticleControlApplied(articleFontSelect); });
+if(articleFontWeightSelect) articleFontWeightSelect.addEventListener('change', ()=>{ articleContentEditor.style.fontWeight = articleFontWeightSelect.value; markArticleControlApplied(articleFontWeightSelect); });
+if(articleFontSizeInput) articleFontSizeInput.addEventListener('change', ()=>{ applyArticleFontSize(); markArticleControlApplied(articleFontSizeInput); });
+if(articleColorInput) articleColorInput.addEventListener('input', ()=>{ applyArticleCommand('foreColor', articleColorInput.value); markArticleControlApplied(articleColorInput); });
+if(articleHeadingSelect) articleHeadingSelect.addEventListener('change', ()=>{ applyArticleCommand('formatBlock', articleHeadingSelect.value); markArticleControlApplied(articleHeadingSelect); });
 if(articleInsertImageBtn) articleInsertImageBtn.addEventListener('click', ()=>articleImageInput?.click());
 if(articleImageInput) articleImageInput.addEventListener('change', async ()=>{
   const file = articleImageInput.files && articleImageInput.files[0];
@@ -6839,8 +6896,8 @@ function publicAvatarStyle(avatar){
 function renderSearchResults(items){
   if(!searchResultsPanel) return;
   if(!items.length){
-    searchResultsPanel.innerHTML = '<div class="search-result-item"><div class="search-result-avatar"></div><div><strong>没有找到结果</strong><span>换个关键词试试，例如用户名、标签或文章标题</span></div><em class="search-result-kind">EMPTY</em></div>';
-    searchResultsPanel.classList.add('open');
+    searchResultsPanel.innerHTML = '';
+    searchResultsPanel.classList.remove('open');
     return;
   }
   searchResultsPanel.innerHTML = items.map((item, index)=>{
@@ -6886,7 +6943,8 @@ function renderSearchResults(items){
 async function runHomeSearch(){
   const query = String(homeSearchInput?.value || '').trim();
   if(!query){
-    renderSearchResults([]);
+    searchResultsPanel.innerHTML = '';
+    searchResultsPanel.classList.remove('open');
     return;
   }
   const articleMatches = getAllArticles()
@@ -7126,8 +7184,10 @@ if(homeSearchBtn) homeSearchBtn.addEventListener('click', ()=>{
 });
 if(homeSearchInput){
   homeSearchInput.addEventListener('input', ()=>{
-    clearTimeout(homeSearchInput._searchTimer);
-    homeSearchInput._searchTimer = setTimeout(runHomeSearch, 260);
+    if(!String(homeSearchInput.value || '').trim()){
+      searchResultsPanel.innerHTML = '';
+      searchResultsPanel.classList.remove('open');
+    }
   });
   homeSearchInput.addEventListener('keydown', event=>{
     if(event.key === 'Enter') runHomeSearch();
