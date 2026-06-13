@@ -3867,20 +3867,21 @@
   }
   .mail-card,
   .owner-contact-card{
-    width:min(840px, 94vw);
+    width:min(900px, 94vw);
     max-height:86vh;
     overflow:auto;
     display:grid;
     gap:14px;
-    padding:22px;
-    border-radius:30px;
+    padding:26px;
+    border-radius:38px;
     color:#fff;
     background:
-      radial-gradient(circle at 14% 0%, rgba(255,190,221,.28), transparent 36%),
-      radial-gradient(circle at 92% 14%, rgba(143,247,255,.2), transparent 35%),
-      rgba(26,28,64,.9);
-    border:1px solid rgba(255,255,255,.2);
-    box-shadow:0 30px 90px rgba(0,0,0,.4);
+      radial-gradient(circle at 10% -8%, rgba(255,239,177,.34), transparent 34%),
+      radial-gradient(circle at 18% 8%, rgba(255,190,221,.34), transparent 34%),
+      radial-gradient(circle at 92% 12%, rgba(143,247,255,.26), transparent 34%),
+      linear-gradient(135deg, rgba(61,52,117,.92), rgba(39,45,95,.9));
+    border:1px solid rgba(255,255,255,.28);
+    box-shadow:0 34px 100px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.24);
   }
   .mail-card{
     animation:mailPopIn .34s cubic-bezier(.22,.08,.28,1) both;
@@ -3896,11 +3897,12 @@
     justify-content:space-between;
     gap:14px;
   }
-  .mail-head h2,.owner-contact-head h2{margin:0;font-size:24px;letter-spacing:-.03em;}
+  .mail-head h2,.owner-contact-head h2{margin:0;font-size:28px;letter-spacing:-.05em;text-shadow:0 16px 36px rgba(0,0,0,.22);}
   .mail-close,.owner-contact-close{
-    width:34px;height:34px;border-radius:50%;
-    border:1px solid rgba(255,255,255,.2);
-    color:#fff;background:rgba(255,255,255,.1);cursor:pointer;
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.34);
+    color:#fff;background:rgba(255,255,255,.16);cursor:pointer;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28);
   }
   .mail-tabs,.owner-contact-actions{
     display:flex;
@@ -3908,20 +3910,20 @@
     gap:10px;
   }
   .mail-tabs button,.owner-contact-actions button,.mail-send-btn{
-    min-height:38px;
-    padding:0 14px;
+    min-height:40px;
+    padding:0 16px;
     border-radius:999px;
     border:1px solid rgba(255,255,255,.2);
     color:#fff;
     font-weight:900;
     cursor:pointer;
-    background:linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,156,204,.14));
+    background:linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,190,221,.18));
     box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
     transition:transform .2s, background .2s, box-shadow .2s;
   }
   .mail-tabs button:hover,.mail-send-btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(0,0,0,.18);}
-  .mail-tabs button.active{background:linear-gradient(135deg, rgba(127,247,255,.28), rgba(255,143,199,.2));}
-  .mail-compose{display:grid;gap:10px;padding:14px;border-radius:24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);}
+  .mail-tabs button.active{background:linear-gradient(135deg, rgba(143,247,255,.32), rgba(255,190,221,.26), rgba(255,239,177,.16));}
+  .mail-compose{display:grid;gap:12px;padding:16px;border-radius:28px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.18);}
   .mail-list{
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -3934,18 +3936,20 @@
   }
   .mail-compose input,.mail-compose textarea{
     width:100%;border:none;outline:none;border-radius:14px;
-    padding:10px 11px;color:#fff;background:rgba(255,255,255,.14);
-    border:1px solid rgba(255,255,255,.14);font:inherit;resize:none;
+    padding:11px 12px;color:#fff;background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.18);font:inherit;resize:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
   }
   .mail-item{
     position:relative;
     min-height:136px;
     padding:14px;
-    border-radius:22px;
+    border-radius:26px;
     background:
-      radial-gradient(circle at 12% 0%, rgba(255,190,221,.2), transparent 34%),
-      linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.08));
-    border:1px solid rgba(255,255,255,.13);
+      radial-gradient(circle at 12% 0%, rgba(255,239,177,.18), transparent 32%),
+      radial-gradient(circle at 88% 8%, rgba(143,247,255,.14), transparent 30%),
+      linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.1));
+    border:1px solid rgba(255,255,255,.18);
     text-align:left;
     cursor:pointer;
     animation:mailItemIn .32s cubic-bezier(.22,.08,.28,1) both;
@@ -3953,9 +3957,10 @@
   }
   @keyframes mailItemIn{from{opacity:0;transform:translateY(12px) scale(.98);}to{opacity:1;transform:none;}}
   .mail-item:hover{
-    transform:translateY(-3px);
-    background:rgba(255,255,255,.15);
-    box-shadow:0 18px 40px rgba(0,0,0,.2);
+    transform:translateY(-5px) scale(1.01);
+    background:rgba(255,255,255,.18);
+    border-color:rgba(255,255,255,.3);
+    box-shadow:0 22px 52px rgba(0,0,0,.22), 0 0 26px rgba(143,247,255,.12);
   }
   .mail-item strong{display:block;font-size:13px;}
   .mail-item small{display:block;margin:5px 0;color:#8fceff;font-weight:850;}
@@ -3995,6 +4000,20 @@
     background:#ff315f;
     box-shadow:0 0 12px rgba(255,49,95,.6);
   }
+  .mail-delete-btn{
+    position:absolute;
+    right:10px;
+    bottom:10px;
+    min-height:28px;
+    padding:0 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.22);
+    color:#fff;
+    font-size:10px;
+    font-weight:950;
+    cursor:pointer;
+    background:linear-gradient(135deg, rgba(255,91,122,.34), rgba(255,190,221,.18));
+  }
   .mail-thumb{
     width:100%;
     height:70px;
@@ -4012,9 +4031,9 @@
     justify-content:space-between;
     gap:10px;
     padding:12px 14px;
-    border-radius:20px;
-    background:rgba(255,255,255,.09);
-    border:1px solid rgba(255,255,255,.12);
+    border-radius:24px;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.18);
   }
   .mail-list-toolbar strong{font-size:14px;}
   .mail-list-toolbar button{
@@ -6156,7 +6175,6 @@
     <div class="mail-tabs">
       <button id="mailInboxTab" class="active" type="button">收件箱</button>
       <button id="mailSentTab" type="button">发件箱</button>
-      <button id="mailComposeTab" type="button">写邮件</button>
     </div>
     <div class="mail-compose" id="mailComposePanel" hidden>
       <label>收件用户名<input id="mailToInput" type="text" maxlength="20" placeholder="填写对方用户名" /></label>
@@ -6168,7 +6186,10 @@
         <button id="mailClearAttachBtn" type="button">清除附件</button>
         <input id="mailAttachmentInput" type="file" hidden />
       </div>
-      <button class="mail-send-btn" id="mailSendBtn" type="button">发送邮件</button>
+      <div class="mail-attach-row">
+        <button class="mail-send-btn" id="mailSendBtn" type="button">发送邮件</button>
+        <button id="mailBackListBtn" type="button">返回列表</button>
+      </div>
     </div>
     <div class="mail-list" id="mailListPanel"></div>
   </div>
@@ -6739,6 +6760,7 @@ const mailToInput = document.getElementById('mailToInput');
 const mailSubjectInput = document.getElementById('mailSubjectInput');
 const mailBodyInput = document.getElementById('mailBodyInput');
 const mailSendBtn = document.getElementById('mailSendBtn');
+const mailBackListBtn = document.getElementById('mailBackListBtn');
 const mailAttachBtn = document.getElementById('mailAttachBtn');
 const mailClearAttachBtn = document.getElementById('mailClearAttachBtn');
 const mailAttachmentInput = document.getElementById('mailAttachmentInput');
@@ -8028,7 +8050,8 @@ function openMailCenter(mode = 'inbox', to = ''){
   if(to) mailToInput.value = to;
   mailModal?.classList.add('open');
   mailModal?.setAttribute('aria-hidden', 'false');
-  loadMail(mode);
+  if(mode === 'compose') openMailCompose(to);
+  else loadMail(mode);
 }
 
 function closeMailCenter(){
@@ -8064,6 +8087,10 @@ function openMailCompose(to = ''){
   setTimeout(()=>mailSubjectInput?.focus(), 80);
 }
 
+function backToMailList(){
+  loadMail(currentMailMode === 'compose' ? 'sent' : currentMailMode);
+}
+
 async function loadMail(mode = 'inbox'){
   setMailTab(mode);
   if(mode === 'compose') return;
@@ -8096,6 +8123,7 @@ function renderMailList(mode){
   mailListPanel.innerHTML = toolbar + items.slice(0, 8).map((mail, index)=>`
     <article class="mail-item ${mode === 'inbox' && !mail.read ? 'unread' : ''}" data-mail-index="${index}" style="animation-delay:${index * 45}ms">
       ${mode === 'inbox' ? `<span class="mail-read-state ${!mail.read ? 'unread' : ''}">${mail.read ? '已读' : '未读'}</span>` : '<span class="mail-read-state">已发送</span>'}
+      <button class="mail-delete-btn" type="button" data-mail-delete="${index}">删除</button>
       <strong>${escapeHtml(mail.subject || '无主题')}</strong>
       <small>${mode === 'sent' ? '收件人' : '发件人'} <span class="mail-user-link" data-mail-user="${escapeHtml(mode === 'sent' ? mail.to : mail.from)}">${escapeHtml(mode === 'sent' ? mail.to : mail.from)}</span> · ${mode === 'sent' ? '发送时间' : '收件时间'} ${escapeHtml(mail.createdAt || '')}</small>
       ${mail.attachment && String(mail.attachment.type || '').startsWith('image/') ? `<img class="mail-thumb" src="${mail.attachment.data}" alt="邮件图片缩略图" />` : ''}
@@ -8107,12 +8135,36 @@ function renderMailList(mode){
   mailListPanel.querySelectorAll('[data-mail-index]').forEach(el=>{
     el.addEventListener('click', ()=>openMailReader(items[Number(el.dataset.mailIndex)], mode));
   });
+  mailListPanel.querySelectorAll('[data-mail-delete]').forEach(btn=>{
+    btn.addEventListener('click', event=>{
+      event.stopPropagation();
+      deleteMail(items[Number(btn.dataset.mailDelete)], mode);
+    });
+  });
   mailListPanel.querySelectorAll('[data-mail-user]').forEach(el=>{
     el.addEventListener('click', event=>{
       event.stopPropagation();
       openMailCompose(el.dataset.mailUser || '');
     });
   });
+}
+
+async function deleteMail(mail, mode){
+  if(!mail?.id) return;
+  try{
+    await authRequest('/api/mail', {
+      method:'DELETE',
+      headers:authorizedHeaders(),
+      body:JSON.stringify({ id:mail.id, box:mode })
+    });
+    mailState[mode] = (mailState[mode] || []).filter(item=>item.id !== mail.id);
+    updateToolStats();
+    updateMailBadge();
+    renderMailList(mode);
+    showLoginToast('邮件已删除。', 'success', '删除成功');
+  }catch(error){
+    showLoginToast(error.message || '删除邮件失败。', 'error', '删除失败');
+  }
 }
 
 function openMailReader(mail, mode){
@@ -8207,7 +8259,7 @@ async function sendMail(){
     mailBodyInput.value = '';
     clearMailAttachment();
     showLoginToast('站内邮件已发送。', 'success', '发送成功');
-    await loadMail('inbox');
+    await loadMail('sent');
   }catch(error){
     showLoginToast(error.message || '发送邮件失败。', 'error', '发送失败');
   }finally{
@@ -8246,8 +8298,10 @@ if(contactOwnerBtn) contactOwnerBtn.addEventListener('click', contactSiteOwner);
 if(homeMailBtn) homeMailBtn.addEventListener('click', ()=>openMailCenter('inbox'));
 if(mailCloseBtn) mailCloseBtn.addEventListener('click', closeMailCenter);
 if(mailInboxTab) mailInboxTab.addEventListener('click', ()=>loadMail('inbox'));
+if(mailSentTab) mailSentTab.addEventListener('click', ()=>loadMail('sent'));
 if(mailComposeTab) mailComposeTab.addEventListener('click', ()=>setMailTab('compose'));
 if(mailSendBtn) mailSendBtn.addEventListener('click', sendMail);
+if(mailBackListBtn) mailBackListBtn.addEventListener('click', backToMailList);
 if(mailModal) mailModal.addEventListener('click', event=>{ if(event.target === mailModal) closeMailCenter(); });
 if(mailReadCloseBtn) mailReadCloseBtn.addEventListener('click', closeMailReader);
 if(mailReadModal) mailReadModal.addEventListener('click', event=>{ if(event.target === mailReadModal) closeMailReader(); });

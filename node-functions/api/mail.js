@@ -150,6 +150,27 @@ export async function onRequestPut(context){
   }
 }
 
+export async function onRequestDelete(context){
+  const auth = await requireUser(context.request);
+  if(auth.error){
+    return json({ error:auth.error }, auth.status);
+  }
+  try{
+    const body = await readJsonBody(context.request);
+    const id = String(body.id || '').trim();
+    const box = String(body.box || 'inbox').trim();
+    if(!id) return json({ error:'缺少邮件 ID。' }, 400);
+    const key = box === 'sent' ? sentKey(auth.user.username) : inboxKey(auth.user.username);
+    const items = await readMailbox(key);
+    const nextItems = items.filter(mail => mail.id !== id);
+    await redis.set(key, nextItems);
+    return json({ ok:true, deleted:items.length - nextItems.length });
+  }catch(error){
+    console.error('mail delete error:', error);
+    return json({ error:error.message || '删除邮件失败。' }, error.status || 500);
+  }
+}
+
 export function onRequest(){
-  return json({ error:'只支持 GET、POST 或 PUT 请求。' }, 405);
+  return json({ error:'只支持 GET、POST、PUT 或 DELETE 请求。' }, 405);
 }
