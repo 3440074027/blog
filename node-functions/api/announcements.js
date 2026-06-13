@@ -3,12 +3,12 @@ import { json, readJsonBody, requireUser, isSiteOwner, redis, nowIso } from './_
 const ANNOUNCEMENTS_KEY = 'site:announcements';
 
 const DEFAULT_ANNOUNCEMENTS = [
-  { id:'welcome', kicker:'✨ 星尘公告', title:'欢迎来到你的灵感档案馆', body:'这里会收纳文章、文件、灵感和成长记录。每一次登录，都是和未来的自己重逢。' },
-  { id:'writing', kicker:'🌙 创作提醒', title:'把今天的想法留下来', body:'一段文字、一张配图、一次复盘，都可以成为下一篇博客的起点。' },
-  { id:'roadmap', kicker:'💫 系统计划', title:'文章系统正在扩展', body:'后续会加入文章编辑、文件收纳、分类检索和独立文章详情页。' },
-  { id:'profile', kicker:'🫧 温柔提示', title:'资料已和账号绑定', body:'头像、签名、简介和标签都可以同步保存，换设备登录也能继续显示。' },
-  { id:'owner', kicker:'💌 站主小纸条', title:'如果迷路了，可以联系站主 An', body:'站主资料卡里会同步 QQ 和邮箱，点击联系站主就能快速查看。' },
-  { id:'search', kicker:'🔎 搜索上线', title:'顶部搜索可以查找用户和文章', body:'输入用户名、标签或文章关键词，就能打开公开资料或定位内容。' }
+  { id:'welcome', kicker:'✨ 星尘公告', title:'欢迎来到你的灵感档案馆', body:'这里会收纳文章、文件、灵感和成长记录。每一次登录，都是和未来的自己重逢。', updatedAt:'2026-06-13', image:'' },
+  { id:'writing', kicker:'🌙 创作提醒', title:'把今天的想法留下来', body:'一段文字、一张配图、一次复盘，都可以成为下一篇博客的起点。', updatedAt:'2026-06-13', image:'' },
+  { id:'roadmap', kicker:'💫 系统计划', title:'文章系统正在扩展', body:'后续会加入文章编辑、文件收纳、分类检索和独立文章详情页。', updatedAt:'2026-06-13', image:'' },
+  { id:'profile', kicker:'🫧 温柔提示', title:'资料已和账号绑定', body:'头像、签名、简介和标签都可以同步保存，换设备登录也能继续显示。', updatedAt:'2026-06-13', image:'' },
+  { id:'owner', kicker:'💌 站主小纸条', title:'如果迷路了，可以联系站主 An', body:'站主资料卡里会同步 QQ 和邮箱，点击联系站主就能快速查看。', updatedAt:'2026-06-13', image:'' },
+  { id:'search', kicker:'🔎 搜索上线', title:'顶部搜索可以查找用户和文章', body:'输入用户名、标签或文章关键词，就能打开公开资料或定位内容。', updatedAt:'2026-06-13', image:'' }
 ];
 
 function sanitizeAnnouncements(input){
@@ -20,7 +20,9 @@ function sanitizeAnnouncements(input){
       id: typeof item.id === 'string' && item.id.trim() ? item.id.trim().slice(0, 80) : `notice-${index + 1}`,
       kicker: String(item.kicker || '').trim().slice(0, 60),
       title: String(item.title || '').trim().slice(0, 80),
-      body: String(item.body || '').trim().slice(0, 500)
+      body: String(item.body || '').trim().slice(0, 500),
+      updatedAt: String(item.updatedAt || nowIso().slice(0, 10)).trim().slice(0, 40),
+      image: String(item.image || '').trim().startsWith('data:image/') ? String(item.image || '').trim().slice(0, 700000) : ''
     }))
     .filter(item => item.kicker || item.title || item.body);
   return items.length ? items : DEFAULT_ANNOUNCEMENTS;

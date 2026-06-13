@@ -3472,6 +3472,17 @@
     cursor:pointer;
     background:linear-gradient(135deg, rgba(255,143,199,.26), rgba(127,247,255,.18));
   }
+  .profile-mail-btn{
+    width:100%;
+    min-height:42px;
+    margin-top:10px;
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:999px;
+    color:#fff;
+    font-weight:950;
+    cursor:pointer;
+    background:linear-gradient(135deg, rgba(127,247,255,.24), rgba(124,92,255,.2));
+  }
   .blog-profile-tags{
     margin-top:16px;
     display:flex;
@@ -3713,6 +3724,19 @@
     border:1px solid rgba(255,255,255,.14);
     resize:none;
   }
+  .notice-image-upload{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+  }
+  .notice-image-preview{
+    width:100%;
+    max-height:120px;
+    object-fit:cover;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.16);
+  }
   .notice-editor-actions{
     display:flex;
     flex-wrap:wrap;
@@ -3779,7 +3803,114 @@
     border-radius:16px;
     background:rgba(255,255,255,.09);
     border:1px solid rgba(255,255,255,.12);
+    cursor:pointer;
   }
+  .copy-field{
+    cursor:pointer;
+    transition:background .2s, transform .2s;
+  }
+  .copy-field:hover{background:rgba(127,247,255,.13);transform:translateY(-1px);}
+  .mail-modal,
+  .owner-contact-modal{
+    position:fixed;
+    inset:0;
+    z-index:360;
+    display:grid;
+    place-items:center;
+    padding:22px;
+    background:rgba(8,10,26,.5);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .24s, visibility .24s;
+  }
+  .mail-modal.open,
+  .owner-contact-modal.open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+  .mail-card,
+  .owner-contact-card{
+    width:min(760px, 94vw);
+    max-height:86vh;
+    overflow:auto;
+    display:grid;
+    gap:14px;
+    padding:22px;
+    border-radius:30px;
+    color:#fff;
+    background:rgba(16,20,48,.9);
+    border:1px solid rgba(255,255,255,.2);
+    box-shadow:0 30px 90px rgba(0,0,0,.4);
+  }
+  .mail-head,
+  .owner-contact-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+  }
+  .mail-head h2,.owner-contact-head h2{margin:0;font-size:22px;}
+  .mail-close,.owner-contact-close{
+    width:34px;height:34px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;background:rgba(255,255,255,.1);cursor:pointer;
+  }
+  .mail-tabs,.owner-contact-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .mail-tabs button,.owner-contact-actions button,.mail-send-btn{
+    min-height:38px;
+    padding:0 14px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+    font-weight:900;
+    cursor:pointer;
+    background:linear-gradient(135deg, rgba(255,255,255,.14), rgba(124,92,255,.16));
+  }
+  .mail-tabs button.active{background:linear-gradient(135deg, rgba(127,247,255,.28), rgba(255,143,199,.2));}
+  .mail-compose,.mail-list{display:grid;gap:10px;}
+  .mail-compose label{
+    display:grid;gap:6px;
+    color:rgba(255,255,255,.72);
+    font-size:11px;font-weight:900;
+  }
+  .mail-compose input,.mail-compose textarea{
+    width:100%;border:none;outline:none;border-radius:14px;
+    padding:10px 11px;color:#fff;background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.14);font:inherit;resize:none;
+  }
+  .mail-item{
+    padding:12px;
+    border-radius:18px;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.13);
+    text-align:left;
+  }
+  .mail-item strong{display:block;font-size:13px;}
+  .mail-item small{display:block;margin:5px 0;color:#8fceff;font-weight:850;}
+  .mail-item p{margin:0;color:rgba(255,255,255,.68);font-size:12px;line-height:1.65;}
+  .mail-user-link{color:#fff;text-decoration:underline;cursor:pointer;}
+  .tool-stats-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .tool-stat{
+    padding:12px;
+    border-radius:18px;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.14);
+  }
+  .tool-stat strong{display:block;font-size:24px;line-height:1;color:#fff;}
+  .tool-stat span{display:block;margin-top:6px;color:rgba(255,255,255,.58);font-size:10px;font-weight:900;}
+  .tool-mini-actions{display:grid;gap:8px;margin-top:12px;}
   .public-profile-articles small{color:#8fceff;font-size:10px;font-weight:900;}
   .public-profile-articles h3{margin:7px 0;font-size:14px;}
   .public-profile-articles p{margin:0;color:rgba(255,255,255,.62);font-size:11px;line-height:1.6;}
@@ -4323,6 +4454,23 @@
     font-weight:750;
     line-height:1.9;
   }
+  .notice-date{
+    display:inline-block;
+    margin-top:10px;
+    color:rgba(255,255,255,.52);
+    font-size:11px;
+    font-weight:850;
+    letter-spacing:.08em;
+  }
+  .notice-image{
+    max-width:min(360px, 42%);
+    max-height:180px;
+    object-fit:cover;
+    border-radius:24px;
+    margin-top:18px;
+    border:1px solid rgba(255,255,255,.2);
+    box-shadow:0 18px 46px rgba(0,0,0,.24);
+  }
   .article-grid{
     grid-template-columns:repeat(2, minmax(0, 1fr));
     min-height:272px;
@@ -4809,7 +4957,7 @@
         <div class="blog-user-mini-avatar" id="blogMiniAvatar" aria-hidden="true"></div>
         <div>
           <strong id="blogWelcomeName">访客</strong>
-          <span data-i18n="portalSynced">访客身份已同步</span>
+          <span id="blogVisitorIdentity" data-i18n="portalSynced">访客身份已同步</span>
         </div>
       </div>
       <div class="blog-profile-avatar" id="blogProfileAvatar" aria-label="用户头像"></div>
@@ -4844,6 +4992,7 @@
         </div>
       </div>
       <button class="owner-contact-btn" id="contactOwnerBtn" type="button">联系站主 An</button>
+      <button class="profile-mail-btn" id="mailCenterBtn" type="button">站内邮件中心</button>
       <div class="profile-quick-grid">
         <button class="profile-quick-btn" id="profileEditBtn" type="button">编辑资料</button>
         <button class="profile-quick-btn" id="profileMoodBtn" type="button">今日灵感</button>
@@ -4935,13 +5084,20 @@
 
     <aside class="blog-side-area">
       <section class="blog-stat-card blog-glass-card feature-orbit-card">
-        <small>功能区</small>
+        <small>个人数据</small>
         <h2>灵感工具箱</h2>
-        <button class="feature-pill active" type="button" data-feature="writing">写作模式</button>
-        <button class="feature-pill" type="button" data-feature="archive">文件收纳</button>
-        <button class="feature-pill" type="button" data-feature="search">快速检索</button>
-        <button class="feature-pill" type="button" data-feature="timeline">成长时间线</button>
-        <p id="featureDescription">进入沉浸式写作状态，整理今日想法和下一篇文章提纲。</p>
+        <div class="tool-stats-grid">
+          <div class="tool-stat"><strong id="toolArticleCount">0</strong><span>个人文章记录</span></div>
+          <div class="tool-stat"><strong id="toolRegisterDays">0</strong><span>注册天数</span></div>
+          <div class="tool-stat"><strong id="toolTagCount">0</strong><span>资料标签</span></div>
+          <div class="tool-stat"><strong id="toolMailCount">0</strong><span>收件箱邮件</span></div>
+        </div>
+        <div class="tool-mini-actions">
+          <button class="feature-pill active" type="button" data-feature="writing">今日写作建议</button>
+          <button class="feature-pill" type="button" data-feature="archive">资料完整度</button>
+          <button class="feature-pill" type="button" data-feature="search">快速搜索</button>
+        </div>
+        <p id="featureDescription">结合生日、星座、标签和文章记录，为你生成今日灵感。</p>
       </section>
       <section class="blog-tech-card blog-glass-card" id="blogTech">
         <small data-i18n="coreTech">核心技术</small>
@@ -4957,6 +5113,40 @@
     </aside>
   </div>
 </main>
+<div class="mail-modal" id="mailModal" aria-hidden="true">
+  <div class="mail-card" role="dialog" aria-modal="true" aria-labelledby="mailTitle">
+    <div class="mail-head">
+      <h2 id="mailTitle">站内邮件中心</h2>
+      <button class="mail-close" id="mailCloseBtn" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="mail-tabs">
+      <button id="mailInboxTab" class="active" type="button">收件箱</button>
+      <button id="mailSentTab" type="button">发件箱</button>
+      <button id="mailComposeTab" type="button">写邮件</button>
+    </div>
+    <div class="mail-compose" id="mailComposePanel" hidden>
+      <label>收件用户名<input id="mailToInput" type="text" maxlength="20" placeholder="填写对方用户名" /></label>
+      <label>主题<input id="mailSubjectInput" type="text" maxlength="80" placeholder="邮件主题" /></label>
+      <label>内容<textarea id="mailBodyInput" maxlength="1200" placeholder="写下你想发送的内容"></textarea></label>
+      <button class="mail-send-btn" id="mailSendBtn" type="button">发送邮件</button>
+    </div>
+    <div class="mail-list" id="mailListPanel"></div>
+  </div>
+</div>
+<div class="owner-contact-modal" id="ownerContactModal" aria-hidden="true">
+  <div class="owner-contact-card" role="dialog" aria-modal="true" aria-labelledby="ownerContactTitle">
+    <div class="owner-contact-head">
+      <h2 id="ownerContactTitle">联系站主 An</h2>
+      <button class="owner-contact-close" id="ownerContactCloseBtn" type="button" aria-label="关闭">×</button>
+    </div>
+    <p id="ownerContactInfo">可复制 QQ，或直接给站主发送站内邮件。</p>
+    <div class="owner-contact-actions">
+      <button id="ownerMailBtn" type="button">给站主发邮件</button>
+      <button id="ownerCopyQqBtn" type="button">复制站主 QQ</button>
+      <button id="ownerViewProfileBtn" type="button">查看站主资料</button>
+    </div>
+  </div>
+</div>
 <div class="public-profile-modal" id="publicProfileModal" aria-hidden="true">
   <div class="public-profile-card" role="dialog" aria-modal="true" aria-labelledby="publicProfileTitle">
     <div class="public-profile-head">
@@ -5387,6 +5577,8 @@ const profileZodiacText = document.getElementById('profileZodiacText');
 const profileQqText = document.getElementById('profileQqText');
 const profileEmailText = document.getElementById('profileEmailText');
 const contactOwnerBtn = document.getElementById('contactOwnerBtn');
+const mailCenterBtn = document.getElementById('mailCenterBtn');
+const blogVisitorIdentity = document.getElementById('blogVisitorIdentity');
 const profileEditBtn = document.getElementById('profileEditBtn');
 const profileMoodBtn = document.getElementById('profileMoodBtn');
 const profileEditor = document.getElementById('profileEditor');
@@ -5444,6 +5636,27 @@ const publicProfileModal = document.getElementById('publicProfileModal');
 const publicProfileCloseBtn = document.getElementById('publicProfileCloseBtn');
 const publicProfileBody = document.getElementById('publicProfileBody');
 const featureDescription = document.getElementById('featureDescription');
+const toolArticleCount = document.getElementById('toolArticleCount');
+const toolRegisterDays = document.getElementById('toolRegisterDays');
+const toolTagCount = document.getElementById('toolTagCount');
+const toolMailCount = document.getElementById('toolMailCount');
+const mailModal = document.getElementById('mailModal');
+const mailCloseBtn = document.getElementById('mailCloseBtn');
+const mailInboxTab = document.getElementById('mailInboxTab');
+const mailSentTab = document.getElementById('mailSentTab');
+const mailComposeTab = document.getElementById('mailComposeTab');
+const mailComposePanel = document.getElementById('mailComposePanel');
+const mailListPanel = document.getElementById('mailListPanel');
+const mailToInput = document.getElementById('mailToInput');
+const mailSubjectInput = document.getElementById('mailSubjectInput');
+const mailBodyInput = document.getElementById('mailBodyInput');
+const mailSendBtn = document.getElementById('mailSendBtn');
+const ownerContactModal = document.getElementById('ownerContactModal');
+const ownerContactCloseBtn = document.getElementById('ownerContactCloseBtn');
+const ownerContactInfo = document.getElementById('ownerContactInfo');
+const ownerMailBtn = document.getElementById('ownerMailBtn');
+const ownerCopyQqBtn = document.getElementById('ownerCopyQqBtn');
+const ownerViewProfileBtn = document.getElementById('ownerViewProfileBtn');
 const guestLoginBtn = document.getElementById('guestLoginBtn');
 const SITE_OWNER_USERNAME = 'An';
 const AUTH_TOKEN_KEY = 'ans_blog_auth_token';
@@ -5577,6 +5790,26 @@ function isSiteOwnerUser(user){
   return !!user && user.username === SITE_OWNER_USERNAME;
 }
 
+function daysSince(dateValue){
+  const time = Date.parse(dateValue || '');
+  if(!Number.isFinite(time)) return 0;
+  return Math.max(1, Math.floor((Date.now() - time) / 86400000) + 1);
+}
+
+async function copyText(value, label = '内容'){
+  const text = String(value || '').trim();
+  if(!text || text === '未填写'){
+    showLoginToast(`${label}还未填写。`, 'warn', '无法复制');
+    return;
+  }
+  try{
+    await navigator.clipboard.writeText(text);
+    showLoginToast(`${label}已复制：${text}`, 'success', '复制成功');
+  }catch(_){
+    showLoginToast(`请手动复制：${text}`, 'warn', '复制受限');
+  }
+}
+
 function applyBlogAvatarPreview(avatar){
   [blogMiniAvatar, blogProfileAvatar].forEach(el=>{
     if(!el) return;
@@ -5617,6 +5850,7 @@ function renderBlogHomeUser(userLike){
     : [tr('tagLong'), tr('tagAuto'), tr('tagVisual'), tr('tagCode')];
 
   if(blogWelcomeName) blogWelcomeName.textContent = displayName;
+  if(blogVisitorIdentity) blogVisitorIdentity.textContent = isSiteOwnerUser(user) ? '站主身份已同步' : tr('portalSynced');
   if(blogProfileName) blogProfileName.textContent = displayName;
   if(blogHeroName) blogHeroName.textContent = displayName;
   if(blogProfileMeta) blogProfileMeta.textContent = profileMeta;
@@ -5646,6 +5880,7 @@ function renderBlogHomeUser(userLike){
   if(blogProfileTags){
     blogProfileTags.innerHTML = tags.map(tag=>`<span>${escapeHtml(tag)}</span>`).join('');
   }
+  updateToolStats(user);
 }
 
 const BLOG_ARTICLES = [
@@ -5661,6 +5896,21 @@ const BLOG_ARTICLES = [
 
 let articlePage = 1;
 const ARTICLES_PER_PAGE = 4;
+let mailState = { inbox:[], sent:[] };
+
+function updateToolStats(user = readSavedUser()){
+  const profile = user?.profile || {};
+  const tags = Array.isArray(profile.tags) ? profile.tags : [];
+  const articleCount = BLOG_ARTICLES.length;
+  if(toolArticleCount) toolArticleCount.textContent = articleCount;
+  if(toolRegisterDays) toolRegisterDays.textContent = daysSince(user?.createdAt);
+  if(toolTagCount) toolTagCount.textContent = tags.length;
+  if(toolMailCount) toolMailCount.textContent = mailState.inbox.length;
+  const activeTool = document.querySelector('.feature-pill.active');
+  if(featureDescription && activeTool && typeof getFeatureText === 'function'){
+    featureDescription.textContent = getFeatureText(activeTool.dataset.feature);
+  }
+}
 
 function renderArticles(){
   if(!articleGrid) return;
@@ -5706,12 +5956,12 @@ if(articlePageInput){
 renderArticles();
 
 const DEFAULT_ANNOUNCEMENTS = [
-  { id:'welcome', kicker:'✨ 星尘公告', title:'欢迎来到你的灵感档案馆', body:'这里会收纳文章、文件、灵感和成长记录。每一次登录，都是和未来的自己重逢。' },
-  { id:'writing', kicker:'🌙 创作提醒', title:'把今天的想法留下来', body:'一段文字、一张配图、一次复盘，都可以成为下一篇博客的起点。' },
-  { id:'roadmap', kicker:'💫 系统计划', title:'文章系统正在扩展', body:'后续会加入文章编辑、文件收纳、分类检索和独立文章详情页。' },
-  { id:'profile', kicker:'🫧 温柔提示', title:'资料已和账号绑定', body:'头像、签名、简介和标签都可以同步保存，换设备登录也能继续显示。' },
-  { id:'owner', kicker:'💌 站主小纸条', title:'如果迷路了，可以联系站主 An', body:'站主资料卡里会同步 QQ 和邮箱，点击联系站主就能快速查看。' },
-  { id:'search', kicker:'🔎 搜索上线', title:'顶部搜索可以查找用户和文章', body:'输入用户名、标签或文章关键词，就能打开公开资料或定位内容。' }
+  { id:'welcome', kicker:'✨ 星尘公告', title:'欢迎来到你的灵感档案馆', body:'这里会收纳文章、文件、灵感和成长记录。每一次登录，都是和未来的自己重逢。', updatedAt:'2026-06-13', image:'' },
+  { id:'writing', kicker:'🌙 创作提醒', title:'把今天的想法留下来', body:'一段文字、一张配图、一次复盘，都可以成为下一篇博客的起点。', updatedAt:'2026-06-13', image:'' },
+  { id:'roadmap', kicker:'💫 系统计划', title:'文章系统正在扩展', body:'后续会加入文章编辑、文件收纳、分类检索和独立文章详情页。', updatedAt:'2026-06-13', image:'' },
+  { id:'profile', kicker:'🫧 温柔提示', title:'资料已和账号绑定', body:'头像、签名、简介和标签都可以同步保存，换设备登录也能继续显示。', updatedAt:'2026-06-13', image:'' },
+  { id:'owner', kicker:'💌 站主小纸条', title:'如果迷路了，可以联系站主 An', body:'站主资料卡里会同步 QQ 和邮箱，点击联系站主就能快速查看。', updatedAt:'2026-06-13', image:'' },
+  { id:'search', kicker:'🔎 搜索上线', title:'顶部搜索可以查找用户和文章', body:'输入用户名、标签或文章关键词，就能打开公开资料或定位内容。', updatedAt:'2026-06-13', image:'' }
 ];
 let noticeTimer = 0;
 let noticeTypeTimer = 0;
@@ -5729,6 +5979,8 @@ function renderNoticeSlides(){
       <span>${escapeHtml(item.kicker || '')}</span>
       <h1></h1>
       <p></p>
+      <small class="notice-date">更新于 ${escapeHtml(item.updatedAt || '')}</small>
+      ${item.image ? `<img class="notice-image" src="${item.image}" alt="公告图片" />` : ''}
     </article>
   `).join('');
 }
@@ -5817,6 +6069,13 @@ function renderNoticeEditor(){
       <label>公告标签<input data-field="kicker" value="${escapeHtml(item.kicker || '')}" maxlength="60" /></label>
       <label>公告标题<input data-field="title" value="${escapeHtml(item.title || '')}" maxlength="80" /></label>
       <label>公告信息<textarea data-field="body" maxlength="500">${escapeHtml(item.body || '')}</textarea></label>
+      <label>更新日期<input data-field="updatedAt" value="${escapeHtml(item.updatedAt || new Date().toISOString().slice(0, 10))}" maxlength="40" /></label>
+      <div class="notice-image-upload">
+        <button class="notice-remove-btn" type="button" data-upload-image="${index}">上传公告图片</button>
+        <button class="notice-remove-btn" type="button" data-clear-image="${index}">清除图片</button>
+        <input data-field="image" value="${escapeHtml(item.image || '')}" hidden />
+        ${item.image ? `<img class="notice-image-preview" src="${item.image}" alt="公告图片预览" />` : ''}
+      </div>
       <button class="notice-remove-btn" type="button" data-remove="${index}">删除这条</button>
     </div>
   `).join('');
@@ -5828,6 +6087,16 @@ function renderNoticeEditor(){
       renderNoticeEditor();
     });
   });
+  noticeEditorList.querySelectorAll('[data-upload-image]').forEach(btn=>{
+    btn.addEventListener('click', ()=>selectNoticeImage(Number(btn.dataset.uploadImage)));
+  });
+  noticeEditorList.querySelectorAll('[data-clear-image]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const index = Number(btn.dataset.clearImage);
+      currentAnnouncements[index].image = '';
+      renderNoticeEditor();
+    });
+  });
 }
 
 function collectNoticeEditorItems(){
@@ -5835,8 +6104,29 @@ function collectNoticeEditorItems(){
     id:currentAnnouncements[index]?.id || `notice-${Date.now()}-${index}`,
     kicker:row.querySelector('[data-field="kicker"]')?.value.trim() || '',
     title:row.querySelector('[data-field="title"]')?.value.trim() || '',
-    body:row.querySelector('[data-field="body"]')?.value.trim() || ''
+    body:row.querySelector('[data-field="body"]')?.value.trim() || '',
+    updatedAt:row.querySelector('[data-field="updatedAt"]')?.value.trim() || new Date().toISOString().slice(0, 10),
+    image:row.querySelector('[data-field="image"]')?.value.trim() || ''
   })).filter(item=>item.kicker || item.title || item.body);
+}
+
+function selectNoticeImage(index){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.addEventListener('change', async ()=>{
+    const file = input.files && input.files[0];
+    if(!file) return;
+    try{
+      const image = await compressAvatarFile(file, 900, .78);
+      currentAnnouncements[index].image = image;
+      currentAnnouncements[index].updatedAt = new Date().toISOString().slice(0, 10);
+      renderNoticeEditor();
+    }catch(_){
+      showLoginToast('公告图片读取失败，请换一张图片。', 'error', '上传失败');
+    }
+  });
+  input.click();
 }
 
 async function saveNoticeEditor(){
@@ -5984,16 +6274,27 @@ function renderPublicProfile(user){
       <div><span>资料副标题</span><strong>${escapeHtml(texts.profileMeta || '未填写')}</strong></div>
       <div><span>个性签名</span><strong>${escapeHtml(profile.signature || '未填写')}</strong></div>
       <div><span>生日 / 星座</span><strong>${escapeHtml(texts.birthday || '未填写')} · ${escapeHtml(texts.zodiac || '未填写')}</strong></div>
-      <div><span>QQ</span><strong>${escapeHtml(texts.qq || '未填写')}</strong></div>
-      <div><span>邮箱</span><strong>${escapeHtml(texts.email || '未填写')}</strong></div>
+      <div class="copy-field" data-copy="${escapeHtml(texts.qq || '')}" data-copy-label="QQ"><span>QQ（点击复制）</span><strong>${escapeHtml(texts.qq || '未填写')}</strong></div>
+      <div class="copy-field" data-copy="${escapeHtml(texts.email || '')}" data-copy-label="邮箱"><span>邮箱（点击复制）</span><strong>${escapeHtml(texts.email || '未填写')}</strong></div>
       <div style="grid-column:1 / -1"><span>个人简介</span><p>${escapeHtml(profile.intro || '这个用户暂时还没有填写简介。')}</p></div>
       <div style="grid-column:1 / -1"><span>标签</span><strong>${tags.map(escapeHtml).join(' · ') || '未填写'}</strong></div>
     </div>
     <h3>公开文章</h3>
     <div class="public-profile-articles">
-      ${BLOG_ARTICLES.slice(0, 4).map(article=>`<article><small>${escapeHtml(article.category)} · ${escapeHtml(article.date)}</small><h3>${escapeHtml(article.title)}</h3><p>${escapeHtml(article.summary)}</p></article>`).join('')}
+      ${BLOG_ARTICLES.slice(0, 4).map((article, index)=>`<article data-article-index="${index}"><small>${escapeHtml(article.category)} · ${escapeHtml(article.date)}</small><h3>${escapeHtml(article.title)}</h3><p>${escapeHtml(article.summary)}</p></article>`).join('')}
     </div>
   `;
+  publicProfileBody.querySelectorAll('[data-copy]').forEach(el=>{
+    el.addEventListener('click', ()=>copyText(el.dataset.copy, el.dataset.copyLabel || '内容'));
+  });
+  publicProfileBody.querySelectorAll('[data-article-index]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const index = Number(el.dataset.articleIndex);
+      goArticlePage(Math.floor(index / ARTICLES_PER_PAGE) + 1);
+      closePublicProfile();
+      document.getElementById('blogPosts')?.scrollIntoView({ behavior:'smooth', block:'center' });
+    });
+  });
 }
 
 async function openPublicUserProfile(username){
@@ -6009,16 +6310,109 @@ async function openPublicUserProfile(username){
   }
 }
 
+let ownerContactUser = null;
+
 async function contactSiteOwner(){
   try{
     const data = await authRequest(`/api/users/profile?username=${encodeURIComponent(SITE_OWNER_USERNAME)}`, { method:'GET' });
-    const texts = userTexts(data.user);
-    showLoginToast(`QQ：${texts.qq || '未填写'}  邮箱：${texts.email || '未填写'}`, 'success', '站主 An 的联系方式');
-    renderPublicProfile(data.user);
-    publicProfileModal?.classList.add('open');
-    publicProfileModal?.setAttribute('aria-hidden', 'false');
+    ownerContactUser = data.user;
+    const texts = userTexts(ownerContactUser);
+    if(ownerContactInfo) ownerContactInfo.textContent = `站主 QQ：${texts.qq || '未填写'}；邮箱：${texts.email || '未填写'}。你可以复制 QQ，或直接发送站内邮件。`;
+    ownerContactModal?.classList.add('open');
+    ownerContactModal?.setAttribute('aria-hidden', 'false');
   }catch(error){
     showLoginToast(error.message || '暂时无法获取站主联系方式。', 'error', '联系失败');
+  }
+}
+
+function closeOwnerContact(){
+  ownerContactModal?.classList.remove('open');
+  ownerContactModal?.setAttribute('aria-hidden', 'true');
+}
+
+function openMailCenter(mode = 'inbox', to = ''){
+  const user = readSavedUser();
+  if(!getAuthToken() || !user || user.username === 'guest'){
+    showLoginToast('请先注册或登录账号后使用站内邮件。', 'warn', '需要账号');
+    return;
+  }
+  if(to) mailToInput.value = to;
+  mailModal?.classList.add('open');
+  mailModal?.setAttribute('aria-hidden', 'false');
+  loadMail(mode);
+}
+
+function closeMailCenter(){
+  mailModal?.classList.remove('open');
+  mailModal?.setAttribute('aria-hidden', 'true');
+}
+
+function setMailTab(mode){
+  [mailInboxTab, mailSentTab, mailComposeTab].forEach(btn=>btn?.classList.remove('active'));
+  mailInboxTab?.classList.toggle('active', mode === 'inbox');
+  mailSentTab?.classList.toggle('active', mode === 'sent');
+  mailComposeTab?.classList.toggle('active', mode === 'compose');
+  if(mailComposePanel) mailComposePanel.hidden = mode !== 'compose';
+  if(mailListPanel) mailListPanel.hidden = mode === 'compose';
+}
+
+async function loadMail(mode = 'inbox'){
+  setMailTab(mode);
+  if(mode === 'compose') return;
+  try{
+    const data = await authRequest('/api/mail', { method:'GET', headers:authorizedHeaders() });
+    mailState = { inbox:data.inbox || [], sent:data.sent || [] };
+    updateToolStats();
+    renderMailList(mode);
+  }catch(error){
+    showLoginToast(error.message || '读取邮件失败。', 'error', '邮件错误');
+  }
+}
+
+function renderMailList(mode){
+  const items = mailState[mode] || [];
+  if(!mailListPanel) return;
+  if(!items.length){
+    mailListPanel.innerHTML = `<div class="mail-item"><strong>${mode === 'inbox' ? '收件箱为空' : '发件箱为空'}</strong><p>这里会显示你的站内邮件记录。</p></div>`;
+    return;
+  }
+  mailListPanel.innerHTML = items.map(mail=>`
+    <article class="mail-item">
+      <strong>${escapeHtml(mail.subject || '无主题')}</strong>
+      <small>${mode === 'inbox' ? '来自' : '发送给'} <span class="mail-user-link" data-mail-user="${escapeHtml(mode === 'inbox' ? mail.from : mail.to)}">${escapeHtml(mode === 'inbox' ? mail.from : mail.to)}</span> · ${escapeHtml(mail.createdAt || '')}</small>
+      <p>${escapeHtml(mail.body || '')}</p>
+    </article>
+  `).join('');
+  mailListPanel.querySelectorAll('[data-mail-user]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      mailToInput.value = el.dataset.mailUser || '';
+      setMailTab('compose');
+    });
+  });
+}
+
+async function sendMail(){
+  try{
+    mailSendBtn.disabled = true;
+    mailSendBtn.textContent = '发送中...';
+    await authRequest('/api/mail', {
+      method:'POST',
+      headers:authorizedHeaders(),
+      body:JSON.stringify({
+        to:mailToInput.value,
+        subject:mailSubjectInput.value,
+        body:mailBodyInput.value
+      })
+    });
+    mailSubjectInput.value = '';
+    mailBodyInput.value = '';
+    showLoginToast('站内邮件已发送。', 'success', '发送成功');
+    await loadMail('sent');
+  }catch(error){
+    showLoginToast(error.message || '发送邮件失败。', 'error', '发送失败');
+  }finally{
+    mailSendBtn.disabled = false;
+    mailSendBtn.textContent = '发送邮件';
   }
 }
 
@@ -6043,18 +6437,47 @@ if(publicProfileModal){
   });
 }
 if(contactOwnerBtn) contactOwnerBtn.addEventListener('click', contactSiteOwner);
+if(mailCenterBtn) mailCenterBtn.addEventListener('click', ()=>openMailCenter('inbox'));
+if(mailCloseBtn) mailCloseBtn.addEventListener('click', closeMailCenter);
+if(mailInboxTab) mailInboxTab.addEventListener('click', ()=>loadMail('inbox'));
+if(mailSentTab) mailSentTab.addEventListener('click', ()=>loadMail('sent'));
+if(mailComposeTab) mailComposeTab.addEventListener('click', ()=>setMailTab('compose'));
+if(mailSendBtn) mailSendBtn.addEventListener('click', sendMail);
+if(mailModal) mailModal.addEventListener('click', event=>{ if(event.target === mailModal) closeMailCenter(); });
+if(ownerContactCloseBtn) ownerContactCloseBtn.addEventListener('click', closeOwnerContact);
+if(ownerContactModal) ownerContactModal.addEventListener('click', event=>{ if(event.target === ownerContactModal) closeOwnerContact(); });
+if(ownerMailBtn) ownerMailBtn.addEventListener('click', ()=>{ closeOwnerContact(); openMailCenter('compose', SITE_OWNER_USERNAME); });
+if(ownerCopyQqBtn) ownerCopyQqBtn.addEventListener('click', ()=>copyText(userTexts(ownerContactUser).qq, '站主 QQ'));
+if(ownerViewProfileBtn) ownerViewProfileBtn.addEventListener('click', ()=>{ closeOwnerContact(); if(ownerContactUser){ renderPublicProfile(ownerContactUser); publicProfileModal?.classList.add('open'); publicProfileModal?.setAttribute('aria-hidden','false'); } });
 
-const FEATURE_TEXT = {
-  writing:'进入沉浸式写作状态，整理今日想法和下一篇文章提纲。',
-  archive:'为图片、文档、代码片段预留收纳入口，后续可和账号资料关联。',
-  search:'快速定位文章、标签和文件，减少翻找成本。',
-  timeline:'把每一次更新沉淀为成长时间线，记录持续创作的轨迹。'
-};
+function getProfileCompleteness(user = readSavedUser()){
+  const profile = user?.profile || {};
+  const texts = userTexts(user);
+  const fields = [profile.nickname, profile.signature, profile.intro, texts.birthday, texts.zodiac, texts.qq, texts.email, ...(Array.isArray(profile.tags) ? profile.tags : [])];
+  const filled = fields.filter(Boolean).length;
+  return Math.min(100, Math.round((filled / 10) * 100));
+}
+
+function getFeatureText(type){
+  const user = readSavedUser();
+  const texts = userTexts(user);
+  const zodiac = texts.zodiac || '未知星座';
+  const birthday = texts.birthday || '未填写生日';
+  const days = daysSince(user?.createdAt);
+  const completeness = getProfileCompleteness(user);
+  const map = {
+    writing:`今日适合写一篇与 ${zodiac} 灵感相关的短文；你的账号已记录 ${days} 天，可以回顾最近一次成长。`,
+    archive:`资料完整度约 ${completeness}%。补全生日、星座、QQ、邮箱后，公开资料和今日灵感会更丰富。`,
+    search:`可以搜索用户、文章和标签；生日：${birthday}，星座：${zodiac}，这些信息也会参与个人灵感生成。`
+  };
+  return map[type] || map.writing;
+}
+
 document.querySelectorAll('.feature-pill').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.feature-pill').forEach(item=>item.classList.remove('active'));
     btn.classList.add('active');
-    if(featureDescription) featureDescription.textContent = FEATURE_TEXT[btn.dataset.feature] || FEATURE_TEXT.writing;
+    if(featureDescription) featureDescription.textContent = getFeatureText(btn.dataset.feature);
   });
 });
 
@@ -6082,6 +6505,9 @@ function enterDashboard(userLike){
   }
   if(returnLoginBtn) returnLoginBtn.classList.add('visible');
   if(topTools) topTools.classList.add('portal-mode');
+  if(getAuthToken() && readSavedUser()?.username !== 'guest'){
+    loadMail('inbox');
+  }
   pulseTransitionFlare();
   triggerLightFeathers();
   setTimeout(()=>{
@@ -6367,7 +6793,17 @@ if(accountDeleteModal){
 }
 if(profileMoodBtn){
   profileMoodBtn.addEventListener('click', ()=>{
-    const ideas = ['今天适合写一篇短随笔。', '把一个重复动作变成自动化。', '整理三个灵感关键词。', '给未来的自己留一段注释。'];
+    const user = readSavedUser();
+    const texts = userTexts(user);
+    const zodiac = texts.zodiac || '神秘星座';
+    const birthday = texts.birthday || '还未填写生日';
+    const tags = Array.isArray(user?.profile?.tags) && user.profile.tags.length ? user.profile.tags.join('、') : '生活、学习、创作';
+    const ideas = [
+      `${zodiac} 今日关键词：把 ${tags} 中的一个主题写成 300 字灵感卡片。生日信息：${birthday}。`,
+      `围绕 ${zodiac} 的性格印象，给未来的自己写一封短邮件，记录今天最想坚持的一件事。`,
+      `从你的标签「${tags}」里选一个，写一篇“为什么它对我重要”的微型随笔。`,
+      `今天适合整理一篇文章提纲：标题、三个小节、一个真实案例，再给它配一张灵感图。`
+    ];
     showLoginToast(ideas[Math.floor(Math.random() * ideas.length)], 'success', '今日灵感');
   });
 }
@@ -6415,6 +6851,8 @@ function returnToLogin(){
   searchResultsPanel?.classList.remove('open');
   closePublicProfile();
   closeNoticeEditor();
+  closeMailCenter();
+  closeOwnerContact();
   if(loginStage){
     loginStage.classList.remove('hidden','login-exit');
     loginStage.classList.add('login-enter');
