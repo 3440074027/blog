@@ -233,7 +233,9 @@ function renderHero(user, articles){
   `;
   articleCountText.textContent = `共 ${articles.length} 篇公开文章`;
 }
-function openDetail(article){
+async function openDetail(article){
+  const full = await fetchJson(`/api/articles?id=${encodeURIComponent(article.id)}`).then(data=>data.article).catch(()=>article);
+  article = full || article;
   detailTitle.textContent = article.title || '未命名文章';
   detailMeta.textContent = `${article.category || '随笔'} · @${article.author || username} · ${article.createdAt || ''}`;
   detailContent.style.fontFamily = article.fontFamily || '';
