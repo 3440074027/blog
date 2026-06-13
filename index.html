@@ -780,7 +780,7 @@
     position:fixed;
     top:50%;
     left:50%;
-    z-index:260;
+    z-index:999;
     width:min(360px, calc(100vw - 48px));
     min-height:148px;
     transform:translate(-50%,-50%) scale(.88);
@@ -3472,17 +3472,6 @@
     cursor:pointer;
     background:linear-gradient(135deg, rgba(255,143,199,.26), rgba(127,247,255,.18));
   }
-  .profile-mail-btn{
-    width:100%;
-    min-height:42px;
-    margin-top:10px;
-    border:1px solid rgba(255,255,255,.2);
-    border-radius:999px;
-    color:#fff;
-    font-weight:950;
-    cursor:pointer;
-    background:linear-gradient(135deg, rgba(127,247,255,.24), rgba(124,92,255,.2));
-  }
   .blog-profile-tags{
     margin-top:16px;
     display:flex;
@@ -3501,8 +3490,9 @@
   }
   .blog-main-area{
     min-width:0;
+    min-height:0;
     display:grid;
-    grid-template-rows:minmax(238px, 0.68fr) minmax(290px, 1fr);
+    grid-template-rows:250px minmax(0, 1fr);
     gap:24px;
   }
   .blog-hero-card{
@@ -3814,7 +3804,7 @@
   .owner-contact-modal{
     position:fixed;
     inset:0;
-    z-index:360;
+    z-index:420;
     display:grid;
     place-items:center;
     padding:22px;
@@ -3942,7 +3932,7 @@
   .mail-read-modal{
     position:fixed;
     inset:0;
-    z-index:390;
+    z-index:460;
     display:grid;
     place-items:center;
     padding:22px;
@@ -3980,23 +3970,49 @@
   .tool-stats-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:10px;
+    gap:8px;
   }
   .tool-stat{
-    padding:12px;
+    min-height:74px;
+    padding:11px;
     border-radius:18px;
-    background:rgba(255,255,255,.1);
+    background:
+      radial-gradient(circle at 15% 0%, rgba(127,247,255,.16), transparent 42%),
+      rgba(255,255,255,.1);
     border:1px solid rgba(255,255,255,.14);
+    overflow:hidden;
   }
-  .tool-stat strong{display:block;font-size:24px;line-height:1;color:#fff;}
-  .tool-stat span{display:block;margin-top:6px;color:rgba(255,255,255,.58);font-size:10px;font-weight:900;}
-  .tool-mini-actions{display:grid;gap:8px;margin-top:12px;}
+  .feature-orbit-card .tool-stat strong{
+    display:block;
+    margin:0;
+    color:#fff;
+    font-size:clamp(22px, 2.1vw, 30px);
+    line-height:1;
+    letter-spacing:-.04em;
+  }
+  .feature-orbit-card .tool-stat span{
+    display:block;
+    margin-top:7px;
+    color:rgba(255,255,255,.62);
+    font-size:10px;
+    font-weight:900;
+    line-height:1.25;
+    letter-spacing:.06em;
+  }
+  .tool-mini-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+    margin-top:4px;
+  }
   .public-profile-articles small{color:#8fceff;font-size:10px;font-weight:900;}
   .public-profile-articles h3{margin:7px 0;font-size:14px;}
   .public-profile-articles p{margin:0;color:rgba(255,255,255,.62);font-size:11px;line-height:1.6;}
   .blog-posts-card{
     border-radius:30px;
     padding:22px;
+    min-height:0;
+    overflow:hidden;
   }
   .blog-post-grid{
     display:grid;
@@ -4485,24 +4501,25 @@
     background:linear-gradient(135deg, #ff5b7a, #ff8fc7);
   }
   .notice-carousel-card{
-    min-height:260px;
-    max-height:330px;
+    min-height:250px;
+    max-height:250px;
     justify-content:space-between;
     overflow:hidden;
-    padding:clamp(22px, 3vw, 38px);
+    padding:24px 28px 32px;
   }
-  .notice-topline{margin-bottom:18px;}
+  .notice-topline{margin-bottom:10px;}
   .notice-carousel{
     position:relative;
     flex:1;
-    min-height:160px;
+    min-height:142px;
   }
   .notice-slide{
     position:absolute;
     inset:0;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
+    display:grid;
+    grid-template-columns:minmax(0, 1fr);
+    align-items:center;
+    gap:16px;
     opacity:0;
     transform:translateY(22px) scale(.98);
     filter:blur(8px);
@@ -4513,6 +4530,13 @@
     transform:translateY(0) scale(1);
     filter:blur(0);
   }
+  .notice-slide.has-image{
+    grid-template-columns:minmax(0, 1fr) minmax(130px, 190px);
+  }
+  .notice-copy{
+    min-width:0;
+    align-self:center;
+  }
   .notice-slide span{
     color:#7ff7ff;
     font-size:12px;
@@ -4520,17 +4544,17 @@
     letter-spacing:.18em;
   }
   .notice-slide h1{
-    max-width:620px;
-    margin:18px 0 14px;
+    max-width:100%;
+    margin:10px 0 10px;
     font-family:"Trebuchet MS","Comic Sans MS","Segoe UI",cursive,sans-serif;
-    font-size:clamp(30px, 3.7vw, 52px);
+    font-size:clamp(27px, 3.2vw, 44px);
     line-height:.98;
     letter-spacing:-.06em;
     color:#fff;
     text-shadow:0 18px 50px rgba(0,0,0,.3);
   }
   .notice-slide p{
-    max-width:600px;
+    max-width:100%;
     margin:0;
     color:rgba(255,255,255,.72);
     font-size:14px;
@@ -4539,20 +4563,21 @@
   }
   .notice-date{
     display:inline-block;
-    margin-top:10px;
+    margin-top:8px;
     color:rgba(255,255,255,.52);
     font-size:11px;
     font-weight:850;
     letter-spacing:.08em;
   }
   .notice-image{
-    position:absolute;
-    right:0;
-    bottom:4px;
-    width:min(190px, 28%);
-    max-height:128px;
+    position:relative;
+    right:auto;
+    bottom:auto;
+    width:100%;
+    height:118px;
+    max-height:118px;
     object-fit:cover;
-    border-radius:22px;
+    border-radius:20px;
     margin-top:0;
     border:1px solid rgba(255,255,255,.2);
     box-shadow:0 18px 46px rgba(0,0,0,.24);
@@ -5081,7 +5106,6 @@
         </div>
       </div>
       <button class="owner-contact-btn" id="contactOwnerBtn" type="button">联系站主 An</button>
-      <button class="profile-mail-btn" id="mailCenterBtn" type="button">站内邮件中心</button>
       <div class="profile-quick-grid">
         <button class="profile-quick-btn" id="profileEditBtn" type="button">编辑资料</button>
         <button class="profile-quick-btn" id="profileMoodBtn" type="button">今日灵感</button>
@@ -5249,6 +5273,7 @@
     <div class="owner-contact-actions">
       <button id="ownerMailBtn" type="button">给站主发邮件</button>
       <button id="ownerCopyQqBtn" type="button">复制站主 QQ</button>
+      <button id="ownerCopyEmailBtn" type="button">复制站主邮箱</button>
       <button id="ownerViewProfileBtn" type="button">查看站主资料</button>
     </div>
   </div>
@@ -5683,7 +5708,6 @@ const profileZodiacText = document.getElementById('profileZodiacText');
 const profileQqText = document.getElementById('profileQqText');
 const profileEmailText = document.getElementById('profileEmailText');
 const contactOwnerBtn = document.getElementById('contactOwnerBtn');
-const mailCenterBtn = document.getElementById('mailCenterBtn');
 const blogVisitorIdentity = document.getElementById('blogVisitorIdentity');
 const profileEditBtn = document.getElementById('profileEditBtn');
 const profileMoodBtn = document.getElementById('profileMoodBtn');
@@ -5772,6 +5796,7 @@ const ownerContactCloseBtn = document.getElementById('ownerContactCloseBtn');
 const ownerContactInfo = document.getElementById('ownerContactInfo');
 const ownerMailBtn = document.getElementById('ownerMailBtn');
 const ownerCopyQqBtn = document.getElementById('ownerCopyQqBtn');
+const ownerCopyEmailBtn = document.getElementById('ownerCopyEmailBtn');
 const ownerViewProfileBtn = document.getElementById('ownerViewProfileBtn');
 const guestLoginBtn = document.getElementById('guestLoginBtn');
 const SITE_OWNER_USERNAME = 'An';
@@ -6093,11 +6118,13 @@ function getNoticeSlides(){
 function renderNoticeSlides(){
   if(!noticeCarousel) return;
   noticeCarousel.innerHTML = currentAnnouncements.map((item, index)=>`
-    <article class="notice-slide ${index === noticeCurrent ? 'active' : ''}">
-      <span>${escapeHtml(item.kicker || '')}</span>
-      <h1></h1>
-      <p></p>
-      <small class="notice-date">更新于 ${escapeHtml(item.updatedAt || '')}</small>
+    <article class="notice-slide ${item.image ? 'has-image' : ''} ${index === noticeCurrent ? 'active' : ''}">
+      <div class="notice-copy">
+        <span>${escapeHtml(item.kicker || '')}</span>
+        <h1></h1>
+        <p></p>
+        <small class="notice-date">更新于 ${escapeHtml(item.updatedAt || '')}</small>
+      </div>
       ${item.image ? `<img class="notice-image" src="${item.image}" alt="公告图片" />` : ''}
     </article>
   `).join('');
@@ -6607,7 +6634,6 @@ if(publicProfileModal){
   });
 }
 if(contactOwnerBtn) contactOwnerBtn.addEventListener('click', contactSiteOwner);
-if(mailCenterBtn) mailCenterBtn.addEventListener('click', ()=>openMailCenter('inbox'));
 if(mailCloseBtn) mailCloseBtn.addEventListener('click', closeMailCenter);
 if(mailInboxTab) mailInboxTab.addEventListener('click', ()=>loadMail('inbox'));
 if(mailSentTab) mailSentTab.addEventListener('click', ()=>loadMail('sent'));
@@ -6645,6 +6671,7 @@ if(ownerContactCloseBtn) ownerContactCloseBtn.addEventListener('click', closeOwn
 if(ownerContactModal) ownerContactModal.addEventListener('click', event=>{ if(event.target === ownerContactModal) closeOwnerContact(); });
 if(ownerMailBtn) ownerMailBtn.addEventListener('click', ()=>{ closeOwnerContact(); openMailCenter('compose', SITE_OWNER_USERNAME); });
 if(ownerCopyQqBtn) ownerCopyQqBtn.addEventListener('click', ()=>copyText(userTexts(ownerContactUser).qq, '站主 QQ'));
+if(ownerCopyEmailBtn) ownerCopyEmailBtn.addEventListener('click', ()=>copyText(userTexts(ownerContactUser).email, '站主邮箱'));
 if(ownerViewProfileBtn) ownerViewProfileBtn.addEventListener('click', ()=>{ closeOwnerContact(); if(ownerContactUser){ renderPublicProfile(ownerContactUser); publicProfileModal?.classList.add('open'); publicProfileModal?.setAttribute('aria-hidden','false'); } });
 
 function getProfileCompleteness(user = readSavedUser()){
