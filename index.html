@@ -4913,10 +4913,82 @@
     background:rgba(255,255,255,.14);
     border-color:rgba(255,255,255,.22);
   }
+  #publicProfileBody{
+    display:grid;
+    gap:18px;
+  }
+  .public-profile-card{
+    width:min(980px, 95vw);
+    max-height:90vh;
+    padding:28px;
+  }
+  .public-profile-head{
+    position:sticky;
+    top:0;
+    z-index:3;
+    padding-bottom:6px;
+    backdrop-filter:blur(10px);
+  }
+  .public-profile-top{
+    grid-template-columns:132px minmax(0, 1fr);
+    gap:22px;
+    min-height:188px;
+    padding:28px;
+    align-items:center;
+  }
+  .public-profile-avatar{
+    width:132px;
+    height:132px;
+  }
+  .public-profile-main{
+    display:grid;
+    gap:10px;
+  }
+  .public-profile-stats{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:12px;
+  }
+  .public-profile-stats div{
+    padding:14px;
+    border-radius:22px;
+    text-align:center;
+    background:linear-gradient(135deg, rgba(127,247,255,.13), rgba(255,143,199,.11));
+    border:1px solid rgba(255,255,255,.13);
+  }
+  .public-profile-stats strong{
+    display:block;
+    font-size:20px;
+    color:#fff;
+  }
+  .public-profile-stats span{
+    display:block;
+    margin-top:4px;
+    color:rgba(255,255,255,.62);
+    font-size:11px;
+    font-weight:900;
+  }
+  .public-profile-section-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin:2px 0 -4px;
+    color:#fff;
+  }
+  .public-profile-section-title h3{
+    margin:0;
+    font-size:18px;
+  }
+  .public-profile-section-title small{
+    color:rgba(255,255,255,.52);
+    font-weight:850;
+  }
   @media (max-width:680px){
     .public-profile-top,
     .public-profile-info-grid,
-    .public-profile-articles{
+    .public-profile-articles,
+    .public-profile-stats{
       grid-template-columns:1fr;
     }
     .public-profile-top{
@@ -5418,7 +5490,7 @@
   <div class="home-settings-wrap" id="homeSettingsWrap">
     <div class="home-search-popover" id="homeSearchPopover" aria-label="首页搜索">
       <div class="search-star" aria-hidden="true">✦</div>
-      <input id="homeSearchInput" type="search" placeholder="搜索用户、文章、标签和灵感..." autocomplete="off" />
+      <input id="homeSearchInput" type="text" name="site_public_search_box" placeholder="搜索用户、文章、标签和灵感..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search" data-lpignore="true" data-form-type="other" />
       <button id="homeSearchBtn" type="button" title="搜索" aria-label="搜索">
         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="11" cy="11" r="6.5"/>
@@ -6830,7 +6902,7 @@ function goUserArticles(username){
     showLoginToast('没有找到要浏览的用户。', 'warn', '无法跳转');
     return;
   }
-  window.location.href = `html/user_articles.html?user=${encodeURIComponent(target)}`;
+  window.open(`html/user_articles.html?user=${encodeURIComponent(target)}`, '_blank', 'noopener,noreferrer');
 }
 
 function getAllArticles(){
@@ -7692,14 +7764,22 @@ function renderPublicProfile(user){
   const texts = userTexts(user);
   const tags = Array.isArray(profile.tags) ? profile.tags : [];
   const profileArticles = publicArticles.filter(article=>article.author === user.username);
+  const registerDays = daysSince(user.createdAt);
   publicProfileBody.innerHTML = `
     <div class="public-profile-top">
       <div class="public-profile-avatar" style="--public-avatar:${publicAvatarStyle(profile.avatar || '')}"></div>
       <div class="public-profile-main">
         <h3>${escapeHtml(userDisplayName(user))}</h3>
         <p>@${escapeHtml(user.username)} · 公开资料只读，不可编辑</p>
+        <div class="public-profile-tags">${tags.length ? tags.slice(0, 8).map(tag=>`<b>${escapeHtml(tag)}</b>`).join('') : '<b>暂无标签</b>'}</div>
       </div>
     </div>
+    <div class="public-profile-stats">
+      <div><strong>${profileArticles.length}</strong><span>公开文章</span></div>
+      <div><strong>${tags.length}</strong><span>个人标签</span></div>
+      <div><strong>${registerDays}</strong><span>记录天数</span></div>
+    </div>
+    <div class="public-profile-section-title"><h3>公开信息</h3><small>点击 QQ / 邮箱可复制</small></div>
     <div class="public-profile-info-grid">
       <div><span>身份说明</span><strong>${escapeHtml(texts.profileRole || '未填写')}</strong></div>
       <div><span>资料副标题</span><strong>${escapeHtml(texts.profileMeta || '未填写')}</strong></div>
@@ -7708,7 +7788,6 @@ function renderPublicProfile(user){
       <div class="copy-field" data-copy="${escapeHtml(texts.qq || '')}" data-copy-label="QQ"><span>QQ（点击复制）</span><strong>${escapeHtml(texts.qq || '未填写')}</strong></div>
       <div class="copy-field" data-copy="${escapeHtml(texts.email || '')}" data-copy-label="邮箱"><span>邮箱（点击复制）</span><strong>${escapeHtml(texts.email || '未填写')}</strong></div>
       <div class="public-profile-wide"><span>个人简介</span><p>${escapeHtml(profile.intro || '这个用户暂时还没有填写简介。')}</p></div>
-      <div class="public-profile-wide"><span>标签</span><div class="public-profile-tags">${tags.length ? tags.map(tag=>`<b>${escapeHtml(tag)}</b>`).join('') : '<b>未填写</b>'}</div></div>
     </div>
     <div class="public-profile-article-head">
       <h3>公开文章</h3>
@@ -7913,7 +7992,13 @@ if(homeSearchBtn) homeSearchBtn.addEventListener('click', ()=>{
   if(String(homeSearchInput?.value || '').trim()) runHomeSearch();
 });
 if(homeSearchInput){
+  homeSearchInput.value = '';
+  homeSearchInput.setAttribute('autocomplete', 'off');
+  homeSearchInput.setAttribute('readonly', 'readonly');
+  setTimeout(()=>homeSearchInput.removeAttribute('readonly'), 350);
+  window.addEventListener('pageshow', ()=>{ homeSearchInput.value = ''; searchResultsPanel?.classList.remove('open'); });
   homeSearchInput.addEventListener('input', scheduleHomeSearch);
+  homeSearchInput.addEventListener('focus', ()=>homeSearchInput.removeAttribute('readonly'));
   homeSearchInput.addEventListener('keydown', event=>{
     if(event.key === 'Enter') runHomeSearch();
     if(event.key === 'Escape') searchResultsPanel?.classList.remove('open');
