@@ -3851,7 +3851,7 @@
     display:grid;
     place-items:center;
     padding:22px;
-    background:rgba(8,10,26,.5);
+    background:rgba(12,14,34,.42);
     backdrop-filter:blur(18px);
     -webkit-backdrop-filter:blur(18px);
     opacity:0;
@@ -3867,7 +3867,7 @@
   }
   .mail-card,
   .owner-contact-card{
-    width:min(760px, 94vw);
+    width:min(840px, 94vw);
     max-height:86vh;
     overflow:auto;
     display:grid;
@@ -3875,9 +3875,19 @@
     padding:22px;
     border-radius:30px;
     color:#fff;
-    background:rgba(16,20,48,.9);
+    background:
+      radial-gradient(circle at 14% 0%, rgba(255,190,221,.28), transparent 36%),
+      radial-gradient(circle at 92% 14%, rgba(143,247,255,.2), transparent 35%),
+      rgba(26,28,64,.9);
     border:1px solid rgba(255,255,255,.2);
     box-shadow:0 30px 90px rgba(0,0,0,.4);
+  }
+  .mail-card{
+    animation:mailPopIn .34s cubic-bezier(.22,.08,.28,1) both;
+  }
+  @keyframes mailPopIn{
+    from{opacity:0;transform:translateY(18px) scale(.98);filter:blur(8px);}
+    to{opacity:1;transform:none;filter:none;}
   }
   .mail-head,
   .owner-contact-head{
@@ -3886,7 +3896,7 @@
     justify-content:space-between;
     gap:14px;
   }
-  .mail-head h2,.owner-contact-head h2{margin:0;font-size:22px;}
+  .mail-head h2,.owner-contact-head h2{margin:0;font-size:24px;letter-spacing:-.03em;}
   .mail-close,.owner-contact-close{
     width:34px;height:34px;border-radius:50%;
     border:1px solid rgba(255,255,255,.2);
@@ -3905,10 +3915,13 @@
     color:#fff;
     font-weight:900;
     cursor:pointer;
-    background:linear-gradient(135deg, rgba(255,255,255,.14), rgba(124,92,255,.16));
+    background:linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,156,204,.14));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+    transition:transform .2s, background .2s, box-shadow .2s;
   }
+  .mail-tabs button:hover,.mail-send-btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(0,0,0,.18);}
   .mail-tabs button.active{background:linear-gradient(135deg, rgba(127,247,255,.28), rgba(255,143,199,.2));}
-  .mail-compose{display:grid;gap:10px;}
+  .mail-compose{display:grid;gap:10px;padding:14px;border-radius:24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);}
   .mail-list{
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -3921,7 +3934,7 @@
   }
   .mail-compose input,.mail-compose textarea{
     width:100%;border:none;outline:none;border-radius:14px;
-    padding:10px 11px;color:#fff;background:rgba(255,255,255,.12);
+    padding:10px 11px;color:#fff;background:rgba(255,255,255,.14);
     border:1px solid rgba(255,255,255,.14);font:inherit;resize:none;
   }
   .mail-item{
@@ -3930,13 +3943,15 @@
     padding:14px;
     border-radius:22px;
     background:
-      radial-gradient(circle at 12% 0%, rgba(255,143,199,.18), transparent 34%),
-      rgba(255,255,255,.1);
+      radial-gradient(circle at 12% 0%, rgba(255,190,221,.2), transparent 34%),
+      linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.08));
     border:1px solid rgba(255,255,255,.13);
     text-align:left;
     cursor:pointer;
-    transition:transform .22s, background .22s, box-shadow .22s;
+    animation:mailItemIn .32s cubic-bezier(.22,.08,.28,1) both;
+    transition:transform .22s, background .22s, box-shadow .22s, border-color .22s;
   }
+  @keyframes mailItemIn{from{opacity:0;transform:translateY(12px) scale(.98);}to{opacity:1;transform:none;}}
   .mail-item:hover{
     transform:translateY(-3px);
     background:rgba(255,255,255,.15);
@@ -3990,6 +4005,28 @@
     box-shadow:0 12px 24px rgba(0,0,0,.18);
   }
   .mail-user-link{color:#fff;text-decoration:underline;cursor:pointer;}
+  .mail-list-toolbar{
+    grid-column:1 / -1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 14px;
+    border-radius:20px;
+    background:rgba(255,255,255,.09);
+    border:1px solid rgba(255,255,255,.12);
+  }
+  .mail-list-toolbar strong{font-size:14px;}
+  .mail-list-toolbar button{
+    min-height:32px;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+    font-weight:900;
+    cursor:pointer;
+    background:linear-gradient(135deg, rgba(143,247,255,.2), rgba(255,156,204,.18));
+  }
   .mail-attach-row{
     display:flex;
     flex-wrap:wrap;
@@ -4046,6 +4083,35 @@
   .mail-read-close{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.1);cursor:pointer;}
   .mail-read-meta{color:#8fceff;font-size:12px;font-weight:900;}
   .mail-read-body{margin:0;color:rgba(255,255,255,.76);line-height:1.85;white-space:pre-wrap;}
+  .mail-read-user{
+    color:#fff;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+  .mail-attachment-preview{
+    display:grid;
+    gap:10px;
+    padding:12px;
+    border-radius:20px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+  }
+  .mail-attachment-preview img,
+  .mail-attachment-preview video,
+  .mail-attachment-preview audio{
+    width:100%;
+    max-height:320px;
+    border-radius:16px;
+    object-fit:contain;
+    background:rgba(0,0,0,.16);
+  }
+  .mail-attachment-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    justify-content:space-between;
+  }
   .tool-stats-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -6089,6 +6155,7 @@
     </div>
     <div class="mail-tabs">
       <button id="mailInboxTab" class="active" type="button">收件箱</button>
+      <button id="mailSentTab" type="button">发件箱</button>
       <button id="mailComposeTab" type="button">写邮件</button>
     </div>
     <div class="mail-compose" id="mailComposePanel" hidden>
@@ -7720,8 +7787,14 @@ function publicAvatarStyle(avatar){
 function renderSearchResults(items){
   if(!searchResultsPanel) return;
   if(!items.length){
-    searchResultsPanel.innerHTML = '';
-    searchResultsPanel.classList.remove('open');
+    searchResultsPanel.innerHTML = `
+      <div class="search-result-item">
+        <div class="search-result-avatar"></div>
+        <div><strong>没有找到相关结果</strong><span>可以换个关键词，或搜索用户名、文章标题、分类标签。</span></div>
+        <em class="search-result-kind">EMPTY</em>
+      </div>
+    `;
+    searchResultsPanel.classList.add('open');
     return;
   }
   searchResultsPanel.innerHTML = items.map((item, index)=>{
@@ -7974,6 +8047,23 @@ function setMailTab(mode){
   if(mailListPanel) mailListPanel.hidden = mode === 'compose';
 }
 
+function openMailCompose(to = ''){
+  const user = readSavedUser();
+  setMailTab('compose');
+  if(mailToInput){
+    if(isSiteOwnerUser(user)){
+      mailToInput.readOnly = false;
+      mailToInput.value = to || '';
+      mailToInput.placeholder = '填写收件用户用户名';
+    }else{
+      mailToInput.readOnly = true;
+      mailToInput.value = SITE_OWNER_USERNAME;
+      mailToInput.placeholder = '普通用户只能给站主 An 发邮件';
+    }
+  }
+  setTimeout(()=>mailSubjectInput?.focus(), 80);
+}
+
 async function loadMail(mode = 'inbox'){
   setMailTab(mode);
   if(mode === 'compose') return;
@@ -7991,52 +8081,92 @@ async function loadMail(mode = 'inbox'){
 function renderMailList(mode){
   const items = mailState[mode] || [];
   if(!mailListPanel) return;
+  const modeTitle = mode === 'sent' ? '发件箱' : '收件箱';
+  const toolbar = `
+    <div class="mail-list-toolbar">
+      <strong>${modeTitle} · ${items.length} 封</strong>
+      ${mode === 'sent' ? '<button id="mailQuickComposeBtn" type="button">写新邮件</button>' : '<span>点击邮件可查看详情</span>'}
+    </div>
+  `;
   if(!items.length){
-    mailListPanel.innerHTML = `<div class="mail-item"><strong>收件箱为空</strong><p>这里会显示最近收到的站内邮件，邮件 24 小时后会自动清理。</p></div>`;
+    mailListPanel.innerHTML = `${toolbar}<div class="mail-item"><strong>${modeTitle}为空</strong><p>${mode === 'sent' ? '点击“写新邮件”给对方发送站内信。' : '这里会显示最近收到的站内邮件，邮件 24 小时后会自动清理。'}</p></div>`;
+    mailListPanel.querySelector('#mailQuickComposeBtn')?.addEventListener('click', ()=>openMailCompose());
     return;
   }
-  mailListPanel.innerHTML = items.slice(0, 8).map((mail, index)=>`
-    <article class="mail-item ${!mail.read ? 'unread' : ''}" data-mail-index="${index}">
-      <span class="mail-read-state ${!mail.read ? 'unread' : ''}">${mail.read ? '已读' : '未读'}</span>
+  mailListPanel.innerHTML = toolbar + items.slice(0, 8).map((mail, index)=>`
+    <article class="mail-item ${mode === 'inbox' && !mail.read ? 'unread' : ''}" data-mail-index="${index}" style="animation-delay:${index * 45}ms">
+      ${mode === 'inbox' ? `<span class="mail-read-state ${!mail.read ? 'unread' : ''}">${mail.read ? '已读' : '未读'}</span>` : '<span class="mail-read-state">已发送</span>'}
       <strong>${escapeHtml(mail.subject || '无主题')}</strong>
-      <small>发件人 <span class="mail-user-link" data-mail-user="${escapeHtml(mail.from)}">${escapeHtml(mail.from)}</span> · 收件时间 ${escapeHtml(mail.createdAt || '')}</small>
+      <small>${mode === 'sent' ? '收件人' : '发件人'} <span class="mail-user-link" data-mail-user="${escapeHtml(mode === 'sent' ? mail.to : mail.from)}">${escapeHtml(mode === 'sent' ? mail.to : mail.from)}</span> · ${mode === 'sent' ? '发送时间' : '收件时间'} ${escapeHtml(mail.createdAt || '')}</small>
       ${mail.attachment && String(mail.attachment.type || '').startsWith('image/') ? `<img class="mail-thumb" src="${mail.attachment.data}" alt="邮件图片缩略图" />` : ''}
       <p>${escapeHtml(mail.body || '')}</p>
       ${mail.attachment ? `<small>📎 ${escapeHtml(mail.attachment.name || '附件')}</small>` : ''}
     </article>
   `).join('');
+  mailListPanel.querySelector('#mailQuickComposeBtn')?.addEventListener('click', ()=>openMailCompose());
   mailListPanel.querySelectorAll('[data-mail-index]').forEach(el=>{
     el.addEventListener('click', ()=>openMailReader(items[Number(el.dataset.mailIndex)], mode));
   });
   mailListPanel.querySelectorAll('[data-mail-user]').forEach(el=>{
     el.addEventListener('click', event=>{
       event.stopPropagation();
-      mailToInput.value = el.dataset.mailUser || '';
-      setMailTab('compose');
+      openMailCompose(el.dataset.mailUser || '');
     });
   });
 }
 
 function openMailReader(mail, mode){
   if(!mail) return;
+  const otherUser = mode === 'inbox' ? mail.from : mail.to;
   if(mailReadTitle) mailReadTitle.textContent = mail.subject || '无主题邮件';
-  if(mailReadMeta) mailReadMeta.textContent = `${mode === 'inbox' ? '来自' : '发送给'} ${mode === 'inbox' ? mail.from : mail.to} · ${mail.createdAt || ''} · 24 小时后自动清理`;
+  if(mailReadMeta) mailReadMeta.innerHTML = `${mode === 'inbox' ? '来自' : '发送给'} <span class="mail-read-user" data-reply-user="${escapeHtml(otherUser)}">${escapeHtml(otherUser)}</span> · ${mail.createdAt || ''} · 24 小时后自动清理`;
   if(mailReadBody) mailReadBody.textContent = mail.body || '这封邮件只有附件，没有正文。';
   if(mailReadAttachment){
-    mailReadAttachment.innerHTML = mail.attachment ? `<a class="mail-attachment-link" href="${mail.attachment.data}" download="${escapeHtml(mail.attachment.name || '附件')}">下载附件：${escapeHtml(mail.attachment.name || '附件')}</a>` : '';
+    mailReadAttachment.innerHTML = renderMailAttachment(mail.attachment);
   }
   mailReadModal?.classList.add('open');
   mailReadModal?.setAttribute('aria-hidden', 'false');
+  mailReadMeta?.querySelector('[data-reply-user]')?.addEventListener('click', ()=>{
+    closeMailReader();
+    openMailCompose(otherUser);
+  });
   if(mode === 'inbox' && !mail.read){
-    mail.read = true;
-    updateMailBadge();
-    renderMailList('inbox');
     authRequest('/api/mail', {
       method:'PUT',
       headers:authorizedHeaders(),
       body:JSON.stringify({ id:mail.id })
-    }).then(()=>loadMail('inbox')).catch(()=>{});
+    }).then(()=>{
+      mailState.inbox = mailState.inbox.map(item=>item.id === mail.id ? { ...item, read:true } : item);
+      updateMailBadge();
+      if(currentMailMode === 'inbox') renderMailList('inbox');
+    }).catch(()=>{
+      showLoginToast('邮件已打开，但已读状态同步失败。', 'warn', '状态未同步');
+    });
   }
+}
+
+function renderMailAttachment(attachment){
+  if(!attachment) return '';
+  const type = String(attachment.type || '');
+  const name = escapeHtml(attachment.name || '附件');
+  const data = attachment.data || '';
+  let preview = '<p class="mail-read-body">此附件暂不支持预览，可直接下载。</p>';
+  if(type.startsWith('image/')){
+    preview = `<img src="${data}" alt="${name}" />`;
+  }else if(type.startsWith('video/')){
+    preview = `<video src="${data}" controls></video>`;
+  }else if(type.startsWith('audio/')){
+    preview = `<audio src="${data}" controls></audio>`;
+  }
+  return `
+    <div class="mail-attachment-preview">
+      ${preview}
+      <div class="mail-attachment-actions">
+        <span>附件：${name}</span>
+        <a class="mail-attachment-link" href="${data}" download="${name}">下载附件</a>
+      </div>
+    </div>
+  `;
 }
 
 function closeMailReader(){
