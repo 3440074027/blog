@@ -4022,31 +4022,29 @@
   .mail-tabs button:hover,.mail-send-btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(0,0,0,.18);}
   .mail-tabs button.active{background:linear-gradient(135deg, rgba(143,247,255,.32), rgba(255,190,221,.26), rgba(255,239,177,.16));}
   .mail-compose{
-    position:fixed;
-    inset:50% auto auto 50%;
-    transform:translate(-50%,-50%);
-    z-index:900;
-    width:min(760px, 94vw);
-    height:min(720px, 88vh);
+    position:relative;
+    width:100%;
+    height:560px;
     display:grid;
     grid-template-rows:auto minmax(0,1fr) auto;
     gap:12px;
-    padding:16px;
-    border-radius:32px;
+    margin-top:16px;
+    padding:18px;
+    border-radius:34px;
     background:
       radial-gradient(circle at 8% 0%, rgba(255,216,232,.82), transparent 32%),
       radial-gradient(circle at 92% 10%, rgba(207,230,255,.76), transparent 34%),
       rgba(250,247,243,.96);
     border:1px solid rgba(218,200,225,.86);
     box-shadow:
-      0 0 0 9999px rgba(48,42,64,.34),
-      0 34px 100px rgba(88,72,104,.36),
+      0 18px 54px rgba(88,72,104,.18),
       inset 0 1px 0 rgba(255,255,255,.86);
     animation:mailPopIn .24s cubic-bezier(.22,.08,.28,1) both;
   }
+  .mail-card.compose-mode .mail-layout{display:none;}
   .mail-compose[hidden]{display:none !important;}
   .mail-compose::before{
-    content:"写新邮件";
+    content:"写新邮件 · 编辑页";
     position:absolute;
     top:-15px;
     left:26px;
@@ -4070,9 +4068,9 @@
   .mail-rich-toolbar{
     display:flex;
     flex-wrap:wrap;
-    gap:7px;
-    padding:11px;
-    border-radius:24px;
+    gap:8px;
+    padding:12px;
+    border-radius:26px;
     background:
       radial-gradient(circle at 8% 0%, rgba(255,255,255,.86), transparent 32%),
       linear-gradient(135deg, rgba(255,236,244,.86), rgba(232,242,255,.78));
@@ -4082,16 +4080,16 @@
   .mail-rich-toolbar button,
   .mail-rich-toolbar select,
   .mail-rich-toolbar label{
-    min-height:30px;
-    padding:0 10px;
-    border-radius:999px;
+    min-height:32px;
+    padding:0 11px;
+    border-radius:18px;
     border:1px solid rgba(218,200,225,.7);
     background:
       radial-gradient(circle at 20% 0%, rgba(255,255,255,.95), transparent 42%),
       linear-gradient(135deg,rgba(255,255,255,.92),rgba(250,245,252,.84));
-    color:#6b5b6d;
+    color:#5a465d;
     font-weight:900;
-    font-size:11px;
+    font-size:12px;
     cursor:pointer;
     display:inline-flex;
     align-items:center;
@@ -4115,8 +4113,8 @@
   .mail-rich-toolbar button i,
   .mail-rich-toolbar button u,
   .mail-rich-toolbar button s{
-    min-width:18px;
-    height:18px;
+    min-width:20px;
+    height:20px;
     display:grid;
     place-items:center;
     border-radius:999px;
@@ -4124,15 +4122,15 @@
     text-decoration:inherit;
   }
   .mail-rich-toolbar input[type="color"]{
-    width:26px;height:26px;border:none;border-radius:999px;background:none;padding:0;cursor:pointer;
+    width:28px;height:28px;border:2px solid rgba(255,255,255,.85);border-radius:999px;background:none;padding:0;cursor:pointer;
   }
   .mail-size-control input{
-    width:48px;
-    min-height:24px;
+    width:56px;
+    min-height:26px;
     border:none;
     outline:none;
-    color:#6b5b6d;
-    background:rgba(255,255,255,.75);
+    color:#4f4052;
+    background:#fff;
     border-radius:999px;
     padding:0 8px;
     font-weight:900;
@@ -4140,7 +4138,7 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
   }
   .mail-rich-toolbar select{
-    max-width:160px;
+    max-width:176px;
     appearance:none;
     padding-right:24px;
     background-image:
@@ -4287,20 +4285,28 @@
   .mail-compose label{
     display:grid;
     gap:6px;
-    color:#7a657d;
-    font-size:12px;
-    font-weight:900;
+    color:#4f4052;
+    font-size:13px;
+    font-weight:950;
+    letter-spacing:.03em;
+  }
+  .mail-compose .mail-scroll-area > label{
+    padding:9px 11px;
+    border-radius:20px;
+    background:linear-gradient(135deg,rgba(255,248,251,.88),rgba(239,247,255,.76));
+    border:1px solid rgba(218,200,225,.62);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
   }
   .mail-compose input[type="text"]{
     width:100%;
-    min-height:38px;
+    min-height:40px;
     border-radius:16px;
     border:1px solid rgba(218,200,225,.72);
     outline:none;
-    color:#5f5263;
+    color:#453949;
     background:#fffafd;
     padding:0 12px;
-    font-weight:850;
+    font-weight:900;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
     transition:border-color .18s, box-shadow .18s;
   }
@@ -6830,7 +6836,7 @@
   <div class="mail-compose-footer">
     <button id="mailSaveDraftBtn" type="button">💾 存草稿</button>
     <button id="mailDiscardDraftBtn" type="button">🗑 清空</button>
-    <button id="mailBackListBtn" type="button">关闭编辑</button>
+    <button id="mailBackListBtn" type="button">返回邮件首页</button>
     <button class="mail-send-btn" id="mailSendBtn" type="button">✿ 发送邮件</button>
   </div>
 </div>
@@ -7379,6 +7385,7 @@ const toolRegisterDays = document.getElementById('toolRegisterDays');
 const toolTagCount = document.getElementById('toolTagCount');
 const toolMailCount = document.getElementById('toolMailCount');
 const mailModal = document.getElementById('mailModal');
+const mailCard = document.querySelector('.mail-card');
 const mailCloseBtn = document.getElementById('mailCloseBtn');
 const mailInboxTab = document.getElementById('mailInboxTab');
 const mailSentTab = document.getElementById('mailSentTab');
@@ -7430,6 +7437,10 @@ const AUTH_TOKEN_KEY = 'ans_blog_auth_token';
 const AUTH_USER_KEY = 'ans_blog_auth_user';
 const AUTH_RETURN_LOGIN_KEY = 'ans_blog_return_login';
 const AUTH_API_BASE = (window.AUTH_API_BASE || window.PROFILE_API_BASE || '').replace(/\/$/, '');
+
+if(mailComposePanel && mailCard && mailComposePanel.parentElement !== mailCard){
+  mailCard.appendChild(mailComposePanel);
+}
 
 function authApiUrl(path){
   return `${AUTH_API_BASE}${path}`;
@@ -8715,6 +8726,7 @@ function closeMailCenter(){
   mailModal?.classList.remove('open');
   mailModal?.setAttribute('aria-hidden', 'true');
   if(mailComposePanel) mailComposePanel.hidden = true;
+  mailCard?.classList.remove('compose-mode');
   closeMailReader();
 }
 
@@ -8730,13 +8742,17 @@ function setMailTab(mode){
     mailReadModal.hidden = false;
     mailReadModal.setAttribute('aria-hidden', 'false');
   }
-  if(mode !== 'compose' && mailComposePanel) mailComposePanel.hidden = true;
+  if(mode !== 'compose'){
+    if(mailComposePanel) mailComposePanel.hidden = true;
+    mailCard?.classList.remove('compose-mode');
+  }
   if(mailListPanel) mailListPanel.hidden = false;
 }
 
 function openMailCompose(to = '', preset = null){
   const user = readSavedUser();
   if(mailComposePanel) mailComposePanel.hidden = false;
+  mailCard?.classList.add('compose-mode');
   if(mailReadModal) mailReadModal.hidden = false;
   if(mailToInput){
     if(isSiteOwnerUser(user)){
@@ -8761,6 +8777,7 @@ function openMailCompose(to = '', preset = null){
 
 function backToMailList(){
   if(mailComposePanel) mailComposePanel.hidden = true;
+  mailCard?.classList.remove('compose-mode');
   renderMailList(currentMailMode === 'compose' ? 'sent' : currentMailMode);
 }
 
