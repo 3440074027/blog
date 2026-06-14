@@ -12,6 +12,7 @@ import {
 
 const inboxKey = username => `mail:inbox:${username}`;
 const sentKey = username => `mail:sent:${username}`;
+const mailboxKey = username => `mail:box:${username}`;
 const MAIL_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
@@ -44,7 +45,6 @@ function sanitizeMail(mail){
     from: String(mail.from || '').trim().slice(0, 20),
     to: String(mail.to || '').trim().slice(0, 20),
     subject: String(mail.subject || '').trim().slice(0, 80),
-    mailType: ['normal','feedback','notice','other'].includes(mail.mailType) ? mail.mailType : 'normal',
     body: String(mail.body || '').trim().slice(0, 1200),
     createdAt: typeof mail.createdAt === 'string' ? mail.createdAt : nowIso(),
     expiresAt: typeof mail.expiresAt === 'string' ? mail.expiresAt : new Date(Date.now() + MAIL_TTL_MS).toISOString(),
@@ -69,16 +69,39 @@ async function prependMailboxItem(key, item){
   await redis.set(key, items.slice(0, 100));
 }
 
+async function readUserMailbox(username){
+  const box = await redis.get(mailboxKey(username));
+  let inbox = Array.isArray(box?.inbox) ? box.inbox.map(sanitizeMail).filter(item=>!isExpired(item)) : [];
+  let sent = Array.isArray(box?.sent) ? box.sent.map(sanitizeMail).filter(item=>!isExpired(item)) : [];
+  if(!box){
+    inbox = await readMailbox(inboxKey(username));
+    sent = await readMailbox(sentKey(username));
+    await writeUserMailbox(username, { inbox, sent });
+  }
+  return { inbox, sent };
+}
+
+async function writeUserMailbox(username, box){
+  await redis.set(mailboxKey(username), {
+    inbox:(box.inbox || []).map(sanitizeMail).filter(item=>!isExpired(item)).slice(0, 100),
+    sent:(box.sent || []).map(sanitizeMail).filter(item=>!isExpired(item)).slice(0, 100),
+    updatedAt:nowIso()
+  });
+}
+
+async function addUserMail(username, boxName, mail){
+  const box = await readUserMailbox(username);
+  box[boxName] = [mail, ...(box[boxName] || [])].slice(0, 100);
+  await writeUserMailbox(username, box);
+}
+
 export async function onRequestGet(context){
   const auth = await requireUser(context.request);
   if(auth.error){
     return json({ error:auth.error }, auth.status);
   }
   try{
-    const [inbox, sent] = await Promise.all([
-      readMailbox(inboxKey(auth.user.username)),
-      readMailbox(sentKey(auth.user.username))
-    ]);
+    const { inbox, sent } = await readUserMailbox(auth.user.username);
     return json({ ok:true, inbox, sent });
   }catch(error){
     console.error('mail get error:', error);
@@ -111,7 +134,6 @@ export async function onRequestPost(context){
       from: auth.user.username,
       to: target.username,
       subject: body.subject || '来自博客站内信',
-      mailType: body.mailType || 'normal',
       body: body.body || '',
       createdAt: nowIso(),
       expiresAt: new Date(Date.now() + MAIL_TTL_MS).toISOString(),
@@ -122,8 +144,8 @@ export async function onRequestPost(context){
       return json({ error:'邮件内容或附件至少填写一项。' }, 400);
     }
     await Promise.all([
-      prependMailboxItem(inboxKey(target.username), mail),
-      prependMailboxItem(sentKey(auth.user.username), { ...mail, read:true })
+      addUserMail(target.username, 'inbox', mail),
+      addUserMail(auth.user.username, 'sent', { ...mail, read:true })
     ]);
     return json({ ok:true, mail });
   }catch(error){
@@ -141,9 +163,9 @@ export async function onRequestPut(context){
     const body = await readJsonBody(context.request);
     const id = String(body.id || '').trim();
     if(!id) return json({ error:'缺少邮件 ID。' }, 400);
-    const inbox = await readMailbox(inboxKey(auth.user.username));
-    const nextInbox = inbox.map(mail => mail.id === id ? { ...mail, read:true } : mail);
-    await redis.set(inboxKey(auth.user.username), nextInbox);
+    const box = await readUserMailbox(auth.user.username);
+    const nextInbox = box.inbox.map(mail => mail.id === id ? { ...mail, read:true } : mail);
+    await writeUserMailbox(auth.user.username, { ...box, inbox:nextInbox });
     const mail = nextInbox.find(item=>item.id === id) || null;
     return json({ ok:true, mail });
   }catch(error){
@@ -162,10 +184,13 @@ export async function onRequestDelete(context){
     const id = String(body.id || '').trim();
     const box = String(body.box || 'inbox').trim();
     if(!id) return json({ error:'缺少邮件 ID。' }, 400);
-    const key = box === 'sent' ? sentKey(auth.user.username) : inboxKey(auth.user.username);
-    const items = await readMailbox(key);
+    const userBox = await readUserMailbox(auth.user.username);
+    const items = box === 'sent' ? userBox.sent : userBox.inbox;
     const nextItems = items.filter(mail => mail.id !== id);
-    await redis.set(key, nextItems);
+    await writeUserMailbox(auth.user.username, {
+      ...userBox,
+      [box === 'sent' ? 'sent' : 'inbox']:nextItems
+    });
     return json({ ok:true, deleted:items.length - nextItems.length });
   }catch(error){
     console.error('mail delete error:', error);
