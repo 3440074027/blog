@@ -3985,7 +3985,27 @@
     background:rgba(255,156,204,.28);
   }
   .mail-list-panel{padding:12px;overflow:auto;}
-  .mail-content-panel{padding:14px;display:grid;align-content:start;}
+  .mail-content-panel{padding:14px;display:grid;align-content:start;max-height:560px;overflow:hidden;position:relative;}
+  .mail-content-panel > .mail-compose,
+  .mail-content-panel > .mail-read-card{height:100%;}
+  .mail-content-panel .mail-read-card[hidden],
+  .mail-content-panel .mail-compose[hidden]{display:none !important;}
+  .mail-scroll-area{
+    overflow:auto;
+    max-height:calc(560px - 56px);
+    padding-right:6px;
+    scrollbar-width:thin;
+    scrollbar-color:#f3b6cf transparent;
+  }
+  .mail-scroll-area::-webkit-scrollbar{width:8px;}
+  .mail-scroll-area::-webkit-scrollbar-track{background:transparent;border-radius:999px;}
+  .mail-scroll-area::-webkit-scrollbar-thumb{
+    background:linear-gradient(180deg,#ffd0e3,#cfe6ff);
+    border-radius:999px;
+    border:2px solid rgba(255,255,255,.6);
+    box-shadow:inset 0 0 0 1px rgba(255,196,217,.6);
+  }
+  .mail-scroll-area::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#ff9ec3,#9fd1ff);}
   .mail-tabs button,.owner-contact-actions button,.mail-send-btn{
     min-height:40px;
     padding:0 16px;
@@ -4001,6 +4021,101 @@
   .mail-tabs button:hover,.mail-send-btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(0,0,0,.18);}
   .mail-tabs button.active{background:linear-gradient(135deg, rgba(143,247,255,.32), rgba(255,190,221,.26), rgba(255,239,177,.16));}
   .mail-compose{display:grid;gap:12px;padding:16px;border-radius:28px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.18);}
+  .mail-compose .mail-scroll-area{display:grid;gap:12px;padding-right:8px;}
+  .mail-rich-toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:8px 10px;
+    border-radius:18px;
+    background:linear-gradient(135deg, rgba(255,224,235,.55), rgba(207,230,255,.5));
+    border:1px solid rgba(218,200,225,.75);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+  }
+  .mail-rich-toolbar button,
+  .mail-rich-toolbar select,
+  .mail-rich-toolbar label{
+    min-height:30px;
+    padding:0 10px;
+    border-radius:999px;
+    border:1px solid rgba(218,200,225,.7);
+    background:rgba(255,255,255,.7);
+    color:#6b5b6d;
+    font-weight:900;
+    font-size:12px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    transition:transform .18s, box-shadow .18s, background .18s;
+  }
+  .mail-rich-toolbar button:hover,
+  .mail-rich-toolbar label:hover{transform:translateY(-1px);background:#fff;box-shadow:0 8px 18px rgba(176,158,200,.18);}
+  .mail-rich-toolbar input[type="color"]{
+    width:26px;height:26px;border:none;border-radius:999px;background:none;padding:0;cursor:pointer;
+  }
+  .mail-rich-editor{
+    min-height:160px;
+    max-height:340px;
+    overflow:auto;
+    padding:14px 16px;
+    border-radius:20px;
+    background:#fffafd;
+    border:1px solid rgba(218,200,225,.7);
+    color:#5b4d5f;
+    line-height:1.85;
+    font-size:14px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+    scrollbar-width:thin;
+    scrollbar-color:#f3b6cf transparent;
+  }
+  .mail-rich-editor img,
+  .mail-rich-editor video{
+    max-width:100%;
+    border-radius:14px;
+    margin:6px 0;
+    box-shadow:0 8px 18px rgba(176,158,200,.18);
+  }
+  .mail-rich-editor:focus{outline:none;border-color:#f0b6d4;box-shadow:0 0 0 3px rgba(255,179,210,.25);}
+  .mail-rich-editor::-webkit-scrollbar,
+  .mail-attachments-bar::-webkit-scrollbar{width:8px;}
+  .mail-rich-editor::-webkit-scrollbar-thumb,
+  .mail-attachments-bar::-webkit-scrollbar-thumb{
+    background:linear-gradient(180deg,#ffd0e3,#cfe6ff);
+    border-radius:999px;
+  }
+  .mail-attachments-bar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    max-height:120px;
+    overflow:auto;
+    padding:4px 2px;
+  }
+  .mail-attach-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px 6px 8px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#fff8fb,#eef6ff);
+    border:1px solid rgba(218,200,225,.75);
+    color:#6b5b6d;
+    font-size:12px;
+    font-weight:900;
+    box-shadow:0 6px 12px rgba(176,158,200,.16);
+  }
+  .mail-attach-chip span{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mail-attach-chip button{
+    border:none;background:transparent;cursor:pointer;color:#c8456b;font-weight:950;
+  }
+  .mail-compose-footer{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;}
+  .mail-compose-footer .mail-send-btn{
+    background:linear-gradient(135deg,#ffb1cf,#a9d1ff);
+    color:#fff;
+    border-color:rgba(255,255,255,.8);
+    box-shadow:0 12px 26px rgba(214,150,196,.32);
+  }
   .mail-list{
     display:grid;
     grid-template-columns:1fr;
@@ -4016,51 +4131,6 @@
     padding:11px 12px;color:#fff;background:rgba(255,255,255,.16);
     border:1px solid rgba(255,255,255,.18);font:inherit;resize:none;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
-  }
-  .mail-editor-tools{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    align-items:center;
-    padding:10px;
-    border-radius:18px;
-    background:rgba(255,255,255,.14);
-    border:1px solid rgba(255,255,255,.16);
-  }
-  .mail-editor-tools button,
-  .mail-editor-tools select,
-  .mail-editor-tools input[type="color"]{
-    min-height:32px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.18);
-    color:#fff;
-    font-weight:900;
-    background:rgba(255,255,255,.12);
-    padding:0 10px;
-  }
-  .mail-body-editor{
-    min-height:190px;
-    max-height:330px;
-    overflow:auto;
-    padding:14px;
-    border-radius:18px;
-    color:#fff;
-    background:rgba(255,255,255,.16);
-    border:1px solid rgba(255,255,255,.18);
-    line-height:1.8;
-    outline:none;
-  }
-  .mail-body-editor:empty::before{
-    content:attr(data-placeholder);
-    color:rgba(255,255,255,.46);
-  }
-  .mail-body-editor img,
-  .mail-body-editor video{
-    max-width:100%;
-    max-height:220px;
-    border-radius:16px;
-    display:block;
-    margin:8px 0;
   }
   .mail-item{
     position:relative;
@@ -4102,30 +4172,45 @@
   }
   .mail-read-state{
     position:absolute;
-    top:10px;
-    right:10px;
+    top:9px;
+    right:9px;
     display:inline-flex;
     align-items:center;
     gap:5px;
-    padding:6px 10px;
+    padding:4px 10px 4px 8px;
     border-radius:999px;
-    color:#fff;
+    color:#5a4a60;
     font-size:11px;
     font-weight:950;
-    background:linear-gradient(135deg,#8aa2b7,#b1bec9);
-    border:1px solid rgba(255,255,255,.72);
-    box-shadow:0 8px 18px rgba(99,89,110,.16);
+    letter-spacing:.04em;
+    background:linear-gradient(135deg,#fff8fb,#f1f5ff);
+    border:1px solid rgba(218,200,225,.7);
+    box-shadow:0 6px 14px rgba(176,158,200,.18);
   }
-  .mail-read-state.state-unread{background:linear-gradient(135deg,#e45b83,#ff9fbe);}
-  .mail-read-state.state-read{background:linear-gradient(135deg,#6f9f92,#a8cdbd);}
-  .mail-read-state.state-sent{background:linear-gradient(135deg,#6f88b7,#a8b7db);}
+  .mail-read-state::before{
+    content:"✿";
+    color:#caa9d6;
+    font-size:11px;
+  }
+  .mail-read-state.read{color:#7d8dab;background:linear-gradient(135deg,#eef4ff,#fbf3ff);}
+  .mail-read-state.read::before{content:"✓";color:#7eb6ff;}
+  .mail-read-state.sent{color:#5e8a7c;background:linear-gradient(135deg,#eafff4,#f8fffd);border-color:rgba(173,221,194,.75);}
+  .mail-read-state.sent::before{content:"➤";color:#7cc5a3;}
+  .mail-read-state.draft{color:#9a7a5e;background:linear-gradient(135deg,#fff7e8,#fff1f4);border-color:rgba(232,198,164,.75);}
+  .mail-read-state.draft::before{content:"✎";color:#d8a877;}
+  .mail-read-state.unread{color:#c8456b;background:linear-gradient(135deg,#ffeaf2,#fff6fb);border-color:rgba(255,176,201,.85);box-shadow:0 6px 14px rgba(255,160,200,.28);}
   .mail-read-state.unread::before{
     content:"";
     width:7px;
     height:7px;
     border-radius:50%;
-    background:#ff315f;
-    box-shadow:0 0 12px rgba(255,49,95,.6);
+    background:#ff5b86;
+    box-shadow:0 0 0 3px rgba(255,91,134,.18), 0 0 10px rgba(255,91,134,.55);
+    animation:mailDotPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes mailDotPulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.3);}
   }
   .mail-delete-btn{
     position:absolute;
@@ -4290,24 +4375,11 @@
     color:#6b5b6d;
   }
   .mail-modal .mail-compose input,
-  .mail-modal .mail-compose textarea,
-  .mail-modal .mail-body-editor{
+  .mail-modal .mail-compose textarea{
     color:#5f5263;
     background:#fffafd;
     border-color:rgba(208,188,212,.54);
   }
-  .mail-modal .mail-editor-tools{
-    background:rgba(250,247,243,.78);
-    border-color:rgba(190,174,198,.5);
-  }
-  .mail-modal .mail-editor-tools button,
-  .mail-modal .mail-editor-tools select,
-  .mail-modal .mail-editor-tools input[type="color"]{
-    color:#6b5b6d;
-    background:linear-gradient(135deg,#faf6f1,#eee7f1);
-    border-color:rgba(190,174,198,.54);
-  }
-  .mail-modal .mail-body-editor:empty::before{color:rgba(107,91,109,.48);}
   .mail-modal .mail-delete-btn{
     color:#fff;
     background:linear-gradient(135deg,#c98299,#d9a8ba);
@@ -4337,8 +4409,6 @@
   .mail-read-card{
     width:100%;
     min-height:100%;
-    max-height:520px;
-    overflow:auto;
     display:grid;
     gap:14px;
     padding:24px;
@@ -4356,33 +4426,6 @@
   .mail-read-close{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.1);cursor:pointer;}
   .mail-read-meta{color:#8fceff;font-size:12px;font-weight:900;}
   .mail-read-body{margin:0;color:rgba(255,255,255,.76);line-height:1.85;white-space:pre-wrap;}
-  .mail-read-body.rich{
-    white-space:normal;
-    overflow-wrap:anywhere;
-  }
-  .mail-read-body.rich img,
-  .mail-read-body.rich video{
-    max-width:100%;
-    max-height:320px;
-    border-radius:18px;
-    display:block;
-    margin:10px 0;
-  }
-  .mail-read-card::-webkit-scrollbar,
-  .mail-body-editor::-webkit-scrollbar{
-    width:10px;
-  }
-  .mail-read-card::-webkit-scrollbar-track,
-  .mail-body-editor::-webkit-scrollbar-track{
-    background:rgba(255,255,255,.35);
-    border-radius:999px;
-  }
-  .mail-read-card::-webkit-scrollbar-thumb,
-  .mail-body-editor::-webkit-scrollbar-thumb{
-    background:linear-gradient(180deg,#d8b7c8,#aab9ca);
-    border-radius:999px;
-    border:2px solid rgba(255,255,255,.52);
-  }
   .mail-read-user{
     color:#fff;
     text-decoration:underline;
@@ -6467,44 +6510,55 @@
       </section>
       <section class="mail-content-panel">
         <div class="mail-compose" id="mailComposePanel" hidden>
-          <label>收件用户名<input id="mailToInput" type="text" maxlength="20" placeholder="填写对方用户名" /></label>
-          <label>主题<input id="mailSubjectInput" type="text" maxlength="80" placeholder="写下邮件主题吧✨" /></label>
-          <div class="mail-editor-tools">
-            <select id="mailFontSelect" aria-label="邮件字体">
-              <option value="">默认字体</option>
-              <option value='Microsoft YaHei'>微软雅黑</option>
-              <option value='KaiTi'>楷体</option>
-              <option value='SimSun'>宋体</option>
-              <option value='Comic Sans MS'>可爱手写</option>
+          <div class="mail-rich-toolbar">
+            <select id="mailFontSize" title="字号">
+              <option value="2">小</option>
+              <option value="3" selected>常规</option>
+              <option value="5">大</option>
+              <option value="6">特大</option>
             </select>
-            <button type="button" data-mail-cmd="bold">加粗</button>
-            <button type="button" data-mail-cmd="italic">斜体</button>
-            <button type="button" data-mail-cmd="underline">下划线</button>
-            <input id="mailColorInput" type="color" value="#8a5b76" title="文字颜色" />
-            <button id="mailInsertAttachmentBtn" type="button">插入附件到正文</button>
+            <button type="button" data-rich="bold" title="加粗"><b>B</b></button>
+            <button type="button" data-rich="italic" title="斜体"><i>I</i></button>
+            <button type="button" data-rich="underline" title="下划线"><u>U</u></button>
+            <button type="button" data-rich="strikeThrough" title="删除线"><s>S</s></button>
+            <label title="字体颜色">🎨<input id="mailFontColor" type="color" value="#5b4d5f" /></label>
+            <button type="button" data-rich="insertUnorderedList" title="项目符号">• 列表</button>
+            <button type="button" data-rich="justifyLeft" title="左对齐">⇤</button>
+            <button type="button" data-rich="justifyCenter" title="居中">⇔</button>
+            <button type="button" data-rich="justifyRight" title="右对齐">⇥</button>
+            <button id="mailInsertImageBtn" type="button" title="插入图片">🖼 插图</button>
+            <button id="mailInsertEmojiBtn" type="button" title="插入表情">✨ 表情</button>
+            <button id="mailAttachBtn" type="button" title="添加附件">📎 附件</button>
           </div>
-          <label>内容<textarea id="mailBodyInput" maxlength="1200" hidden></textarea><div id="mailBodyEditor" class="mail-body-editor" contenteditable="true" data-placeholder="像写一张温柔信纸一样，写下想说的话"></div></label>
-          <div class="mail-attach-row">
-            <button id="mailAttachBtn" type="button">上传附件（≤10MB）</button>
-            <span class="mail-attachment-name" id="mailAttachmentName">未选择附件</span>
-            <button id="mailClearAttachBtn" type="button">清除附件</button>
-            <input id="mailAttachmentInput" type="file" hidden />
+          <div class="mail-scroll-area">
+            <label>收件用户名<input id="mailToInput" type="text" maxlength="20" placeholder="填写对方用户名" autocomplete="off" data-lpignore="true" /></label>
+            <label>主题<input id="mailSubjectInput" type="text" maxlength="80" placeholder="写下邮件主题吧✨" autocomplete="off" data-lpignore="true" /></label>
+            <div id="mailBodyEditor" class="mail-rich-editor" contenteditable="true" data-placeholder="像写一张温柔信纸一样，写下想说的话"></div>
+            <div class="mail-attachments-bar" id="mailAttachmentsBar"></div>
+            <input id="mailAttachmentInput" type="file" hidden multiple />
           </div>
-          <div class="mail-attach-row">
-            <button class="mail-send-btn" id="mailSendBtn" type="button">发送邮件</button>
+          <div class="mail-compose-footer">
+            <button id="mailSaveDraftBtn" type="button">💾 存草稿</button>
+            <button id="mailDiscardDraftBtn" type="button">🗑 清空</button>
             <button id="mailBackListBtn" type="button">返回列表</button>
+            <button class="mail-send-btn" id="mailSendBtn" type="button">✿ 发送邮件</button>
           </div>
         </div>
-        <div class="mail-read-card" id="mailReadModal" aria-hidden="true">
+        <div class="mail-read-card" id="mailReadModal" aria-hidden="true" hidden>
           <div class="mail-read-head">
             <h2 id="mailReadTitle">选择一封邮件</h2>
-            <button class="mail-read-close" id="mailReadCloseBtn" type="button">清空</button>
+            <div style="display:flex;gap:8px;">
+              <button id="mailReadReplyBtn" type="button" class="mail-read-close">回信</button>
+              <button class="mail-read-close" id="mailReadCloseBtn" type="button">收起</button>
+            </div>
           </div>
           <div class="mail-read-meta" id="mailReadMeta">在左侧选择邮件后，会像打开一张柔软信纸一样显示内容。</div>
-          <p class="mail-read-body" id="mailReadBody">暂时没有打开的邮件。</p>
-          <div id="mailReadAttachment"></div>
+          <div class="mail-scroll-area">
+            <div class="mail-read-body" id="mailReadBody">暂时没有打开的邮件。</div>
+            <div id="mailReadAttachment"></div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </div>
@@ -7066,17 +7120,19 @@ const mailComposePanel = document.getElementById('mailComposePanel');
 const mailListPanel = document.getElementById('mailListPanel');
 const mailToInput = document.getElementById('mailToInput');
 const mailSubjectInput = document.getElementById('mailSubjectInput');
-const mailBodyInput = document.getElementById('mailBodyInput');
 const mailBodyEditor = document.getElementById('mailBodyEditor');
-const mailFontSelect = document.getElementById('mailFontSelect');
-const mailColorInput = document.getElementById('mailColorInput');
-const mailInsertAttachmentBtn = document.getElementById('mailInsertAttachmentBtn');
 const mailSendBtn = document.getElementById('mailSendBtn');
 const mailBackListBtn = document.getElementById('mailBackListBtn');
 const mailAttachBtn = document.getElementById('mailAttachBtn');
-const mailClearAttachBtn = document.getElementById('mailClearAttachBtn');
 const mailAttachmentInput = document.getElementById('mailAttachmentInput');
-const mailAttachmentName = document.getElementById('mailAttachmentName');
+const mailAttachmentsBar = document.getElementById('mailAttachmentsBar');
+const mailSaveDraftBtn = document.getElementById('mailSaveDraftBtn');
+const mailDiscardDraftBtn = document.getElementById('mailDiscardDraftBtn');
+const mailFontSize = document.getElementById('mailFontSize');
+const mailFontColor = document.getElementById('mailFontColor');
+const mailInsertImageBtn = document.getElementById('mailInsertImageBtn');
+const mailInsertEmojiBtn = document.getElementById('mailInsertEmojiBtn');
+const mailReadReplyBtn = document.getElementById('mailReadReplyBtn');
 const mailReadModal = document.getElementById('mailReadModal');
 const mailReadCloseBtn = document.getElementById('mailReadCloseBtn');
 const mailReadTitle = document.getElementById('mailReadTitle');
@@ -7354,8 +7410,11 @@ let articleFilterMode = 'all';
 let editingArticleId = '';
 let currentDetailArticleId = '';
 let mailState = { inbox:[], sent:[] };
+let mailDrafts = [];
 let currentMailMode = 'inbox';
-let pendingMailAttachment = null;
+let pendingMailAttachments = [];
+let editingDraftId = null;
+const MAIL_DRAFT_STORAGE_KEY = 'ans_blog_mail_drafts';
 
 function updateToolStats(user = readSavedUser()){
   const profile = user?.profile || {};
@@ -8328,7 +8387,6 @@ async function openPublicUserProfile(username, prefetchedUser = null){
 
 let ownerContactUser = null;
 let mailSearchQuery = '';
-const deletedMailIds = new Set();
 
 async function contactSiteOwner(){
   try{
@@ -8390,21 +8448,30 @@ function setMailTab(mode){
   mailSentTab?.classList.toggle('active', mode === 'sent');
   mailDraftTab?.classList.toggle('active', mode === 'draft');
   mailComposeTab?.classList.toggle('active', mode === 'compose');
-  if(mailComposePanel) mailComposePanel.hidden = mode !== 'compose';
-  if(mailReadModal) mailReadModal.hidden = mode === 'compose';
+  // 编辑面板与详情面板互斥显示
+  if(mode === 'compose'){
+    if(mailComposePanel) mailComposePanel.hidden = false;
+    if(mailReadModal){
+      mailReadModal.hidden = true;
+      mailReadModal.classList.remove('open');
+    }
+    renderMailAttachmentChips();
+  }else{
+    if(mailComposePanel) mailComposePanel.hidden = true;
+    if(mailReadModal){
+      mailReadModal.hidden = false;
+    }
+  }
   if(mailListPanel) mailListPanel.hidden = false;
 }
 
-function openMailCompose(to = ''){
+function openMailCompose(to = '', preset = null){
   const user = readSavedUser();
   setMailTab('compose');
-  closeMailReader();
-  if(mailReadModal) mailReadModal.hidden = true;
-  if(mailComposePanel) mailComposePanel.hidden = false;
   if(mailToInput){
     if(isSiteOwnerUser(user)){
       mailToInput.readOnly = false;
-      mailToInput.value = to || '';
+      mailToInput.value = preset?.to ?? (to || '');
       mailToInput.placeholder = '填写收件用户用户名';
     }else{
       mailToInput.readOnly = true;
@@ -8412,6 +8479,13 @@ function openMailCompose(to = ''){
       mailToInput.placeholder = '普通用户只能给站主 An 发邮件';
     }
   }
+  if(mailSubjectInput) mailSubjectInput.value = preset?.subject || '';
+  if(mailBodyEditor){
+    mailBodyEditor.innerHTML = preset?.body || '';
+  }
+  pendingMailAttachments = Array.isArray(preset?.attachments) ? preset.attachments.slice() : [];
+  editingDraftId = preset?.id || null;
+  renderMailAttachmentChips();
   setTimeout(()=>mailSubjectInput?.focus(), 80);
 }
 
@@ -8431,18 +8505,17 @@ function runMailSearch(){
 async function loadMail(mode = 'inbox'){
   setMailTab(mode);
   if(mode === 'compose') return;
+  // 切换邮箱时立刻关闭详情，让面板回到默认提示
+  closeMailReader();
   if(mode === 'draft'){
     renderMailList('draft');
-    closeMailReader();
     return;
   }
+  // 先用本地缓存即时渲染，避免等待
   renderMailList(mode);
   try{
     const data = await authRequest('/api/mail', { method:'GET', headers:authorizedHeaders() });
-    mailState = {
-      inbox:(data.inbox || []).filter(mail=>!deletedMailIds.has(`inbox:${mail.id}`)),
-      sent:(data.sent || []).filter(mail=>!deletedMailIds.has(`sent:${mail.id}`))
-    };
+    mailState = { inbox:data.inbox || [], sent:data.sent || [] };
     updateToolStats();
     updateMailBadge();
     renderMailList(mode);
@@ -8451,24 +8524,47 @@ async function loadMail(mode = 'inbox'){
   }
 }
 
+function loadDrafts(){
+  try{
+    mailDrafts = JSON.parse(localStorage.getItem(MAIL_DRAFT_STORAGE_KEY) || '[]') || [];
+  }catch(_){ mailDrafts = []; }
+  if(!Array.isArray(mailDrafts)) mailDrafts = [];
+}
+function persistDrafts(){
+  try{ localStorage.setItem(MAIL_DRAFT_STORAGE_KEY, JSON.stringify(mailDrafts)); }catch(_){ }
+}
+function getDraftCount(){ loadDrafts(); return mailDrafts.length; }
+
+function getMailItems(mode){
+  if(mode === 'draft'){ loadDrafts(); return mailDrafts.slice().sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||'')); }
+  return mailState[mode] || [];
+}
+
+function mailMatchesSearch(mail, query){
+  if(!query) return true;
+  const haystack = [
+    mail.from, mail.to, mail.subject, mail.body,
+    mail.createdAt, mail.savedAt,
+    ...(Array.isArray(mail.attachments) ? mail.attachments.map(a=>`${a.name||''} ${a.type||''}`) : []),
+    mail.attachment?.name, mail.attachment?.type
+  ].filter(Boolean).join(' ').toLowerCase();
+  return haystack.includes(query);
+}
+
 function renderMailList(mode){
-  const sourceItems = mode === 'draft' ? [] : (mailState[mode] || []);
+  const sourceItems = getMailItems(mode);
   const query = mailSearchQuery.toLowerCase();
-  const items = query ? sourceItems.filter(mail=>[
-    mail.from,
-    mail.to,
-    mail.subject,
-    mail.body,
-    mail.createdAt,
-    mail.attachment?.name,
-    mail.attachment?.type
-  ].join(' ').toLowerCase().includes(query)) : sourceItems;
+  const items = sourceItems.filter(mail=>mailMatchesSearch(mail, query));
   if(!mailListPanel) return;
+  if(mailDraftTab){
+    const draftBadge = mailDraftTab.querySelector('b');
+    if(draftBadge) draftBadge.textContent = String(getDraftCount());
+  }
   const modeTitle = mode === 'sent' ? '发件箱' : mode === 'draft' ? '草稿箱' : '收件箱';
   const toolbar = `
     <div class="mail-list-toolbar">
       <strong>${modeTitle} · ${items.length} 封${mailSearchQuery ? ` · 搜索“${escapeHtml(mailSearchQuery)}”` : ''}</strong>
-      ${mode === 'sent' ? '<button id="mailQuickComposeBtn" type="button">写新邮件</button>' : mode === 'draft' ? '<span>草稿功能预留中</span>' : '<span>点击邮件可查看详情</span>'}
+      ${mode === 'sent' || mode === 'draft' ? '<button id="mailQuickComposeBtn" type="button">✿ 写新邮件</button>' : '<span>点击邮件可查看详情</span>'}
     </div>
   `;
   if(!items.length){
@@ -8477,31 +8573,50 @@ function renderMailList(mode){
       : mode === 'sent'
         ? '点击“写新邮件”给对方发送站内信。'
         : mode === 'draft'
-          ? '草稿箱暂时为空，后续写信草稿会出现在这里。'
+          ? '草稿箱暂时为空，写邮件时点“存草稿”就会出现在这里。'
           : '这里会显示最近收到的站内邮件，邮件 24 小时后会自动清理。';
     mailListPanel.innerHTML = `${toolbar}<div class="mail-item"><strong>${modeTitle}为空</strong><p>${emptyText}</p></div>`;
     mailListPanel.querySelector('#mailQuickComposeBtn')?.addEventListener('click', ()=>openMailCompose());
     return;
   }
-  mailListPanel.innerHTML = toolbar + items.slice(0, 8).map((mail, index)=>`
-    <article class="mail-item ${mode === 'inbox' && !mail.read ? 'unread' : ''}" data-mail-index="${index}" style="animation-delay:${index * 45}ms">
-      ${mode === 'inbox' ? `<span class="mail-read-state ${!mail.read ? 'unread state-unread' : 'state-read'}">${mail.read ? '已读' : '未读'}</span>` : '<span class="mail-read-state state-sent">已发送</span>'}
-      <button class="mail-delete-btn" type="button" data-mail-delete="${index}">删除</button>
+  mailListPanel.innerHTML = toolbar + items.slice(0, 12).map((mail, index)=>{
+    const stateClass = mode === 'inbox' ? (mail.read ? 'read' : 'unread') : mode === 'sent' ? 'sent' : 'draft';
+    const stateText = mode === 'inbox' ? (mail.read ? '已读' : '未读') : mode === 'sent' ? '已发送' : '草稿';
+    const otherUser = mode === 'sent' ? mail.to : mode === 'inbox' ? mail.from : (mail.to || '未填写');
+    const timeText = mail.createdAt || mail.savedAt || '';
+    const timeLabel = mode === 'sent' ? '发送时间' : mode === 'inbox' ? '收件时间' : '保存时间';
+    const sideLabel = mode === 'sent' ? '收件人' : mode === 'inbox' ? '发件人' : '收件人';
+    const firstImage = (mail.attachments || []).find(a=>String(a.type||'').startsWith('image/')) || (String(mail.attachment?.type||'').startsWith('image/') ? mail.attachment : null);
+    const attachCount = (mail.attachments?.length || 0) + (mail.attachment ? 1 : 0);
+    const bodyPreview = stripHtmlForPreview(mail.body || '');
+    return `
+    <article class="mail-item ${mode === 'inbox' && !mail.read ? 'unread' : ''}" data-mail-key="${escapeHtml(mail.id || String(index))}" style="animation-delay:${index * 35}ms">
+      <span class="mail-read-state ${stateClass}">${stateText}</span>
+      <button class="mail-delete-btn" type="button" data-mail-delete="${escapeHtml(mail.id || String(index))}">删除</button>
       <strong>${escapeHtml(mail.subject || '无主题')}</strong>
-      <small>${mode === 'sent' ? '收件人' : '发件人'} <span class="mail-user-link" data-mail-user="${escapeHtml(mode === 'sent' ? mail.to : mail.from)}">${escapeHtml(mode === 'sent' ? mail.to : mail.from)}</span> · ${mode === 'sent' ? '发送时间' : '收件时间'} ${escapeHtml(mail.createdAt || '')}</small>
-      ${mail.attachment && String(mail.attachment.type || '').startsWith('image/') ? `<img class="mail-thumb" src="${mail.attachment.data}" alt="邮件图片缩略图" />` : ''}
-      <p>${escapeHtml(stripMailText(mail.body || ''))}</p>
-      ${mail.attachment ? `<small>📎 ${escapeHtml(mail.attachment.name || '附件')}</small>` : ''}
-    </article>
-  `).join('');
+      <small>${sideLabel} <span class="mail-user-link" data-mail-user="${escapeHtml(otherUser)}">${escapeHtml(otherUser)}</span> · ${timeLabel} ${escapeHtml(timeText)}</small>
+      ${firstImage ? `<img class="mail-thumb" src="${firstImage.data}" alt="邮件图片缩略图" />` : ''}
+      <p>${escapeHtml(bodyPreview)}</p>
+      ${attachCount ? `<small>📎 共 ${attachCount} 个附件</small>` : ''}
+    </article>`;
+  }).join('');
   mailListPanel.querySelector('#mailQuickComposeBtn')?.addEventListener('click', ()=>openMailCompose());
-  mailListPanel.querySelectorAll('[data-mail-index]').forEach(el=>{
-    el.addEventListener('click', ()=>openMailReader(items[Number(el.dataset.mailIndex)], mode));
+  mailListPanel.querySelectorAll('[data-mail-key]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const key = el.dataset.mailKey;
+      const mail = items.find(m=>String(m.id || '') === key) || items[Number(key)];
+      if(!mail) return;
+      if(mode === 'draft') openMailCompose('', mail);
+      else openMailReader(mail, mode);
+    });
   });
   mailListPanel.querySelectorAll('[data-mail-delete]').forEach(btn=>{
     btn.addEventListener('click', event=>{
       event.stopPropagation();
-      deleteMail(items[Number(btn.dataset.mailDelete)], mode);
+      const key = btn.dataset.mailDelete;
+      const mail = items.find(m=>String(m.id || '') === key) || items[Number(key)];
+      if(!mail) return;
+      deleteMail(mail, mode);
     });
   });
   mailListPanel.querySelectorAll('[data-mail-user]').forEach(el=>{
@@ -8512,16 +8627,31 @@ function renderMailList(mode){
   });
 }
 
+function stripHtmlForPreview(html){
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html || '';
+  return (tmp.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 120);
+}
+
 async function deleteMail(mail, mode){
-  if(!mail?.id) return;
-  const key = `${mode}:${mail.id}`;
-  deletedMailIds.add(key);
-  const previous = mailState[mode] || [];
-  mailState[mode] = previous.filter(item=>item.id !== mail.id);
+  if(!mail) return;
+  // 草稿仅本地：直接删除并更新视图，避免后台等待
+  if(mode === 'draft'){
+    loadDrafts();
+    mailDrafts = mailDrafts.filter(d=>d.id !== mail.id);
+    persistDrafts();
+    renderMailList('draft');
+    showLoginToast('草稿已删除。', 'success', '删除成功');
+    return;
+  }
+  if(!mail.id) return;
+  // 乐观更新：先从前端列表里移除并立刻重绘，避免“删除后又出现”的视觉残留
+  const before = (mailState[mode] || []).slice();
+  mailState[mode] = before.filter(item=>item.id !== mail.id);
   updateToolStats();
   updateMailBadge();
   renderMailList(mode);
-  showLoginToast('邮件已从列表移除，正在同步删除。', 'success', '删除中');
+  if(currentReadMailId === mail.id) closeMailReader();
   try{
     await authRequest('/api/mail', {
       method:'DELETE',
@@ -8530,63 +8660,58 @@ async function deleteMail(mail, mode){
     });
     showLoginToast('邮件已删除。', 'success', '删除成功');
   }catch(error){
-    deletedMailIds.delete(key);
-    mailState[mode] = previous;
-    updateToolStats();
+    // 回滚
+    mailState[mode] = before;
     updateMailBadge();
     renderMailList(mode);
     showLoginToast(error.message || '删除邮件失败。', 'error', '删除失败');
   }
 }
 
+let currentReadMailId = '';
+
 function openMailReader(mail, mode){
   if(!mail) return;
+  // 切换为详情面板：与编辑面板互斥
   if(mailComposePanel) mailComposePanel.hidden = true;
-  if(mailReadModal) mailReadModal.hidden = false;
+  if(mailReadModal){
+    mailReadModal.hidden = false;
+    mailReadModal.classList.add('open');
+    mailReadModal.setAttribute('aria-hidden', 'false');
+  }
+  currentReadMailId = mail.id || '';
   const otherUser = mode === 'inbox' ? mail.from : mail.to;
   if(mailReadTitle) mailReadTitle.textContent = mail.subject || '无主题邮件';
-  if(mailReadMeta) mailReadMeta.innerHTML = `${mode === 'inbox' ? '来自' : '发送给'} <span class="mail-read-user" data-reply-user="${escapeHtml(otherUser)}">${escapeHtml(otherUser)}</span> · ${mail.createdAt || ''} · 24 小时后自动清理`;
+  if(mailReadMeta) mailReadMeta.innerHTML = `${mode === 'inbox' ? '来自' : '发送给'} <span class="mail-read-user" data-reply-user="${escapeHtml(otherUser || '')}">${escapeHtml(otherUser || '未知')}</span> · ${escapeHtml(mail.createdAt || '')} · 24 小时后自动清理`;
   if(mailReadBody){
-    mailReadBody.classList.add('rich');
-    mailReadBody.innerHTML = sanitizeMailHtml(mail.body || '<p>这封邮件只有附件，没有正文。</p>');
+    // 安全渲染：保留富文本，但通过 DOM 渲染
+    mailReadBody.innerHTML = mail.body || '<em style="color:#a08aaa;">这封邮件只有附件，没有正文。</em>';
   }
   if(mailReadAttachment){
-    mailReadAttachment.innerHTML = renderMailAttachment(mail.attachment);
+    const list = Array.isArray(mail.attachments) && mail.attachments.length
+      ? mail.attachments
+      : (mail.attachment ? [mail.attachment] : []);
+    mailReadAttachment.innerHTML = list.map(renderMailAttachment).join('');
   }
-  mailReadModal?.classList.add('open');
-  mailReadModal?.setAttribute('aria-hidden', 'false');
+  if(mailReadReplyBtn){
+    mailReadReplyBtn.onclick = ()=>openMailCompose(otherUser || '');
+  }
   mailReadMeta?.querySelector('[data-reply-user]')?.addEventListener('click', ()=>{
-    closeMailReader();
-    openMailCompose(otherUser);
+    openMailCompose(otherUser || '');
   });
   if(mode === 'inbox' && !mail.read){
+    // 立即更新本地未读，避免红点延迟
+    mailState.inbox = mailState.inbox.map(item=>item.id === mail.id ? { ...item, read:true } : item);
+    updateMailBadge();
+    if(currentMailMode === 'inbox') renderMailList('inbox');
     authRequest('/api/mail', {
       method:'PUT',
       headers:authorizedHeaders(),
       body:JSON.stringify({ id:mail.id })
-    }).then(()=>{
-      mailState.inbox = mailState.inbox.map(item=>item.id === mail.id ? { ...item, read:true } : item);
-      updateMailBadge();
-      if(currentMailMode === 'inbox') renderMailList('inbox');
     }).catch(()=>{
       showLoginToast('邮件已打开，但已读状态同步失败。', 'warn', '状态未同步');
     });
   }
-}
-
-function sanitizeMailHtml(html){
-  const template = document.createElement('template');
-  template.innerHTML = String(html || '');
-  template.content.querySelectorAll('script, iframe, object, embed, link, meta, style').forEach(el=>el.remove());
-  template.content.querySelectorAll('*').forEach(el=>{
-    [...el.attributes].forEach(attr=>{
-      const name = attr.name.toLowerCase();
-      const value = attr.value || '';
-      if(name.startsWith('on')) el.removeAttribute(attr.name);
-      if((name === 'href' || name === 'src') && !/^(data:|https?:|mailto:|blob:)/i.test(value)) el.removeAttribute(attr.name);
-    });
-  });
-  return template.innerHTML;
 }
 
 function renderMailAttachment(attachment){
@@ -8596,9 +8721,9 @@ function renderMailAttachment(attachment){
   const data = attachment.data || '';
   let preview = '<p class="mail-read-body">此附件暂不支持预览，可直接下载。</p>';
   if(type.startsWith('image/')){
-    preview = `<img src="${data}" alt="${name}" />`;
+    preview = `<img src="${data}" alt="${name}" style="max-width:100%;border-radius:14px;" />`;
   }else if(type.startsWith('video/')){
-    preview = `<video src="${data}" controls></video>`;
+    preview = `<video src="${data}" controls style="max-width:100%;border-radius:14px;"></video>`;
   }else if(type.startsWith('audio/')){
     preview = `<audio src="${data}" controls></audio>`;
   }
@@ -8606,50 +8731,23 @@ function renderMailAttachment(attachment){
     <div class="mail-attachment-preview">
       ${preview}
       <div class="mail-attachment-actions">
-        <span>附件：${name}</span>
-        <a class="mail-attachment-link" href="${data}" download="${name}">下载附件</a>
+        <span>📎 ${name}</span>
+        <a class="mail-attachment-link" href="${data}" download="${name}">下载</a>
       </div>
     </div>
   `;
 }
 
 function closeMailReader(){
+  currentReadMailId = '';
   if(mailReadTitle) mailReadTitle.textContent = '选择一封邮件';
   if(mailReadMeta) mailReadMeta.textContent = '在左侧选择邮件后，会像打开一张柔软信纸一样显示内容。';
-  if(mailReadBody){
-    mailReadBody.classList.remove('rich');
-    mailReadBody.textContent = '暂时没有打开的邮件。';
-  }
+  if(mailReadBody) mailReadBody.textContent = '暂时没有打开的邮件。';
   if(mailReadAttachment) mailReadAttachment.innerHTML = '';
-}
-
-function stripMailText(html){
-  const div = document.createElement('div');
-  div.innerHTML = sanitizeMailHtml(html);
-  return (div.textContent || '').trim() || '这封邮件只有附件，没有正文。';
-}
-
-function syncMailEditorToInput(){
-  if(mailBodyInput && mailBodyEditor) mailBodyInput.value = mailBodyEditor.innerHTML.trim();
-}
-
-function execMailCommand(command, value = null){
-  mailBodyEditor?.focus();
-  document.execCommand(command, false, value);
-  syncMailEditorToInput();
-}
-
-function insertAttachmentIntoMailBody(){
-  if(!pendingMailAttachment){
-    showLoginToast('请先上传附件，再插入到正文。', 'warn', '没有附件');
-    return;
+  if(mailReadModal){
+    mailReadModal.classList.remove('open');
+    mailReadModal.setAttribute('aria-hidden', 'true');
   }
-  const { data, type, name } = pendingMailAttachment;
-  let html = `<a href="${data}" download="${escapeHtml(name || '附件')}">附件：${escapeHtml(name || '附件')}</a>`;
-  if(String(type || '').startsWith('image/')) html = `<img src="${data}" alt="${escapeHtml(name || '邮件图片')}" />`;
-  else if(String(type || '').startsWith('video/')) html = `<video src="${data}" controls></video>`;
-  else if(String(type || '').startsWith('audio/')) html = `<audio src="${data}" controls></audio>`;
-  execMailCommand('insertHTML', html);
 }
 
 function readFileAsDataUrl(file){
@@ -8661,38 +8759,116 @@ function readFileAsDataUrl(file){
   });
 }
 
+function renderMailAttachmentChips(){
+  if(!mailAttachmentsBar) return;
+  if(!pendingMailAttachments.length){
+    mailAttachmentsBar.innerHTML = '<span style="color:#9b8aaa;font-size:12px;">还没有附件，点击上方📎附件添加文件 (≤10MB)</span>';
+    return;
+  }
+  mailAttachmentsBar.innerHTML = pendingMailAttachments.map((att, idx)=>`
+    <span class="mail-attach-chip">
+      <span title="${escapeHtml(att.name || '附件')}">📎 ${escapeHtml(att.name || '附件')} · ${(att.size/1024/1024).toFixed(2)}MB</span>
+      <button type="button" data-remove-attach="${idx}" title="移除">✕</button>
+    </span>
+  `).join('');
+  mailAttachmentsBar.querySelectorAll('[data-remove-attach]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      pendingMailAttachments.splice(Number(btn.dataset.removeAttach), 1);
+      renderMailAttachmentChips();
+    });
+  });
+}
+
 function clearMailAttachment(){
-  pendingMailAttachment = null;
+  pendingMailAttachments = [];
   if(mailAttachmentInput) mailAttachmentInput.value = '';
-  if(mailAttachmentName) mailAttachmentName.textContent = '未选择附件';
+  renderMailAttachmentChips();
+}
+
+function getMailComposePayload(){
+  return {
+    to: mailToInput?.value || '',
+    subject: mailSubjectInput?.value || '',
+    body: mailBodyEditor?.innerHTML || '',
+    attachments: pendingMailAttachments.slice()
+  };
+}
+
+function saveMailDraft(silent = false){
+  const payload = getMailComposePayload();
+  if(!payload.subject && !payload.body && !payload.attachments.length && !payload.to){
+    if(!silent) showLoginToast('草稿是空的，没有保存哦。', 'warn', '空草稿');
+    return;
+  }
+  loadDrafts();
+  const id = editingDraftId || ('draft_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6));
+  const draft = {
+    id,
+    to: payload.to,
+    subject: payload.subject || '无主题草稿',
+    body: payload.body,
+    attachments: payload.attachments,
+    savedAt: new Date().toLocaleString()
+  };
+  const idx = mailDrafts.findIndex(d=>d.id === id);
+  if(idx >= 0) mailDrafts[idx] = draft;
+  else mailDrafts.unshift(draft);
+  editingDraftId = id;
+  persistDrafts();
+  if(!silent) showLoginToast('草稿已保存到草稿箱。', 'success', '已存草稿');
+  if(currentMailMode === 'draft') renderMailList('draft');
+  if(mailDraftTab){
+    const draftBadge = mailDraftTab.querySelector('b');
+    if(draftBadge) draftBadge.textContent = String(getDraftCount());
+  }
+}
+
+function discardCompose(){
+  if(mailToInput && !mailToInput.readOnly) mailToInput.value = '';
+  if(mailSubjectInput) mailSubjectInput.value = '';
+  if(mailBodyEditor) mailBodyEditor.innerHTML = '';
+  pendingMailAttachments = [];
+  editingDraftId = null;
+  renderMailAttachmentChips();
 }
 
 async function sendMail(){
-  syncMailEditorToInput();
+  if(!mailSendBtn) return;
+  const payload = getMailComposePayload();
+  if(!payload.to || !payload.subject || !stripHtmlForPreview(payload.body)){
+    showLoginToast('收件人、主题、正文都需要填写。', 'warn', '信息不完整');
+    return;
+  }
   try{
     mailSendBtn.disabled = true;
     mailSendBtn.textContent = '发送中...';
+    const firstAttachment = payload.attachments[0] || null;
     await authRequest('/api/mail', {
       method:'POST',
       headers:authorizedHeaders(),
       body:JSON.stringify({
-        to:mailToInput.value,
-        subject:mailSubjectInput.value,
-        body:mailBodyInput.value,
-        attachment:pendingMailAttachment
+        to: payload.to,
+        subject: payload.subject,
+        body: payload.body,
+        attachment: firstAttachment,
+        attachments: payload.attachments
       })
     });
-    mailSubjectInput.value = '';
-    mailBodyInput.value = '';
-    if(mailBodyEditor) mailBodyEditor.innerHTML = '';
-    clearMailAttachment();
+    // 发送成功：若是从草稿编辑发送的，删除该草稿
+    if(editingDraftId){
+      loadDrafts();
+      mailDrafts = mailDrafts.filter(d=>d.id !== editingDraftId);
+      persistDrafts();
+      editingDraftId = null;
+    }
+    discardCompose();
     showLoginToast('站内邮件已发送。', 'success', '发送成功');
     await loadMail('sent');
   }catch(error){
     showLoginToast(error.message || '发送邮件失败。', 'error', '发送失败');
   }finally{
     mailSendBtn.disabled = false;
-    mailSendBtn.textContent = '发送邮件';
+    mailSendBtn.textContent = '✿ 发送邮件';
   }
 }
 
@@ -8742,43 +8918,78 @@ if(mailSearchInput){
     }
   });
 }
-if(mailBodyEditor) mailBodyEditor.addEventListener('input', syncMailEditorToInput);
-document.querySelectorAll('[data-mail-cmd]').forEach(btn=>{
-  btn.addEventListener('click', ()=>execMailCommand(btn.dataset.mailCmd));
-});
-if(mailFontSelect){
-  mailFontSelect.addEventListener('change', ()=>{
-    if(mailFontSelect.value) execMailCommand('fontName', mailFontSelect.value);
-  });
-}
-if(mailColorInput) mailColorInput.addEventListener('input', ()=>execMailCommand('foreColor', mailColorInput.value));
-if(mailInsertAttachmentBtn) mailInsertAttachmentBtn.addEventListener('click', insertAttachmentIntoMailBody);
 if(mailModal) mailModal.addEventListener('click', event=>{ if(event.target === mailModal) closeMailCenter(); });
-if(mailReadCloseBtn) mailReadCloseBtn.addEventListener('click', closeMailReader);
+if(mailReadCloseBtn) mailReadCloseBtn.addEventListener('click', ()=>{
+  // 收起详情：切回邮件列表，不跳到编辑
+  closeMailReader();
+});
 if(mailReadModal) mailReadModal.addEventListener('click', event=>{ if(event.target === mailReadModal) closeMailReader(); });
 if(mailAttachBtn) mailAttachBtn.addEventListener('click', ()=>mailAttachmentInput?.click());
-if(mailClearAttachBtn) mailClearAttachBtn.addEventListener('click', clearMailAttachment);
+if(mailSaveDraftBtn) mailSaveDraftBtn.addEventListener('click', ()=>saveMailDraft());
+if(mailDiscardDraftBtn) mailDiscardDraftBtn.addEventListener('click', ()=>{ discardCompose(); showLoginToast('编辑区已清空。', 'success', '已清空'); });
+// 富文本工具栏
+document.querySelectorAll('.mail-rich-toolbar [data-rich]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    mailBodyEditor?.focus();
+    document.execCommand(btn.dataset.rich, false, null);
+  });
+});
+if(mailFontSize) mailFontSize.addEventListener('change', ()=>{
+  mailBodyEditor?.focus();
+  document.execCommand('fontSize', false, mailFontSize.value);
+});
+if(mailFontColor) mailFontColor.addEventListener('input', ()=>{
+  mailBodyEditor?.focus();
+  document.execCommand('foreColor', false, mailFontColor.value);
+});
+if(mailInsertImageBtn) mailInsertImageBtn.addEventListener('click', ()=>{
+  const url = prompt('粘贴图片地址或留空使用本地图片');
+  if(url){
+    mailBodyEditor?.focus();
+    document.execCommand('insertImage', false, url);
+  }else{
+    // 选择本地图片插入到正文
+    const tmp = document.createElement('input');
+    tmp.type = 'file';
+    tmp.accept = 'image/*';
+    tmp.addEventListener('change', async ()=>{
+      const file = tmp.files?.[0];
+      if(!file) return;
+      const data = await readFileAsDataUrl(file);
+      mailBodyEditor?.focus();
+      document.execCommand('insertImage', false, data);
+    });
+    tmp.click();
+  }
+});
+if(mailInsertEmojiBtn) mailInsertEmojiBtn.addEventListener('click', ()=>{
+  const emojis = ['✨','💖','🌸','🍓','🌙','☁️','🌷','🐰','🍰','🌟','💌','🎀'];
+  const pick = emojis[Math.floor(Math.random()*emojis.length)];
+  mailBodyEditor?.focus();
+  document.execCommand('insertText', false, pick);
+});
 if(mailAttachmentInput){
   mailAttachmentInput.addEventListener('change', async ()=>{
-    const file = mailAttachmentInput.files && mailAttachmentInput.files[0];
-    if(!file) return;
-    if(file.size > 10 * 1024 * 1024){
-      clearMailAttachment();
-      showLoginToast('附件不能超过 10MB。', 'warn', '附件过大');
-      return;
+    const files = Array.from(mailAttachmentInput.files || []);
+    if(!files.length) return;
+    for(const file of files){
+      if(file.size > 10 * 1024 * 1024){
+        showLoginToast(`「${file.name}」超过 10MB，已跳过。`, 'warn', '附件过大');
+        continue;
+      }
+      try{
+        pendingMailAttachments.push({
+          name:file.name,
+          type:file.type || 'application/octet-stream',
+          size:file.size,
+          data:await readFileAsDataUrl(file)
+        });
+      }catch(_){
+        showLoginToast(`「${file.name}」读取失败。`, 'error', '上传失败');
+      }
     }
-    try{
-      pendingMailAttachment = {
-        name:file.name,
-        type:file.type || 'application/octet-stream',
-        size:file.size,
-        data:await readFileAsDataUrl(file)
-      };
-      if(mailAttachmentName) mailAttachmentName.textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)}MB`;
-    }catch(_){
-      clearMailAttachment();
-      showLoginToast('附件读取失败，请重新选择。', 'error', '上传失败');
-    }
+    mailAttachmentInput.value = '';
+    renderMailAttachmentChips();
   });
 }
 if(ownerContactCloseBtn) ownerContactCloseBtn.addEventListener('click', closeOwnerContact);
