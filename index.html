@@ -3926,6 +3926,18 @@
   }
   .mail-global-search input{width:100%;border:none;outline:none;color:#fff;background:transparent;font-weight:850;}
   .mail-global-search input::placeholder{color:rgba(255,255,255,.58);}
+  .mail-page-title{
+    min-width:120px;
+    height:40px;
+    display:grid;
+    place-items:center;
+    border-radius:999px;
+    color:#fff;
+    font-size:18px;
+    font-weight:950;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.22);
+  }
   .mail-close,.owner-contact-close{
     width:38px;height:38px;border-radius:50%;
     border:1px solid rgba(255,255,255,.34);
@@ -4144,6 +4156,117 @@
     background:rgba(255,255,255,.12);
   }
   .mail-attachment-name{color:rgba(255,255,255,.62);font-size:12px;font-weight:850;}
+
+  .mail-modal .mail-card{
+    color:#6b5b6d;
+    background:
+      radial-gradient(circle at 8% 0%, rgba(255,221,233,.9), transparent 30%),
+      radial-gradient(circle at 90% 8%, rgba(196,239,255,.82), transparent 32%),
+      linear-gradient(135deg, rgba(255,252,246,.97), rgba(247,242,255,.94));
+    border:1px solid rgba(208,188,212,.72);
+    box-shadow:0 34px 96px rgba(98,84,125,.25), inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  .mail-modal .mail-topbar{
+    background:rgba(255,255,255,.72);
+    border:1px solid rgba(194,173,199,.68);
+    box-shadow:0 12px 30px rgba(168,145,180,.12);
+  }
+  .mail-modal .mail-brand span{
+    background:var(--mail-avatar, linear-gradient(135deg,#ffe0ec,#bfefff));
+    background-size:cover;
+    background-position:center;
+    border:2px solid #fff;
+  }
+  .mail-modal .mail-brand h2,
+  .mail-modal .mail-page-title{
+    color:#5b4d5f;
+    text-shadow:none;
+  }
+  .mail-modal .mail-page-title,
+  .mail-modal .mail-global-search{
+    background:rgba(255,255,255,.72);
+    border-color:rgba(178,155,186,.58);
+  }
+  .mail-modal .mail-global-search input,
+  .mail-modal .mail-global-search span{
+    color:#6b5b6d;
+  }
+  .mail-modal .mail-global-search input::placeholder{color:rgba(107,91,109,.56);}
+  .mail-modal .mail-close{
+    color:#6b5b6d;
+    background:#fff7fb;
+    border-color:rgba(178,155,186,.7);
+  }
+  .mail-modal .mail-sidebar,
+  .mail-modal .mail-list-panel,
+  .mail-modal .mail-content-panel{
+    background:rgba(255,255,255,.62);
+    border-color:rgba(208,188,212,.56);
+    box-shadow:0 14px 34px rgba(168,145,180,.12), inset 0 1px 0 rgba(255,255,255,.8);
+  }
+  .mail-modal .mail-sidebar .mail-tabs button,
+  .mail-modal .mail-attach-row button,
+  .mail-modal .mail-list-toolbar button,
+  .mail-modal .mail-send-btn{
+    color:#6b5b6d;
+    background:linear-gradient(135deg,#fff,#ffe5f0);
+    border-color:rgba(208,188,212,.62);
+  }
+  .mail-modal .mail-sidebar .mail-tabs button.active{
+    color:#6a4a66;
+    background:linear-gradient(135deg,#ffe0ec,#dff8ff);
+    box-shadow:0 12px 24px rgba(255,169,204,.18);
+  }
+  .mail-modal .mail-sidebar .mail-tabs b{
+    color:#fff;
+    background:#ff9fbe;
+  }
+  .mail-modal .mail-item{
+    background:
+      radial-gradient(circle at 8% 0%, rgba(255,224,236,.88), transparent 34%),
+      linear-gradient(135deg, rgba(255,255,255,.92), rgba(247,251,255,.82));
+    border-color:rgba(208,188,212,.55);
+    color:#6b5b6d;
+    box-shadow:0 12px 26px rgba(168,145,180,.11);
+  }
+  .mail-modal .mail-item:hover{
+    background:#fff;
+    box-shadow:0 20px 42px rgba(168,145,180,.18);
+  }
+  .mail-modal .mail-item small,
+  .mail-modal .mail-list-toolbar span,
+  .mail-modal .mail-read-meta{
+    color:#8c7b8e;
+  }
+  .mail-modal .mail-item p,
+  .mail-modal .mail-read-body,
+  .mail-modal .mail-compose label,
+  .mail-modal .mail-attachment-name{
+    color:#7b6b7d;
+  }
+  .mail-modal .mail-user-link,
+  .mail-modal .mail-read-user{color:#7b65a8;}
+  .mail-modal .mail-compose,
+  .mail-modal .mail-read-card,
+  .mail-modal .mail-attachment-preview,
+  .mail-modal .mail-list-toolbar{
+    background:rgba(255,255,255,.76);
+    border-color:rgba(208,188,212,.55);
+    color:#6b5b6d;
+  }
+  .mail-modal .mail-compose input,
+  .mail-modal .mail-compose textarea{
+    color:#5f5263;
+    background:#fffafd;
+    border-color:rgba(208,188,212,.54);
+  }
+  .mail-modal .mail-delete-btn{
+    color:#fff;
+    background:linear-gradient(135deg,#ff8faf,#ffb9cf);
+  }
+  .mail-modal .mail-draft-soft{
+    opacity:.72;
+  }
   .mail-read-modal{
     position:fixed;
     inset:0;
@@ -6250,8 +6373,9 @@
 <div class="mail-modal" id="mailModal" aria-hidden="true">
   <div class="mail-card" role="dialog" aria-modal="true" aria-labelledby="mailTitle">
     <div class="mail-head mail-topbar">
-      <div class="mail-brand"><span>✉</span><h2 id="mailTitle">软萌邮箱</h2><small>Milk Mail</small></div>
+      <div class="mail-brand"><span id="mailUserAvatar"></span><h2 id="mailUserName">An</h2></div>
       <div class="mail-global-search"><span>⌕</span><input type="text" placeholder="搜索发件人、主题、正文..." autocomplete="new-password" data-lpignore="true" /></div>
+      <div class="mail-page-title" id="mailTitle">邮箱</div>
       <button class="mail-close" id="mailCloseBtn" type="button" aria-label="关闭">×</button>
     </div>
     <div class="mail-layout">
@@ -6260,6 +6384,7 @@
         <div class="mail-tabs">
           <button id="mailInboxTab" class="active" type="button"><span>💌 收件箱</span><b id="mailInboxMiniCount">0</b></button>
           <button id="mailSentTab" type="button"><span>🛩 发件箱</span><b id="mailSentMiniCount">0</b></button>
+          <button type="button" class="mail-draft-soft"><span>✏ 草稿箱</span><b>0</b></button>
         </div>
         <div class="mail-side-apps"><button title="通讯录">🌸</button><button title="日历">🌙</button><button title="文件">☁</button></div>
       </aside>
@@ -6863,6 +6988,8 @@ const mailReadTitle = document.getElementById('mailReadTitle');
 const mailReadMeta = document.getElementById('mailReadMeta');
 const mailReadBody = document.getElementById('mailReadBody');
 const mailReadAttachment = document.getElementById('mailReadAttachment');
+const mailUserAvatar = document.getElementById('mailUserAvatar');
+const mailUserName = document.getElementById('mailUserName');
 const ownerContactModal = document.getElementById('ownerContactModal');
 const ownerContactCloseBtn = document.getElementById('ownerContactCloseBtn');
 const ownerContactInfo = document.getElementById('ownerContactInfo');
@@ -8129,6 +8256,11 @@ function openMailCenter(mode = 'inbox', to = ''){
   if(!getAuthToken() || !user || user.username === 'guest'){
     showLoginToast('请先注册或登录账号后使用站内邮件。', 'warn', '需要账号');
     return;
+  }
+  if(mailUserName) mailUserName.textContent = userDisplayName(user);
+  if(mailUserAvatar){
+    const avatar = user?.profile?.avatar || '';
+    mailUserAvatar.style.setProperty('--mail-avatar', avatar ? `url('${avatar}')` : 'linear-gradient(135deg,#ffe0ec,#bfefff)');
   }
   if(mailToInput){
     if(isSiteOwnerUser(user)){
