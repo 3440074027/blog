@@ -42,10 +42,18 @@ function sanitizeAttachment(attachment){
 
 function sanitizeAttachments(attachments){
   if(!Array.isArray(attachments)) return [];
-  return attachments
+  const list = attachments
     .map(item=>sanitizeAttachment(item))
     .filter(Boolean)
     .slice(0, 12);
+  const totalSize = list.reduce((sum, item)=>sum + Number(item.size || 0), 0);
+  const totalDataLength = list.reduce((sum, item)=>sum + String(item.data || '').length, 0);
+  if(totalSize > MAX_ATTACHMENT_BYTES || totalDataLength > 14 * 1024 * 1024){
+    const error = new Error('附件总大小不能超过 10MB。');
+    error.status = 400;
+    throw error;
+  }
+  return list;
 }
 
 function sanitizeMail(mail){

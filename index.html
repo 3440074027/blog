@@ -3928,8 +3928,10 @@
   .mail-global-search input{width:100%;border:none;outline:none;color:#fff;background:transparent;font-weight:850;}
   .mail-global-search input::placeholder{color:rgba(255,255,255,.58);}
   .mail-global-search button{
-    min-height:30px;
-    padding:0 16px;
+    width:34px;
+    min-width:34px;
+    min-height:34px;
+    padding:0;
     border-radius:999px;
     border:1px solid rgba(255,255,255,.72);
     color:#6a4765;
@@ -3938,6 +3940,10 @@
     background:linear-gradient(135deg,#ffe1ee,#cfe9ff);
     box-shadow:0 10px 22px rgba(176,135,170,.2), inset 0 1px 0 rgba(255,255,255,.85);
     transition:transform .18s, box-shadow .18s;
+    display:grid;
+    place-items:center;
+    font-size:20px;
+    line-height:1;
   }
   .mail-global-search button:hover{
     transform:translateY(-2px) scale(1.04);
@@ -4143,6 +4149,15 @@
     text-align:center;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
   }
+  .mail-size-control{
+    min-width:118px;
+    justify-content:space-between;
+  }
+  .mail-size-control span{
+    color:#4f4052;
+    font-weight:950;
+    margin-right:8px;
+  }
   .mail-rich-toolbar select{
     max-width:220px;
     min-width:178px;
@@ -4162,25 +4177,34 @@
     background-size:32px 100%,5px 5px,5px 5px,100% 100%;
     background-repeat:no-repeat;
   }
-  .mail-align-menu{
+  .mail-align-menu,
+  .mail-style-menu{
     position:relative;
   }
-  .mail-align-options{
+  .mail-align-options,
+  .mail-style-options{
     position:absolute;
     top:35px;
     left:0;
     z-index:8;
     display:none;
-    min-width:94px;
+    min-width:118px;
     padding:6px;
     border-radius:16px;
     background:rgba(255,250,253,.96);
     border:1px solid rgba(218,200,225,.78);
     box-shadow:0 16px 30px rgba(176,158,200,.22);
   }
-  .mail-align-menu.open .mail-align-options{
+  .mail-align-menu.open .mail-align-options,
+  .mail-style-menu.open .mail-style-options{
     display:grid;
     gap:5px;
+  }
+  .mail-style-options button,
+  .mail-align-options button{
+    justify-content:flex-start;
+    border-radius:13px;
+    background:linear-gradient(135deg,#fff,#fff5fb);
   }
   .mail-file-card{
     display:inline-grid;
@@ -4683,6 +4707,25 @@
   .mail-read-head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
   .mail-read-head h2{margin:0;font-size:22px;}
   .mail-read-close{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.1);cursor:pointer;}
+  #mailReadReplyBtn,
+  #mailReadCloseBtn{
+    width:auto;
+    min-width:58px;
+    height:34px;
+    padding:0 13px;
+    border-radius:999px;
+    color:#6a4a66;
+    font-size:12px;
+    font-weight:950;
+    background:linear-gradient(135deg,#fff7fb,#eaf6ff);
+    border:1px solid rgba(218,200,225,.78);
+    box-shadow:0 10px 22px rgba(176,158,200,.16), inset 0 1px 0 rgba(255,255,255,.85);
+  }
+  #mailReadReplyBtn:hover,
+  #mailReadCloseBtn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 14px 28px rgba(176,158,200,.24);
+  }
   .mail-read-meta{color:#8fceff;font-size:12px;font-weight:900;}
   .mail-read-body{margin:0;color:rgba(255,255,255,.76);line-height:1.85;white-space:pre-wrap;}
   .mail-read-user{
@@ -6753,7 +6796,7 @@
   <div class="mail-card" role="dialog" aria-modal="true" aria-labelledby="mailTitle">
     <div class="mail-head mail-topbar">
       <div class="mail-brand"><span id="mailUserAvatar"></span><h2 id="mailUserName">An</h2></div>
-      <div class="mail-global-search"><input id="mailSearchInput" type="text" placeholder="搜索用户、标题、内容、附件名..." autocomplete="new-password" data-lpignore="true" /><button id="mailSearchBtn" type="button">搜索</button></div>
+      <div class="mail-global-search"><input id="mailSearchInput" type="text" placeholder="搜索用户、标题、内容、附件名..." autocomplete="new-password" data-lpignore="true" /><button id="mailSearchBtn" type="button" aria-label="搜索邮件">⌕</button></div>
       <button class="mail-close" id="mailCloseBtn" type="button" aria-label="关闭">×</button>
     </div>
     <div class="mail-layout">
@@ -6847,11 +6890,16 @@
         <option value="'Lucida Console','Consolas',monospace">Lucida Console</option>
       </optgroup>
     </select>
-    <label class="mail-size-control" title="字号">字号 <input id="mailFontSize" type="number" min="10" max="72" value="14" /></label>
-    <button type="button" data-rich="bold" title="加粗"><b>粗</b></button>
-    <button type="button" data-rich="italic" title="斜体"><i>斜</i></button>
-    <button type="button" data-rich="underline" title="下划线"><u>下</u></button>
-    <button type="button" data-rich="strikeThrough" title="删除线"><s>删</s></button>
+    <label class="mail-size-control" title="字号"><span>字号</span><input id="mailFontSize" type="number" min="10" max="72" value="14" /></label>
+    <div class="mail-style-menu">
+      <button id="mailStyleToggle" type="button" title="文字样式">样式⌄</button>
+      <div class="mail-style-options" id="mailStyleOptions">
+        <button type="button" data-rich="bold" title="加粗"><b>粗</b> 加粗</button>
+        <button type="button" data-rich="italic" title="斜体"><i>斜</i> 斜体</button>
+        <button type="button" data-rich="underline" title="下划线"><u>下</u> 下划线</button>
+        <button type="button" data-rich="strikeThrough" title="删除线"><s>删</s> 删除线</button>
+      </div>
+    </div>
     <label title="字体颜色">🎨<input id="mailFontColor" type="color" value="#5b4d5f" /></label>
     <div class="mail-align-menu">
       <button id="mailAlignToggle" type="button" title="对齐方式">对齐⌄</button>
@@ -7450,6 +7498,8 @@ const mailDiscardDraftBtn = document.getElementById('mailDiscardDraftBtn');
 const mailFontFamily = document.getElementById('mailFontFamily');
 const mailFontSize = document.getElementById('mailFontSize');
 const mailFontColor = document.getElementById('mailFontColor');
+const mailStyleToggle = document.getElementById('mailStyleToggle');
+const mailStyleOptions = document.getElementById('mailStyleOptions');
 const mailAlignToggle = document.getElementById('mailAlignToggle');
 const mailAlignOptions = document.getElementById('mailAlignOptions');
 const mailInsertEmojiBtn = document.getElementById('mailInsertEmojiBtn');
@@ -7741,7 +7791,14 @@ let mailDrafts = [];
 let currentMailMode = 'inbox';
 let pendingMailAttachments = [];
 let editingDraftId = null;
+let mailCurrentStyle = {
+  fontFamily:'',
+  fontSize:'14px',
+  color:'#5b4d5f'
+};
+let mailDraftStorageAvailable = true;
 const MAIL_DRAFT_STORAGE_KEY = 'ans_blog_mail_drafts';
+const MAIL_MAX_TOTAL_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
 function updateToolStats(user = readSavedUser()){
   const profile = user?.profile || {};
@@ -8808,6 +8865,7 @@ function openMailCompose(to = '', preset = null){
   if(mailSubjectInput) mailSubjectInput.value = preset?.subject || '';
   if(mailBodyEditor){
     mailBodyEditor.innerHTML = preset?.body || '';
+    applyMailCurrentStyleToEditor();
   }
   pendingMailAttachments = Array.isArray(preset?.attachments) ? preset.attachments.slice() : [];
   editingDraftId = preset?.id || null;
@@ -8853,13 +8911,21 @@ async function loadMail(mode = 'inbox'){
 }
 
 function loadDrafts(){
+  if(!mailDraftStorageAvailable) return;
   try{
     mailDrafts = JSON.parse(localStorage.getItem(MAIL_DRAFT_STORAGE_KEY) || '[]') || [];
   }catch(_){ mailDrafts = []; }
   if(!Array.isArray(mailDrafts)) mailDrafts = [];
 }
 function persistDrafts(){
-  try{ localStorage.setItem(MAIL_DRAFT_STORAGE_KEY, JSON.stringify(mailDrafts)); }catch(_){ }
+  try{
+    localStorage.setItem(MAIL_DRAFT_STORAGE_KEY, JSON.stringify(mailDrafts));
+    mailDraftStorageAvailable = true;
+    return true;
+  }catch(_){
+    mailDraftStorageAvailable = false;
+    return false;
+  }
 }
 function getDraftCount(){ loadDrafts(); return mailDrafts.length; }
 
@@ -9132,6 +9198,8 @@ function insertMailHtmlAtCursor(html){
 }
 
 function applyMailInlineStyle(styleName, value){
+  mailCurrentStyle[styleName] = value;
+  if(mailBodyEditor) mailBodyEditor.style[styleName] = value;
   mailBodyEditor?.focus();
   restoreMailSelection();
   const selection = window.getSelection();
@@ -9143,20 +9211,25 @@ function applyMailInlineStyle(styleName, value){
   const range = selection.getRangeAt(0);
   const span = document.createElement('span');
   span.style[styleName] = value;
-  if(range.collapsed){
-    span.appendChild(document.createTextNode('\u200b'));
-    range.insertNode(span);
-    range.setStart(span.firstChild, 1);
-    range.collapse(true);
-  }else{
-    span.appendChild(range.extractContents());
-    range.insertNode(span);
-    range.selectNodeContents(span);
-    range.collapse(false);
-  }
+  if(range.collapsed) return;
+  span.appendChild(range.extractContents());
+  range.insertNode(span);
+  range.selectNodeContents(span);
+  range.collapse(false);
   selection.removeAllRanges();
   selection.addRange(range);
   savedMailRange = range.cloneRange();
+}
+
+function applyMailCurrentStyleToEditor(){
+  if(!mailBodyEditor) return;
+  Object.entries(mailCurrentStyle).forEach(([key, value])=>{
+    if(value) mailBodyEditor.style[key] = value;
+  });
+}
+
+function currentAttachmentTotalSize(extra = 0){
+  return pendingMailAttachments.reduce((sum, item)=>sum + Number(item.size || 0), 0) + extra;
 }
 
 function mailFileIcon(typeOrName = ''){
@@ -9177,6 +9250,7 @@ function createMailFileCard(att){
   const name = escapeHtml(att.name || '附件');
   const type = escapeHtml(att.type || '文件');
   const data = att.data || '#';
+  const id = escapeHtml(att.id || '');
   let preview = '';
   if(String(att.type || '').startsWith('image/')){
     preview = `<img src="${data}" alt="${name}" />`;
@@ -9186,7 +9260,7 @@ function createMailFileCard(att){
     preview = `<audio src="${data}" controls style="grid-column:1 / -1;width:100%;"></audio>`;
   }
   const download = att.kind === 'link' ? '' : ` download="${name}"`;
-  return `<a class="mail-file-card" contenteditable="false" href="${data}"${download} target="_blank" rel="noopener">
+  return `<a class="mail-file-card" data-attach-id="${id}" contenteditable="false" href="${data}"${download} target="_blank" rel="noopener">
     <span class="file-icon">${mailFileIcon(att.type || att.name)}</span>
     <span><strong>${name}</strong><small>${type}${att.size ? ` · ${(att.size/1024/1024).toFixed(2)}MB` : ''}</small></span>
     ${preview}
@@ -9235,7 +9309,12 @@ function renderMailAttachmentChips(){
   `).join('');
   mailAttachmentsBar.querySelectorAll('[data-remove-attach]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      pendingMailAttachments.splice(Number(btn.dataset.removeAttach), 1);
+      const removed = pendingMailAttachments.splice(Number(btn.dataset.removeAttach), 1)[0];
+      if(removed?.id && mailBodyEditor){
+        mailBodyEditor.querySelectorAll('[data-attach-id]').forEach(node=>{
+          if(node.getAttribute('data-attach-id') === removed.id) node.remove();
+        });
+      }
       renderMailAttachmentChips();
     });
   });
@@ -9252,7 +9331,7 @@ function getMailComposePayload(){
     to: mailToInput?.value || '',
     subject: mailSubjectInput?.value || '',
     body: mailBodyEditor?.innerHTML || '',
-    attachments: pendingMailAttachments.slice()
+    attachments: pendingMailAttachments.map(({ id, ...attachment })=>attachment)
   };
 }
 
@@ -9276,8 +9355,8 @@ function saveMailDraft(silent = false){
   if(idx >= 0) mailDrafts[idx] = draft;
   else mailDrafts.unshift(draft);
   editingDraftId = id;
-  persistDrafts();
-  if(!silent) showLoginToast('草稿已保存到草稿箱。', 'success', '已存草稿');
+  const persisted = persistDrafts();
+  if(!silent) showLoginToast(persisted ? '草稿已保存到草稿箱。' : '草稿较大，已暂存在本次会话的草稿箱。', persisted ? 'success' : 'warn', persisted ? '已存草稿' : '临时保存');
   if(currentMailMode === 'draft') renderMailList('draft');
   if(mailDraftTab){
     const draftBadge = mailDraftTab.querySelector('b');
@@ -9393,12 +9472,15 @@ if(mailBodyEditor){
   ['keyup','mouseup','focus','input'].forEach(eventName=>{
     mailBodyEditor.addEventListener(eventName, saveMailSelection);
   });
+  mailBodyEditor.addEventListener('focus', applyMailCurrentStyleToEditor);
+  mailBodyEditor.addEventListener('beforeinput', applyMailCurrentStyleToEditor);
 }
 // 富文本工具栏
 document.querySelectorAll('.mail-rich-toolbar [data-rich]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     mailBodyEditor?.focus();
     document.execCommand(btn.dataset.rich, false, null);
+    mailStyleToggle?.closest('.mail-style-menu')?.classList.remove('open');
   });
 });
 if(mailFontFamily) mailFontFamily.addEventListener('change', ()=>{
@@ -9416,6 +9498,10 @@ if(mailAlignToggle) mailAlignToggle.addEventListener('click', event=>{
   event.stopPropagation();
   mailAlignToggle.closest('.mail-align-menu')?.classList.toggle('open');
 });
+if(mailStyleToggle) mailStyleToggle.addEventListener('click', event=>{
+  event.stopPropagation();
+  mailStyleToggle.closest('.mail-style-menu')?.classList.toggle('open');
+});
 if(mailAlignOptions){
   mailAlignOptions.querySelectorAll('[data-align]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -9430,6 +9516,9 @@ document.addEventListener('click', event=>{
   if(!event.target.closest?.('.mail-align-menu')){
     document.querySelector('.mail-align-menu')?.classList.remove('open');
   }
+  if(!event.target.closest?.('.mail-style-menu')){
+    document.querySelector('.mail-style-menu')?.classList.remove('open');
+  }
   if(!event.target.closest?.('.mail-rich-toolbar')){
     document.querySelector('.mail-rich-toolbar')?.classList.remove('emoji-open');
   }
@@ -9443,6 +9532,7 @@ if(mailAttachLinkBtn) mailAttachLinkBtn.addEventListener('click', ()=>{
   if(!url) return;
   const name = prompt('给这个链接起一个显示名称', '文件链接') || '文件链接';
   const att = {
+    id:'att_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
     name,
     type:'链接文件',
     size:0,
@@ -9462,8 +9552,13 @@ if(mailAttachmentInput){
         showLoginToast(`「${file.name}」超过 10MB，已跳过。`, 'warn', '附件过大');
         continue;
       }
+      if(currentAttachmentTotalSize(file.size) > MAIL_MAX_TOTAL_ATTACHMENT_BYTES){
+        showLoginToast('附件总大小不能超过 10MB，已跳过后续文件。', 'warn', '附件过大');
+        break;
+      }
       try{
         const att = {
+          id:'att_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
           name:file.name,
           type:file.type || 'application/octet-stream',
           size:file.size,
