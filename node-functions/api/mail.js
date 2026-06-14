@@ -35,8 +35,17 @@ function sanitizeAttachment(attachment){
     name: String(attachment.name || '附件').trim().slice(0, 120),
     type: String(attachment.type || 'application/octet-stream').trim().slice(0, 120),
     size,
-    data
+    data,
+    kind: String(attachment.kind || '').trim().slice(0, 40)
   };
+}
+
+function sanitizeAttachments(attachments){
+  if(!Array.isArray(attachments)) return [];
+  return attachments
+    .map(item=>sanitizeAttachment(item))
+    .filter(Boolean)
+    .slice(0, 12);
 }
 
 function sanitizeMail(mail){
@@ -45,11 +54,12 @@ function sanitizeMail(mail){
     from: String(mail.from || '').trim().slice(0, 20),
     to: String(mail.to || '').trim().slice(0, 20),
     subject: String(mail.subject || '').trim().slice(0, 80),
-    body: String(mail.body || '').trim().slice(0, 12000),
+    body: String(mail.body || '').trim().slice(0, 240000),
     createdAt: typeof mail.createdAt === 'string' ? mail.createdAt : nowIso(),
     expiresAt: typeof mail.expiresAt === 'string' ? mail.expiresAt : new Date(Date.now() + MAIL_TTL_MS).toISOString(),
     read: Boolean(mail.read),
-    attachment: sanitizeAttachment(mail.attachment)
+    attachment: sanitizeAttachment(mail.attachment),
+    attachments: sanitizeAttachments(mail.attachments)
   };
 }
 
@@ -138,9 +148,10 @@ export async function onRequestPost(context){
       createdAt: nowIso(),
       expiresAt: new Date(Date.now() + MAIL_TTL_MS).toISOString(),
       read: false,
-      attachment: body.attachment || null
+      attachment: body.attachment || null,
+      attachments: body.attachments || []
     });
-    if(!mail.body && !mail.attachment){
+    if(!mail.body && !mail.attachment && !mail.attachments.length){
       return json({ error:'邮件内容或附件至少填写一项。' }, 400);
     }
     await Promise.all([
