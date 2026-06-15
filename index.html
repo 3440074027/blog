@@ -7527,9 +7527,10 @@ const AUTH_TOKEN_KEY = 'ans_blog_auth_token';
 const AUTH_USER_KEY = 'ans_blog_auth_user';
 const AUTH_RETURN_LOGIN_KEY = 'ans_blog_return_login';
 const AUTH_API_BASE = (window.AUTH_API_BASE || window.PROFILE_API_BASE || '').replace(/\/$/, '');
-const REALTIME_REFRESH_MS = 5000;
-let realtimeRefreshTimer = 0;
+let realtimeEventSource = null;
 let realtimeRefreshRunning = false;
+let realtimeReconnectTimer = 0;
+let lastRealtimeVersion = '';
 let lastAnnouncementsSnapshot = '';
 let lastArticlesSnapshot = '';
 let lastMailSnapshot = '';
@@ -9699,14 +9700,39 @@ async function refreshRealtimeState(){
 }
 
 function startRealtimeRefresh(){
-  clearInterval(realtimeRefreshTimer);
+  stopRealtimeRefresh();
   refreshRealtimeState();
-  realtimeRefreshTimer = setInterval(refreshRealtimeState, REALTIME_REFRESH_MS);
+  if(typeof EventSource === 'undefined') return;
+  try{
+    realtimeEventSource = new EventSource(authApiUrl('/api/events'));
+    realtimeEventSource.addEventListener('update', event=>{
+      try{
+        const data = JSON.parse(event.data || '{}');
+        if(data.version && data.version !== lastRealtimeVersion){
+          lastRealtimeVersion = data.version;
+          refreshRealtimeState();
+        }
+      }catch(_){
+        refreshRealtimeState();
+      }
+    });
+    realtimeEventSource.onerror = ()=>{
+      stopRealtimeRefresh(false);
+      realtimeReconnectTimer = setTimeout(()=>{
+        if(blogHome?.classList.contains('active') && !document.hidden) startRealtimeRefresh();
+      }, 1800);
+    };
+  }catch(error){
+    console.warn('realtime events unavailable:', error);
+  }
 }
 
-function stopRealtimeRefresh(){
-  clearInterval(realtimeRefreshTimer);
-  realtimeRefreshTimer = 0;
+function stopRealtimeRefresh(clearReconnect = true){
+  if(clearReconnect) clearTimeout(realtimeReconnectTimer);
+  if(realtimeEventSource){
+    realtimeEventSource.close();
+    realtimeEventSource = null;
+  }
   realtimeRefreshRunning = false;
 }
 

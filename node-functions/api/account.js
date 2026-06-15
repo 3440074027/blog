@@ -14,6 +14,7 @@ import {
   publicUser,
   nowIso
 } from './_lib/auth.js';
+import { touchRealtime } from './_lib/realtime.js';
 
 async function requireVerifiedAccount(context){
   const auth = await requireUser(context.request);
@@ -64,6 +65,7 @@ export async function onRequestPut(context){
       user.updatedAt = nowIso();
       await setUser(user);
     }
+    await touchRealtime('account');
 
     return json({
       ok:true,
@@ -82,6 +84,7 @@ export async function onRequestDelete(context){
 
   try{
     await deleteUser(result.user.username);
+    await touchRealtime('account');
     return json({ ok:true, deleted:true });
   }catch(error){
     console.error('account delete error:', error);

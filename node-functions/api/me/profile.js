@@ -7,6 +7,7 @@ import {
   publicUser,
   nowIso
 } from '../_lib/auth.js';
+import { touchRealtime } from '../_lib/realtime.js';
 
 export async function onRequestPut(context){
   const auth = await requireUser(context.request);
@@ -19,6 +20,7 @@ export async function onRequestPut(context){
     auth.user.profile = nextProfile;
     auth.user.updatedAt = nowIso();
     await setUser(auth.user);
+    await touchRealtime('profile');
     return json({ ok:true, user:publicUser(auth.user) });
   }catch(error){
     console.error('me-profile error:', error);

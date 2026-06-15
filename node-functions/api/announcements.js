@@ -1,5 +1,6 @@
 import { json, readJsonBody, requireUser, isSiteOwner, redis, nowIso } from './_lib/auth.js';
 import { DB_KEYS, CACHE_HEADERS } from './_lib/db.js';
+import { touchRealtime } from './_lib/realtime.js';
 
 const DEFAULT_ANNOUNCEMENTS = [
   { id:'welcome', kicker:'✨ 星尘公告', title:'欢迎来到你的灵感档案馆', body:'这里会收纳文章、文件、灵感和成长记录。每一次登录，都是和未来的自己重逢。', updatedAt:'2026-06-13', image:'' },
@@ -49,6 +50,7 @@ export async function onRequestPut(context){
     const body = await readJsonBody(context.request);
     const announcements = sanitizeAnnouncements(body.announcements);
     await redis.set(DB_KEYS.announcements.list, announcements);
+    await touchRealtime('announcements');
     return json({ ok:true, updatedAt:nowIso(), announcements });
   }catch(error){
     console.error('announcements put error:', error);

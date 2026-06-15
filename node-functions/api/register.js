@@ -13,6 +13,7 @@ import {
   publicUser,
   nowIso
 } from './_lib/auth.js';
+import { touchRealtime } from './_lib/realtime.js';
 
 export async function onRequestPost(context){
   try{
@@ -44,6 +45,7 @@ export async function onRequestPost(context){
       profile
     };
     await setUser(user);
+    await touchRealtime('register');
 
     return json({
       ok:true,

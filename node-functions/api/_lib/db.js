@@ -21,6 +21,9 @@ export const DB_KEYS = {
   },
   visitor: {
     count: 'site:visitor-count'
+  },
+  realtime: {
+    version: 'site:realtime-version'
   }
 };
 

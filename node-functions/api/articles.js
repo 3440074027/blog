@@ -7,6 +7,7 @@ import {
   nowIso
 } from './_lib/auth.js';
 import { DB_KEYS, CACHE_HEADERS } from './_lib/db.js';
+import { touchRealtime } from './_lib/realtime.js';
 
 function cleanHtml(html){
   return String(html || '')
@@ -140,6 +141,7 @@ export async function onRequestPost(context){
     const article = sanitizeArticle(body.article || body || {}, auth.user.username);
     if(!article.content) return json({ error:'文章正文不能为空。' }, 400);
     await saveArticle(article);
+    await touchRealtime('articles');
     return json({ ok:true, article });
   }catch(error){
     console.error('articles post error:', error);
@@ -158,6 +160,7 @@ export async function onRequestPut(context){
     if(previous.author !== auth.user.username) return json({ error:'只能修改自己发布的文章。' }, 403);
     const article = { ...next, author:auth.user.username, createdAt:previous.createdAt, updatedAt:nowIso() };
     await saveArticle(article);
+    await touchRealtime('articles');
     return json({ ok:true, article });
   }catch(error){
     console.error('articles put error:', error);
@@ -184,6 +187,7 @@ export async function onRequestDelete(context){
       await redis.del(DB_KEYS.articles.item(article.id));
     }
     await writeArticleIndex(index.filter(article=>!ids.includes(article.id)));
+    await touchRealtime('articles');
     return json({ ok:true, deleted:targetArticles.length });
   }catch(error){
     console.error('articles delete error:', error);

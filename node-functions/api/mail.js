@@ -10,6 +10,7 @@ import {
   SITE_OWNER_USERNAME
 } from './_lib/auth.js';
 import { DB_KEYS, CACHE_HEADERS } from './_lib/db.js';
+import { touchRealtime } from './_lib/realtime.js';
 
 const MAIL_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
@@ -164,6 +165,7 @@ export async function onRequestPost(context){
       addUserMail(target.username, 'inbox', mail),
       addUserMail(auth.user.username, 'sent', { ...mail, read:true })
     ]);
+    await touchRealtime('mail');
     return json({ ok:true, mail });
   }catch(error){
     console.error('mail send error:', error);
@@ -184,6 +186,7 @@ export async function onRequestPut(context){
     const nextInbox = box.inbox.map(mail => mail.id === id ? { ...mail, read:true } : mail);
     await writeUserMailbox(auth.user.username, { ...box, inbox:nextInbox });
     const mail = nextInbox.find(item=>item.id === id) || null;
+    await touchRealtime('mail');
     return json({ ok:true, mail });
   }catch(error){
     console.error('mail update error:', error);
@@ -208,6 +211,7 @@ export async function onRequestDelete(context){
       ...userBox,
       [box === 'sent' ? 'sent' : 'inbox']:nextItems
     });
+    await touchRealtime('mail');
     return json({ ok:true, deleted:items.length - nextItems.length });
   }catch(error){
     console.error('mail delete error:', error);
