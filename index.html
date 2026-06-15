@@ -7527,13 +7527,6 @@ const AUTH_TOKEN_KEY = 'ans_blog_auth_token';
 const AUTH_USER_KEY = 'ans_blog_auth_user';
 const AUTH_RETURN_LOGIN_KEY = 'ans_blog_return_login';
 const AUTH_API_BASE = (window.AUTH_API_BASE || window.PROFILE_API_BASE || '').replace(/\/$/, '');
-let realtimeEventSource = null;
-let realtimeRefreshRunning = false;
-let realtimeReconnectTimer = 0;
-let lastRealtimeVersion = '';
-let lastAnnouncementsSnapshot = '';
-let lastArticlesSnapshot = '';
-let lastMailSnapshot = '';
 
 if(mailComposePanel && mailCard && mailComposePanel.parentElement !== mailCard){
   mailCard.appendChild(mailComposePanel);
@@ -7576,13 +7569,6 @@ function saveLoginSession(token, user){
     sessionStorage.setItem(AUTH_TOKEN_KEY, token);
     sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
     sessionStorage.removeItem(AUTH_RETURN_LOGIN_KEY);
-  }catch(_){}
-}
-
-function updateSavedUser(user){
-  if(!user) return;
-  try{
-    sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
   }catch(_){}
 }
 
@@ -7990,28 +7976,12 @@ function requireRealUser(actionText = '使用文章功能'){
 async function loadPublicArticles(){
   try{
     const data = await authRequest('/api/articles', { method:'GET' });
-    applyPublicArticles(Array.isArray(data.articles) ? data.articles : []);
+    publicArticles = Array.isArray(data.articles) ? data.articles : [];
+    renderArticles();
+    updateToolStats();
   }catch(error){
     console.error('load articles error:', error);
   }
-}
-
-function applyPublicArticles(nextArticles = []){
-  const snapshot = JSON.stringify(nextArticles.map(item=>({
-    id:item.id,
-    title:item.title,
-    author:item.author,
-    updatedAt:item.updatedAt,
-    createdAt:item.createdAt,
-    thumb:item.thumb,
-    summary:item.summary
-  })));
-  if(snapshot === lastArticlesSnapshot) return false;
-  lastArticlesSnapshot = snapshot;
-  publicArticles = Array.isArray(nextArticles) ? nextArticles : [];
-  renderArticles();
-  updateToolStats();
-  return true;
 }
 
 function setArticleCategory(value){
@@ -8445,23 +8415,14 @@ function showNotice(index){
 async function loadAnnouncements(){
   try{
     const data = await authRequest('/api/announcements', { method:'GET' });
-    applyAnnouncements(Array.isArray(data.announcements) && data.announcements.length ? data.announcements : DEFAULT_ANNOUNCEMENTS.slice(), true);
+    currentAnnouncements = Array.isArray(data.announcements) && data.announcements.length ? data.announcements : DEFAULT_ANNOUNCEMENTS.slice();
   }catch(_){
-    applyAnnouncements(DEFAULT_ANNOUNCEMENTS.slice(), true);
+    currentAnnouncements = DEFAULT_ANNOUNCEMENTS.slice();
   }
-}
-
-function applyAnnouncements(items, force = false){
-  const next = Array.isArray(items) && items.length ? items : DEFAULT_ANNOUNCEMENTS.slice();
-  const snapshot = JSON.stringify(next.map(item=>({ id:item.id, title:item.title, body:item.body, updatedAt:item.updatedAt, image:item.image })));
-  if(!force && snapshot === lastAnnouncementsSnapshot) return false;
-  lastAnnouncementsSnapshot = snapshot;
-  currentAnnouncements = next;
   noticeCurrent = Math.min(noticeCurrent, currentAnnouncements.length - 1);
   renderNoticeSlides();
   renderNoticeDots();
   showNotice(noticeCurrent);
-  return true;
 }
 
 function openNoticeEditor(){
@@ -8940,28 +8901,13 @@ async function loadMail(mode = 'inbox'){
   renderMailList(mode);
   try{
     const data = await authRequest('/api/mail', { method:'GET', headers:authorizedHeaders() });
-    applyMailState({ inbox:data.inbox || [], sent:data.sent || [] }, mode, true);
+    mailState = { inbox:data.inbox || [], sent:data.sent || [] };
+    updateToolStats();
+    updateMailBadge();
+    renderMailList(mode);
   }catch(error){
     showLoginToast(error.message || '读取邮件失败。', 'error', '邮件错误');
   }
-}
-
-function applyMailState(nextMail = {}, mode = currentMailMode, force = false){
-  const nextState = {
-    inbox:Array.isArray(nextMail.inbox) ? nextMail.inbox : [],
-    sent:Array.isArray(nextMail.sent) ? nextMail.sent : []
-  };
-  const snapshot = JSON.stringify({
-    inbox:nextState.inbox.map(item=>({ id:item.id, read:item.read, updatedAt:item.updatedAt, createdAt:item.createdAt, subject:item.subject })),
-    sent:nextState.sent.map(item=>({ id:item.id, createdAt:item.createdAt, subject:item.subject }))
-  });
-  if(!force && snapshot === lastMailSnapshot) return false;
-  lastMailSnapshot = snapshot;
-  mailState = nextState;
-  updateToolStats();
-  updateMailBadge();
-  if(mode !== 'compose') renderMailList(mode === 'draft' ? 'draft' : mode);
-  return true;
 }
 
 function loadDrafts(){
@@ -9674,73 +9620,6 @@ function switchBackgroundMode(toHome){
   }, 1400);
 }
 
-async function refreshRealtimeState(){
-  if(realtimeRefreshRunning) return;
-  if(!blogHome?.classList.contains('active')) return;
-  realtimeRefreshRunning = true;
-  try{
-    const data = await authRequest('/api/state', {
-      method:'GET',
-      headers:authorizedHeaders()
-    });
-    if(data.user){
-      updateSavedUser(data.user);
-      renderBlogHomeUser(data.user);
-    }
-    if(Array.isArray(data.announcements)) applyAnnouncements(data.announcements);
-    if(Array.isArray(data.articles)) applyPublicArticles(data.articles);
-    if(data.mail && getAuthToken() && readSavedUser()?.username !== 'guest'){
-      applyMailState(data.mail, currentMailMode);
-    }
-  }catch(error){
-    console.warn('realtime refresh failed:', error);
-  }finally{
-    realtimeRefreshRunning = false;
-  }
-}
-
-function startRealtimeRefresh(){
-  stopRealtimeRefresh();
-  refreshRealtimeState();
-  if(typeof EventSource === 'undefined') return;
-  try{
-    realtimeEventSource = new EventSource(authApiUrl('/api/events'));
-    realtimeEventSource.addEventListener('update', event=>{
-      try{
-        const data = JSON.parse(event.data || '{}');
-        if(data.version && data.version !== lastRealtimeVersion){
-          lastRealtimeVersion = data.version;
-          refreshRealtimeState();
-        }
-      }catch(_){
-        refreshRealtimeState();
-      }
-    });
-    realtimeEventSource.onerror = ()=>{
-      stopRealtimeRefresh(false);
-      realtimeReconnectTimer = setTimeout(()=>{
-        if(blogHome?.classList.contains('active') && !document.hidden) startRealtimeRefresh();
-      }, 1800);
-    };
-  }catch(error){
-    console.warn('realtime events unavailable:', error);
-  }
-}
-
-function stopRealtimeRefresh(clearReconnect = true){
-  if(clearReconnect) clearTimeout(realtimeReconnectTimer);
-  if(realtimeEventSource){
-    realtimeEventSource.close();
-    realtimeEventSource = null;
-  }
-  realtimeRefreshRunning = false;
-}
-
-document.addEventListener('visibilitychange', ()=>{
-  if(document.hidden) stopRealtimeRefresh();
-  else if(blogHome?.classList.contains('active')) startRealtimeRefresh();
-});
-
 function enterDashboard(userLike){
   renderBlogHomeUser(userLike);
   switchBackgroundMode(true);
@@ -9758,7 +9637,6 @@ function enterDashboard(userLike){
   if(getAuthToken() && readSavedUser()?.username !== 'guest'){
     loadMail('inbox');
   }
-  startRealtimeRefresh();
   pulseTransitionFlare();
   triggerLightFeathers();
   setTimeout(()=>{
@@ -10103,7 +9981,6 @@ if(guestLoginBtn){
 
 function returnToLogin(){
   try{ sessionStorage.setItem(AUTH_RETURN_LOGIN_KEY, '1'); }catch(_){}
-  stopRealtimeRefresh();
   switchBackgroundMode(false);
   if(blogHome){
     blogHome.classList.remove('active');
@@ -10167,7 +10044,6 @@ let registerAvatarData = '';
 let usernameCheckTimer = 0;
 let usernameCheckController = null;
 let usernameCheckState = { value:'', available:null };
-const usernameAvailabilityCache = new Map();
 
 function registerAvatarIconSvg(){
   return `
@@ -10305,13 +10181,6 @@ async function checkUsernameAvailability(name, immediate = false){
     setInputState(registerName, 'error');
     return false;
   }
-  const cached = usernameAvailabilityCache.get(value);
-  if(cached && Date.now() - cached.time < 30000){
-    usernameCheckState = { value, available:cached.available };
-    setLiveMessage(usernameStatus, cached.available ? tr('usernameAvailable') : tr('usernameTaken'), cached.available ? 'ok' : 'error');
-    setInputState(registerName, cached.available ? 'ok' : 'error');
-    return cached.available;
-  }
 
   const runCheck = async ()=>{
     if(usernameCheckController) usernameCheckController.abort();
@@ -10326,7 +10195,6 @@ async function checkUsernameAvailability(name, immediate = false){
       if(registerName.value.trim() !== value) return null;
       if(!response.ok) throw new Error(data.error || '用户名检查失败');
       usernameCheckState = { value, available:!!data.available };
-      usernameAvailabilityCache.set(value, { available:!!data.available, time:Date.now() });
       if(data.available){
         setLiveMessage(usernameStatus, tr('usernameAvailable'), 'ok');
         setInputState(registerName, 'ok');
@@ -10346,7 +10214,7 @@ async function checkUsernameAvailability(name, immediate = false){
 
   if(immediate) return runCheck();
   return new Promise(resolve=>{
-    usernameCheckTimer = setTimeout(()=>resolve(runCheck()), 180);
+    usernameCheckTimer = setTimeout(()=>resolve(runCheck()), 220);
   });
 }
 
@@ -10575,18 +10443,103 @@ if(returnLoginBtn) returnLoginBtn.addEventListener('click', returnToLogin);
     const savedUser = readSavedUser();
     if(!token || !savedUser || savedUser.username === 'guest') return;
     enterDashboard(savedUser);
-    const data = await authRequest('/api/state', { method:'GET', headers:authorizedHeaders() });
+    const data = await authRequest('/api/me', { method:'GET', headers:authorizedHeaders() });
     if(data.user){
-      updateSavedUser(data.user);
+      saveLoginSession(token, data.user);
       renderBlogHomeUser(data.user);
     }
-    if(Array.isArray(data.announcements)) applyAnnouncements(data.announcements);
-    if(Array.isArray(data.articles)) applyPublicArticles(data.articles);
-    if(data.mail) applyMailState(data.mail, currentMailMode);
   }catch(error){
     console.warn('restore login state failed:', error);
   }
 })();
+
+/* ------------------ 实时同步：版本号轮询 ------------------
+ * 每 6 秒拉一次 /api/site-versions，对比版本号，变了就只刷对应模块。
+ * 这样公告 / 文章 / 邮件 / 当前用户资料在其他端被修改后，本端可以快速看到更新。
+ */
+const SITE_VERSION_POLL_MS = 6000;
+let _siteVersions = { announcements:0, articles:0, user:0, mail:0 };
+let _siteVersionTimer = null;
+let _siteVersionInFlight = false;
+
+async function pollSiteVersions(){
+  if(_siteVersionInFlight) return;
+  if(document.hidden) return; // 页面不可见时不轮询，省流量
+  _siteVersionInFlight = true;
+  try{
+    const headers = authorizedHeaders();
+    const data = await authRequest('/api/site-versions', { method:'GET', headers });
+    const next = data && data.versions ? data.versions : {};
+    const previous = _siteVersions;
+
+    if(next.announcements && next.announcements !== previous.announcements){
+      try{ await loadAnnouncements(); }catch(_){ }
+    }
+    if(next.articles && next.articles !== previous.articles){
+      try{ await loadPublicArticles(); }catch(_){ }
+    }
+    if(next.mail && next.mail !== previous.mail && getAuthToken()){
+      try{
+        const fresh = await authRequest('/api/mail', { method:'GET', headers:authorizedHeaders() });
+        mailState = { inbox:fresh.inbox || [], sent:fresh.sent || [] };
+        if(typeof updateToolStats === 'function') updateToolStats();
+        if(typeof updateMailBadge === 'function') updateMailBadge();
+        if(typeof renderMailList === 'function'){
+          const mode = (typeof currentMailMode === 'string' && currentMailMode !== 'compose') ? currentMailMode : 'inbox';
+          renderMailList(mode === 'draft' ? 'draft' : mode);
+        }
+      }catch(_){ }
+    }
+    if(next.user && next.user !== previous.user && getAuthToken()){
+      try{
+        const me = await authRequest('/api/me', { method:'GET', headers:authorizedHeaders() });
+        if(me && me.user){
+          const token = getAuthToken();
+          saveLoginSession(token, me.user);
+          if(typeof renderBlogHomeUser === 'function') renderBlogHomeUser(me.user);
+        }
+      }catch(_){ }
+    }
+
+    _siteVersions = {
+      announcements: next.announcements || previous.announcements || 0,
+      articles: next.articles || previous.articles || 0,
+      user: next.user || previous.user || 0,
+      mail: next.mail || previous.mail || 0
+    };
+  }catch(error){
+    // 静默失败，下个周期会再试
+  }finally{
+    _siteVersionInFlight = false;
+  }
+}
+
+function startSiteVersionPoll(){
+  if(_siteVersionTimer) return;
+  // 第一次先静默拉一次拿到基准版本号，避免首跑就刷一次全量
+  (async ()=>{
+    try{
+      const data = await authRequest('/api/site-versions', { method:'GET', headers:authorizedHeaders() });
+      if(data && data.versions){
+        _siteVersions = {
+          announcements: data.versions.announcements || 0,
+          articles: data.versions.articles || 0,
+          user: data.versions.user || 0,
+          mail: data.versions.mail || 0
+        };
+      }
+    }catch(_){ }
+  })();
+  _siteVersionTimer = setInterval(pollSiteVersions, SITE_VERSION_POLL_MS);
+  // 切换可见时立刻校对一次
+  document.addEventListener('visibilitychange', ()=>{
+    if(!document.hidden) pollSiteVersions();
+  });
+  // 重新联网时校对一次
+  window.addEventListener('online', pollSiteVersions);
+}
+
+startSiteVersionPoll();
 </script>
 </body>
 </html>
