@@ -1,4 +1,5 @@
-import { json, isValidUsername, getUser, getRequestUrl } from './_lib/auth.js';
+import { json, isValidUsername, userExistsFast, getRequestUrl } from './_lib/auth.js';
+import { CACHE_HEADERS } from './_lib/db.js';
 
 export async function onRequestGet(context){
   try{
@@ -13,11 +14,11 @@ export async function onRequestGet(context){
       }, 400);
     }
 
-    const user = await getUser(username);
+    const exists = await userExistsFast(username);
     return json({
       ok:true,
-      available:!user
-    });
+      available:!exists
+    }, 200, CACHE_HEADERS.noStore);
   }catch(error){
     console.error('check-username error:', error);
     return json({ error:'用户名检查失败，请稍后再试。' }, 500);

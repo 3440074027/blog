@@ -7527,6 +7527,12 @@ const AUTH_TOKEN_KEY = 'ans_blog_auth_token';
 const AUTH_USER_KEY = 'ans_blog_auth_user';
 const AUTH_RETURN_LOGIN_KEY = 'ans_blog_return_login';
 const AUTH_API_BASE = (window.AUTH_API_BASE || window.PROFILE_API_BASE || '').replace(/\/$/, '');
+const REALTIME_REFRESH_MS = 5000;
+let realtimeRefreshTimer = 0;
+let realtimeRefreshRunning = false;
+let lastAnnouncementsSnapshot = '';
+let lastArticlesSnapshot = '';
+let lastMailSnapshot = '';
 
 if(mailComposePanel && mailCard && mailComposePanel.parentElement !== mailCard){
   mailCard.appendChild(mailComposePanel);
@@ -7569,6 +7575,13 @@ function saveLoginSession(token, user){
     sessionStorage.setItem(AUTH_TOKEN_KEY, token);
     sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
     sessionStorage.removeItem(AUTH_RETURN_LOGIN_KEY);
+  }catch(_){}
+}
+
+function updateSavedUser(user){
+  if(!user) return;
+  try{
+    sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
   }catch(_){}
 }
 
@@ -7976,12 +7989,28 @@ function requireRealUser(actionText = '使用文章功能'){
 async function loadPublicArticles(){
   try{
     const data = await authRequest('/api/articles', { method:'GET' });
-    publicArticles = Array.isArray(data.articles) ? data.articles : [];
-    renderArticles();
-    updateToolStats();
+    applyPublicArticles(Array.isArray(data.articles) ? data.articles : []);
   }catch(error){
     console.error('load articles error:', error);
   }
+}
+
+function applyPublicArticles(nextArticles = []){
+  const snapshot = JSON.stringify(nextArticles.map(item=>({
+    id:item.id,
+    title:item.title,
+    author:item.author,
+    updatedAt:item.updatedAt,
+    createdAt:item.createdAt,
+    thumb:item.thumb,
+    summary:item.summary
+  })));
+  if(snapshot === lastArticlesSnapshot) return false;
+  lastArticlesSnapshot = snapshot;
+  publicArticles = Array.isArray(nextArticles) ? nextArticles : [];
+  renderArticles();
+  updateToolStats();
+  return true;
 }
 
 function setArticleCategory(value){
@@ -8415,14 +8444,23 @@ function showNotice(index){
 async function loadAnnouncements(){
   try{
     const data = await authRequest('/api/announcements', { method:'GET' });
-    currentAnnouncements = Array.isArray(data.announcements) && data.announcements.length ? data.announcements : DEFAULT_ANNOUNCEMENTS.slice();
+    applyAnnouncements(Array.isArray(data.announcements) && data.announcements.length ? data.announcements : DEFAULT_ANNOUNCEMENTS.slice(), true);
   }catch(_){
-    currentAnnouncements = DEFAULT_ANNOUNCEMENTS.slice();
+    applyAnnouncements(DEFAULT_ANNOUNCEMENTS.slice(), true);
   }
+}
+
+function applyAnnouncements(items, force = false){
+  const next = Array.isArray(items) && items.length ? items : DEFAULT_ANNOUNCEMENTS.slice();
+  const snapshot = JSON.stringify(next.map(item=>({ id:item.id, title:item.title, body:item.body, updatedAt:item.updatedAt, image:item.image })));
+  if(!force && snapshot === lastAnnouncementsSnapshot) return false;
+  lastAnnouncementsSnapshot = snapshot;
+  currentAnnouncements = next;
   noticeCurrent = Math.min(noticeCurrent, currentAnnouncements.length - 1);
   renderNoticeSlides();
   renderNoticeDots();
   showNotice(noticeCurrent);
+  return true;
 }
 
 function openNoticeEditor(){
@@ -8901,13 +8939,28 @@ async function loadMail(mode = 'inbox'){
   renderMailList(mode);
   try{
     const data = await authRequest('/api/mail', { method:'GET', headers:authorizedHeaders() });
-    mailState = { inbox:data.inbox || [], sent:data.sent || [] };
-    updateToolStats();
-    updateMailBadge();
-    renderMailList(mode);
+    applyMailState({ inbox:data.inbox || [], sent:data.sent || [] }, mode, true);
   }catch(error){
     showLoginToast(error.message || '读取邮件失败。', 'error', '邮件错误');
   }
+}
+
+function applyMailState(nextMail = {}, mode = currentMailMode, force = false){
+  const nextState = {
+    inbox:Array.isArray(nextMail.inbox) ? nextMail.inbox : [],
+    sent:Array.isArray(nextMail.sent) ? nextMail.sent : []
+  };
+  const snapshot = JSON.stringify({
+    inbox:nextState.inbox.map(item=>({ id:item.id, read:item.read, updatedAt:item.updatedAt, createdAt:item.createdAt, subject:item.subject })),
+    sent:nextState.sent.map(item=>({ id:item.id, createdAt:item.createdAt, subject:item.subject }))
+  });
+  if(!force && snapshot === lastMailSnapshot) return false;
+  lastMailSnapshot = snapshot;
+  mailState = nextState;
+  updateToolStats();
+  updateMailBadge();
+  if(mode !== 'compose') renderMailList(mode === 'draft' ? 'draft' : mode);
+  return true;
 }
 
 function loadDrafts(){
@@ -9620,6 +9673,48 @@ function switchBackgroundMode(toHome){
   }, 1400);
 }
 
+async function refreshRealtimeState(){
+  if(realtimeRefreshRunning) return;
+  if(!blogHome?.classList.contains('active')) return;
+  realtimeRefreshRunning = true;
+  try{
+    const data = await authRequest('/api/state', {
+      method:'GET',
+      headers:authorizedHeaders()
+    });
+    if(data.user){
+      updateSavedUser(data.user);
+      renderBlogHomeUser(data.user);
+    }
+    if(Array.isArray(data.announcements)) applyAnnouncements(data.announcements);
+    if(Array.isArray(data.articles)) applyPublicArticles(data.articles);
+    if(data.mail && getAuthToken() && readSavedUser()?.username !== 'guest'){
+      applyMailState(data.mail, currentMailMode);
+    }
+  }catch(error){
+    console.warn('realtime refresh failed:', error);
+  }finally{
+    realtimeRefreshRunning = false;
+  }
+}
+
+function startRealtimeRefresh(){
+  clearInterval(realtimeRefreshTimer);
+  refreshRealtimeState();
+  realtimeRefreshTimer = setInterval(refreshRealtimeState, REALTIME_REFRESH_MS);
+}
+
+function stopRealtimeRefresh(){
+  clearInterval(realtimeRefreshTimer);
+  realtimeRefreshTimer = 0;
+  realtimeRefreshRunning = false;
+}
+
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden) stopRealtimeRefresh();
+  else if(blogHome?.classList.contains('active')) startRealtimeRefresh();
+});
+
 function enterDashboard(userLike){
   renderBlogHomeUser(userLike);
   switchBackgroundMode(true);
@@ -9637,6 +9732,7 @@ function enterDashboard(userLike){
   if(getAuthToken() && readSavedUser()?.username !== 'guest'){
     loadMail('inbox');
   }
+  startRealtimeRefresh();
   pulseTransitionFlare();
   triggerLightFeathers();
   setTimeout(()=>{
@@ -9981,6 +10077,7 @@ if(guestLoginBtn){
 
 function returnToLogin(){
   try{ sessionStorage.setItem(AUTH_RETURN_LOGIN_KEY, '1'); }catch(_){}
+  stopRealtimeRefresh();
   switchBackgroundMode(false);
   if(blogHome){
     blogHome.classList.remove('active');
@@ -10044,6 +10141,7 @@ let registerAvatarData = '';
 let usernameCheckTimer = 0;
 let usernameCheckController = null;
 let usernameCheckState = { value:'', available:null };
+const usernameAvailabilityCache = new Map();
 
 function registerAvatarIconSvg(){
   return `
@@ -10181,6 +10279,13 @@ async function checkUsernameAvailability(name, immediate = false){
     setInputState(registerName, 'error');
     return false;
   }
+  const cached = usernameAvailabilityCache.get(value);
+  if(cached && Date.now() - cached.time < 30000){
+    usernameCheckState = { value, available:cached.available };
+    setLiveMessage(usernameStatus, cached.available ? tr('usernameAvailable') : tr('usernameTaken'), cached.available ? 'ok' : 'error');
+    setInputState(registerName, cached.available ? 'ok' : 'error');
+    return cached.available;
+  }
 
   const runCheck = async ()=>{
     if(usernameCheckController) usernameCheckController.abort();
@@ -10195,6 +10300,7 @@ async function checkUsernameAvailability(name, immediate = false){
       if(registerName.value.trim() !== value) return null;
       if(!response.ok) throw new Error(data.error || '用户名检查失败');
       usernameCheckState = { value, available:!!data.available };
+      usernameAvailabilityCache.set(value, { available:!!data.available, time:Date.now() });
       if(data.available){
         setLiveMessage(usernameStatus, tr('usernameAvailable'), 'ok');
         setInputState(registerName, 'ok');
@@ -10214,7 +10320,7 @@ async function checkUsernameAvailability(name, immediate = false){
 
   if(immediate) return runCheck();
   return new Promise(resolve=>{
-    usernameCheckTimer = setTimeout(()=>resolve(runCheck()), 420);
+    usernameCheckTimer = setTimeout(()=>resolve(runCheck()), 180);
   });
 }
 
@@ -10443,11 +10549,14 @@ if(returnLoginBtn) returnLoginBtn.addEventListener('click', returnToLogin);
     const savedUser = readSavedUser();
     if(!token || !savedUser || savedUser.username === 'guest') return;
     enterDashboard(savedUser);
-    const data = await authRequest('/api/me', { method:'GET', headers:authorizedHeaders() });
+    const data = await authRequest('/api/state', { method:'GET', headers:authorizedHeaders() });
     if(data.user){
-      saveLoginSession(token, data.user);
+      updateSavedUser(data.user);
       renderBlogHomeUser(data.user);
     }
+    if(Array.isArray(data.announcements)) applyAnnouncements(data.announcements);
+    if(Array.isArray(data.articles)) applyPublicArticles(data.articles);
+    if(data.mail) applyMailState(data.mail, currentMailMode);
   }catch(error){
     console.warn('restore login state failed:', error);
   }

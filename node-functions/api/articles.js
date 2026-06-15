@@ -6,10 +6,7 @@ import {
   redis,
   nowIso
 } from './_lib/auth.js';
-
-const ARTICLE_INDEX_KEY = 'site:article-index:v2';
-const ARTICLE_KEY_PREFIX = 'site:article:';
-const LEGACY_ARTICLES_KEY = 'site:articles';
+import { DB_KEYS, CACHE_HEADERS } from './_lib/db.js';
 
 function cleanHtml(html){
   return String(html || '')
@@ -77,16 +74,16 @@ function toArticleMeta(article){
 }
 
 async function readArticleIndex(){
-  const index = await redis.get(ARTICLE_INDEX_KEY);
+  const index = await redis.get(DB_KEYS.articles.index);
   if(Array.isArray(index) && index.length){
     return index.map(item=>toArticleMeta(sanitizeArticle(item, item.author))).filter(item=>item.author && item.id);
   }
   try{
-    const legacyArticles = await redis.get(LEGACY_ARTICLES_KEY);
+    const legacyArticles = await redis.get(DB_KEYS.articles.legacyList);
     if(Array.isArray(legacyArticles) && legacyArticles.length){
       const migrated = legacyArticles.map(article=>sanitizeArticle(article, article.author)).filter(article=>article.author && article.id);
       for(const article of migrated.slice(0, 200)){
-        await redis.set(`${ARTICLE_KEY_PREFIX}${article.id}`, article);
+        await redis.set(DB_KEYS.articles.item(article.id), article);
       }
       const meta = migrated.map(toArticleMeta);
       await writeArticleIndex(meta);
@@ -99,16 +96,16 @@ async function readArticleIndex(){
 }
 
 async function writeArticleIndex(index){
-  await redis.set(ARTICLE_INDEX_KEY, index.slice(0, 1000).map(toArticleMeta));
+  await redis.set(DB_KEYS.articles.index, index.slice(0, 1000).map(toArticleMeta));
 }
 
 async function getArticle(id){
-  const article = await redis.get(`${ARTICLE_KEY_PREFIX}${id}`);
+  const article = await redis.get(DB_KEYS.articles.item(id));
   return article ? sanitizeArticle(article, article.author) : null;
 }
 
 async function saveArticle(article){
-  await redis.set(`${ARTICLE_KEY_PREFIX}${article.id}`, article);
+  await redis.set(DB_KEYS.articles.item(article.id), article);
   const index = await readArticleIndex();
   const existing = index.findIndex(item=>item.id === article.id);
   const meta = toArticleMeta(article);
@@ -128,7 +125,7 @@ export async function onRequestGet(context){
       return json({ ok:true, article });
     }
     const articles = await readArticleIndex();
-    return json({ ok:true, articles:articles.sort((a, b)=>String(b.createdAt).localeCompare(String(a.createdAt))) });
+    return json({ ok:true, articles:articles.sort((a, b)=>String(b.createdAt).localeCompare(String(a.createdAt))) }, 200, CACHE_HEADERS.shortJson);
   }catch(error){
     console.error('articles get error:', error);
     return json({ error:'读取文章失败。' }, 500);
@@ -184,7 +181,7 @@ export async function onRequestDelete(context){
     const forbidden = targetArticles.some(article=>article.author !== auth.user.username);
     if(forbidden) return json({ error:'只能删除自己发布的文章。' }, 403);
     for(const article of targetArticles){
-      await redis.del(`${ARTICLE_KEY_PREFIX}${article.id}`);
+      await redis.del(DB_KEYS.articles.item(article.id));
     }
     await writeArticleIndex(index.filter(article=>!ids.includes(article.id)));
     return json({ ok:true, deleted:targetArticles.length });

@@ -7,7 +7,7 @@ import {
   sanitizeAvatar,
   sanitizeUserProfile,
   hashPassword,
-  getUser,
+  userExistsFast,
   setUser,
   createToken,
   publicUser,
@@ -28,7 +28,7 @@ export async function onRequestPost(context){
       return json({ error:'密码长度需为 6 到 64 位，只能使用数字、大小写字母和 !@#$%^&*_-+=.? 这些基础符号。' }, 400);
     }
 
-    const exists = await getUser(username);
+    const exists = await userExistsFast(username);
     if(exists){
       return json({ error:'这个用户名已经被注册。' }, 409);
     }

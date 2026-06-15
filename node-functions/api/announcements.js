@@ -1,6 +1,5 @@
 import { json, readJsonBody, requireUser, isSiteOwner, redis, nowIso } from './_lib/auth.js';
-
-const ANNOUNCEMENTS_KEY = 'site:announcements';
+import { DB_KEYS, CACHE_HEADERS } from './_lib/db.js';
 
 const DEFAULT_ANNOUNCEMENTS = [
   { id:'welcome', kicker:'✨ 星尘公告', title:'欢迎来到你的灵感档案馆', body:'这里会收纳文章、文件、灵感和成长记录。每一次登录，都是和未来的自己重逢。', updatedAt:'2026-06-13', image:'' },
@@ -30,8 +29,8 @@ function sanitizeAnnouncements(input){
 
 export async function onRequestGet(){
   try{
-    const saved = await redis.get(ANNOUNCEMENTS_KEY);
-    return json({ ok:true, announcements:sanitizeAnnouncements(saved || DEFAULT_ANNOUNCEMENTS) });
+    const saved = await redis.get(DB_KEYS.announcements.list);
+    return json({ ok:true, announcements:sanitizeAnnouncements(saved || DEFAULT_ANNOUNCEMENTS) }, 200, CACHE_HEADERS.shortJson);
   }catch(error){
     console.error('announcements get error:', error);
     return json({ ok:true, announcements:DEFAULT_ANNOUNCEMENTS, fallback:true });
@@ -49,7 +48,7 @@ export async function onRequestPut(context){
   try{
     const body = await readJsonBody(context.request);
     const announcements = sanitizeAnnouncements(body.announcements);
-    await redis.set(ANNOUNCEMENTS_KEY, announcements);
+    await redis.set(DB_KEYS.announcements.list, announcements);
     return json({ ok:true, updatedAt:nowIso(), announcements });
   }catch(error){
     console.error('announcements put error:', error);

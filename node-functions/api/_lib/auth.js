@@ -1,11 +1,9 @@
 import { Redis } from '@upstash/redis';
 import crypto from 'crypto';
+import { DB_KEYS } from './db.js';
 
 export const redis = Redis.fromEnv();
 const AUTH_SECRET = process.env.AUTH_SECRET || 'change-this-auth-secret-please';
-const LEGACY_USER_STORE_KEY = 'users';
-const USER_KEY_PREFIX = 'user:';
-const USER_INDEX_KEY = 'site:user-index';
 export const SITE_OWNER_USERNAME = 'An';
 
 export const defaultUserProfile = {
@@ -57,16 +55,16 @@ export function nowIso(){
 }
 
 async function getUsers(){
-  const users = await redis.get(LEGACY_USER_STORE_KEY);
+  const users = await redis.get(DB_KEYS.users.legacyStore);
   return users && typeof users === 'object' && !Array.isArray(users) ? users : {};
 }
 
 async function setLegacyUsers(users){
-  await redis.set(LEGACY_USER_STORE_KEY, users);
+  await redis.set(DB_KEYS.users.legacyStore, users);
 }
 
 export async function getUser(username){
-  const user = await redis.get(`${USER_KEY_PREFIX}${username}`);
+  const user = await redis.get(DB_KEYS.users.item(username));
   if(user) return user;
 
   const legacyUsers = await getUsers();
@@ -86,7 +84,7 @@ export function isSiteOwner(userOrUsername){
 export async function listUsers(){
   const users = new Map();
   try{
-    const indexedUsernames = await redis.smembers(USER_INDEX_KEY);
+    const indexedUsernames = await redis.smembers(DB_KEYS.users.index);
     for(const username of indexedUsernames.slice(0, 500)){
       const user = await getUser(username);
       if(user && user.username) users.set(user.username, user);
@@ -95,7 +93,7 @@ export async function listUsers(){
     console.error('list indexed users error:', error);
   }
   try{
-    const keys = await redis.keys(`${USER_KEY_PREFIX}*`);
+    const keys = await redis.keys(`${DB_KEYS.users.prefix}*`);
     for(const key of keys.slice(0, 300)){
       const user = await redis.get(key);
       if(user && user.username) users.set(user.username, user);
@@ -111,18 +109,18 @@ export async function listUsers(){
 }
 
 export async function setUser(user){
-  await redis.set(`${USER_KEY_PREFIX}${user.username}`, user);
+  await redis.set(DB_KEYS.users.item(user.username), user);
   try{
-    await redis.sadd(USER_INDEX_KEY, user.username);
+    await redis.sadd(DB_KEYS.users.index, user.username);
   }catch(error){
     console.error('user index add error:', error);
   }
 }
 
 export async function deleteUser(username){
-  await redis.del(`${USER_KEY_PREFIX}${username}`);
+  await redis.del(DB_KEYS.users.item(username));
   try{
-    await redis.srem(USER_INDEX_KEY, username);
+    await redis.srem(DB_KEYS.users.index, username);
   }catch(error){
     console.error('user index remove error:', error);
   }
@@ -140,16 +138,16 @@ export async function renameUser(user, nextUsername){
     user.profile.nickname = nextUsername;
   }
   user.updatedAt = nowIso();
-  await redis.set(`${USER_KEY_PREFIX}${nextUsername}`, user);
+  await redis.set(DB_KEYS.users.item(nextUsername), user);
   try{
-    await redis.sadd(USER_INDEX_KEY, nextUsername);
+    await redis.sadd(DB_KEYS.users.index, nextUsername);
   }catch(error){
     console.error('user index rename add error:', error);
   }
   if(previousUsername !== nextUsername){
-    await redis.del(`${USER_KEY_PREFIX}${previousUsername}`);
+    await redis.del(DB_KEYS.users.item(previousUsername));
     try{
-      await redis.srem(USER_INDEX_KEY, previousUsername);
+      await redis.srem(DB_KEYS.users.index, previousUsername);
     }catch(error){
       console.error('user index rename remove error:', error);
     }
@@ -280,4 +278,20 @@ export async function requireUser(request){
   const user = await getUser(username);
   if(!user) return { error:'账号不存在，请重新登录。', status:401 };
   return { user };
+}
+
+export async function userExistsFast(username){
+  try{
+    const exists = await redis.exists(DB_KEYS.users.item(username));
+    if(Number(exists) > 0) return true;
+  }catch(error){
+    console.error('fast user exists key error:', error);
+  }
+  try{
+    const indexed = await redis.sismember(DB_KEYS.users.index, username);
+    if(indexed === 1 || indexed === true) return true;
+  }catch(error){
+    console.error('fast user exists index error:', error);
+  }
+  return Boolean(await getUser(username));
 }

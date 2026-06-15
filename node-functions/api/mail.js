@@ -9,10 +9,8 @@ import {
   isSiteOwner,
   SITE_OWNER_USERNAME
 } from './_lib/auth.js';
+import { DB_KEYS, CACHE_HEADERS } from './_lib/db.js';
 
-const inboxKey = username => `mail:inbox:${username}`;
-const sentKey = username => `mail:sent:${username}`;
-const mailboxKey = username => `mail:box:${username}`;
 const MAIL_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
@@ -88,19 +86,19 @@ async function prependMailboxItem(key, item){
 }
 
 async function readUserMailbox(username){
-  const box = await redis.get(mailboxKey(username));
+  const box = await redis.get(DB_KEYS.mail.box(username));
   let inbox = Array.isArray(box?.inbox) ? box.inbox.map(sanitizeMail).filter(item=>!isExpired(item)) : [];
   let sent = Array.isArray(box?.sent) ? box.sent.map(sanitizeMail).filter(item=>!isExpired(item)) : [];
   if(!box){
-    inbox = await readMailbox(inboxKey(username));
-    sent = await readMailbox(sentKey(username));
+    inbox = await readMailbox(DB_KEYS.mail.legacyInbox(username));
+    sent = await readMailbox(DB_KEYS.mail.legacySent(username));
     await writeUserMailbox(username, { inbox, sent });
   }
   return { inbox, sent };
 }
 
 async function writeUserMailbox(username, box){
-  await redis.set(mailboxKey(username), {
+  await redis.set(DB_KEYS.mail.box(username), {
     inbox:(box.inbox || []).map(sanitizeMail).filter(item=>!isExpired(item)).slice(0, 100),
     sent:(box.sent || []).map(sanitizeMail).filter(item=>!isExpired(item)).slice(0, 100),
     updatedAt:nowIso()
@@ -120,7 +118,7 @@ export async function onRequestGet(context){
   }
   try{
     const { inbox, sent } = await readUserMailbox(auth.user.username);
-    return json({ ok:true, inbox, sent });
+    return json({ ok:true, inbox, sent }, 200, CACHE_HEADERS.noStore);
   }catch(error){
     console.error('mail get error:', error);
     return json({ error:'读取邮件失败。' }, 500);
